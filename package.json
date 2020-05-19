@@ -1,0 +1,26 @@
+{
+  "name": "booking_experts_api_v3",
+  "version": "1.0.0",
+  "description": "This project creates the documentation of the Booking Experts Open Api 3 specification.",
+  "main": "oas3_to_markdown.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "dependencies": {
+    "widdershins": "^4.0.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bookingexperts/bookingexperts_api_v3.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/bookingexperts/bookingexperts_api_v3/issues"
+  },
+  "homepage": "https://github.com/bookingexperts/bookingexperts_api_v3#readme"
+}
