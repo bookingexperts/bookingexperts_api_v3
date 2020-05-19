@@ -1,0 +1,131 @@
+@font-face {
+  font-family: "Avenir Next";
+  src: url("AvenirNext-Regular.woff2") format("woff2"), url("AvenirNext-Regular.woff") format("woff"), url("AvenirNext-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Avenir Next";
+  src: url("AvenirNext-Italic.woff2") format("woff2"), url("AvenirNext-Italic.woff") format("woff"), url("AvenirNext-Italic.ttf") format("truetype");
+  font-weight: 400;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "Avenir Next";
+  src: url("AvenirNext-Demi.woff2") format("woff2"), url("AvenirNext-Demi.woff") format("woff"), url("AvenirNext-Demi.ttf") format("truetype");
+  font-weight: 600;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Avenir Next";
+  src:url("AvenirNext-Bold.woff2") format("woff2"), url("AvenirNext-Bold.woff") format("woff"), url("AvenirNext-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Avenir Next";
+  src: url("AvenirNext-Heavy.woff2") format("woff2"), url("AvenirNext-Heavy.woff") format("woff"), url("AvenirNext-Heavy.ttf") format("truetype");
+  font-weight: 900;
+  font-style: normal;
+}
+
+
+.toc-wrapper {
+  font-size: initial;
+  font-weight: initial;
+
+  .toc-link.active,
+  .toc-link.active-parent {
+    font-weight: 700 !important;
+    background: transparent !important;
+    color: $nav-text !important;
+  }
+
+  .logo {
+    border-bottom: 1px solid $light-silver;
+  }
+
+  ul, li {
+    line-height: inherit;
+  }
+
+  .toc-h2 {
+    font-size: inherit;
+  }
+
+  .toc-footer {
+    li {
+      line-height: initial;
+    }
+  }
+}
+
+#nav-button {
+  span {
+    $side-pad: $main-padding / 2 - $base-size;
+    padding: $side-pad $side-pad $side-pad;
+  }
+}
+
+.page-wrapper {
+  border-left: 1px solid $light-silver;
+}
+
+.lang-selector {
+  font-weight: initial;
+}
+
+.content {
+  &>ul, &>ol {
+    padding-left: $main-padding + $base-size;
+  }
+
+  h1 {
+    font-size: 2rem;
+    border-top: 1px solid $light-silver;
+    border-bottom: 1px solid $light-silver;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+    border-top: 1px solid $light-silver;
+  }
+
+  h3, h4, h5, h6 {
+    font-size: inherit;
+  }
+
+  h3 {
+    font-size: 1.3rem;
+  }
+
+  h4 {
+    font-size: 1.2rem;
+  }
+
+  h5, h6 {
+    font-size: 1.1rem;
+  }
+
+  table {
+    code {
+      white-space: nowrap;
+    }
+  }
+
+  p, li, dt, dd {
+    line-height: inherit;
+  }
+
+  aside {
+    line-height: initial;
+  }
+
+  pre {
+    white-space: pre-wrap;
+  }
+}
