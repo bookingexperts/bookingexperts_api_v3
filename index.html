@@ -233,27 +233,33 @@
         </div>
       <ul id="toc" class="toc-list-h1">
           <li>
-            <a href="#booking-experts-contentapi" class="toc-h1 toc-link" data-title="Booking Experts ContentAPI v1.0.0">Booking Experts ContentAPI v1.0.0</a>
+            <a href="#overview" class="toc-h1 toc-link" data-title="Overview">Overview</a>
               <ul class="toc-list-h2">
-                  <li>
-                    <a href="#introduction" class="toc-h2 toc-link" data-title="Introduction">Introduction</a>
-                  </li>
                   <li>
                     <a href="#standards" class="toc-h2 toc-link" data-title="Standards">Standards</a>
                   </li>
                   <li>
-                    <a href="#get-acccess" class="toc-h2 toc-link" data-title="Get acccess">Get acccess</a>
+                    <a href="#responses" class="toc-h2 toc-link" data-title="Responses">Responses</a>
                   </li>
                   <li>
-                    <a href="#basics" class="toc-h2 toc-link" data-title="Basics">Basics</a>
+                    <a href="#throttling" class="toc-h2 toc-link" data-title="Throttling">Throttling</a>
+                  </li>
+                  <li>
+                    <a href="#pagination" class="toc-h2 toc-link" data-title="Pagination">Pagination</a>
+                  </li>
+                  <li>
+                    <a href="#field-sets" class="toc-h2 toc-link" data-title="Field sets">Field sets</a>
+                  </li>
+                  <li>
+                    <a href="#filters" class="toc-h2 toc-link" data-title="Filters">Filters</a>
                   </li>
                   <li>
                     <a href="#use-cases" class="toc-h2 toc-link" data-title="Use cases">Use cases</a>
                   </li>
+                  <li>
+                    <a href="#get-acccess" class="toc-h2 toc-link" data-title="Get acccess">Get acccess</a>
+                  </li>
               </ul>
-          </li>
-          <li>
-            <a href="#authentication" class="toc-h1 toc-link" data-title="Authentication">Authentication</a>
           </li>
           <li>
             <a href="#booking-experts-contentapi-administrations" class="toc-h1 toc-link" data-title="Administrations">Administrations</a>
@@ -495,14 +501,7 @@
     <div class="page-wrapper">
       <div class="dark-box"></div>
       <div class="content">
-        <!-- Generator: Widdershins v4.0.1 -->
-
-<h1 id="booking-experts-contentapi">Booking Experts ContentAPI v1.0.0</h1>
-
-<blockquote>
-<p>Scroll down for code samples, example requests and responses. Select a language for code samples from the tabs above or the mobile navigation menu.</p>
-</blockquote>
-<h2 id='introduction'>Introduction</h2>
+        <h1 id='overview'>Overview</h1>
 <p><strong>DRAFT: this is a draft version and should not be used because this specification will change a lot.</strong></p>
 
 <p>This API is an interface for querying information from and enacting change inside a Booking Experts administration.
@@ -517,26 +516,21 @@ So in case you think that you miss data or API endpoints, please let us know by 
 The API has predictable, resource-oriented URLs, and uses HTTP response codes to indicate API errors.</p>
 
 <p>Documentation is standardized by using the <a href="https://swagger.io/specification/">Open API 3 (OAS3) specification</a>, this allows you to inspect the API using other clients like for example Swagger UI and Postman.
-The specification is hosted here: <code>https://api.webhooks.bookingexperts.nl/v3/oas3.json</code></p>
-<h2 id='get-acccess'>Get acccess</h2>
-<p>First of you need access to at least one Booking Experts organization.
-Inside the administration you can register a new application.</p>
-
-<p>By default this application is only accessible by the administrations of this organization.
-Very handy if you want to make a on the fly integration. But when your app is ready for other organizations to use, you can sign-up for validation to the marketplace.</p>
-<h2 id='basics'>Basics</h2><h3 id='authorization'>Authorization</h3>
-<p>You can authorize on behalf of a user by using OAuth2.
-For on the fly needs you can make use of a simple authentication token but has limited access to the organization and it&#39;s administrations to which is registered.
-If you want other to make use of your app you will need to support OAuth2.</p>
-<h3 id='responses'>Responses</h3><div class="highlight"><pre class="highlight shell tab-shell"><code>curl https://api.bookingexperts.nl/v3/administrations             <span class="nt">-H</span> <span class="s1">'Accept: application/vnd.api+json'</span>             <span class="nt">-H</span> <span class="s1">'Accept-Language: en,nl'</span>             <span class="nt">-H</span> <span class="s1">'X-API-KEY: API_KEY'</span>
+The specification is hosted here: <code>https://api.bookingexperts.nl/v3/oas3.json</code></p>
+<h2 id='responses'>Responses</h2><div class="highlight"><pre class="highlight shell tab-shell"><code>curl <span class="nt">--request</span> GET <span class="se">\</span>
+  <span class="nt">--url</span> https://api.bookingexperts.nl/v3/administrations <span class="se">\</span>
+  <span class="nt">--header</span> <span class="s1">'accept: application/vnd.api+json'</span> <span class="se">\</span>
+  <span class="nt">--header</span> <span class="s1">'accept-language: en,nl'</span> <span class="se">\</span>
+  <span class="nt">--header</span> <span class="s1">'x-api-key: API_KEY'</span>
 </code></pre></div>
 <blockquote>
-<p>Produces the following output</p>
+<p>Might produce the following output</p>
 </blockquote>
 <div class="highlight"><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
   </span><span class="nl">"errors"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
     </span><span class="p">{</span><span class="w">
       </span><span class="nl">"status"</span><span class="p">:</span><span class="w"> </span><span class="mi">401</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"code"</span><span class="p">:</span><span class="w"> </span><span class="s2">"RESOURCE_NOT_FOUND"</span><span class="p">,</span><span class="w">
       </span><span class="nl">"title"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Unauthorized error"</span><span class="p">,</span><span class="w">
       </span><span class="nl">"detail"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Please make sure to set the Authorization HTTP header"</span><span class="w">
     </span><span class="p">}</span><span class="w">
@@ -615,7 +609,7 @@ is passed to allow you to verify that the request was sent by our systems. It us
 <li>No matter which implementation you use, the hash signature starts with sha1=, using the key of your Client Secret and your payload body.</li>
 <li>Using a plain == operator is not advised. A method like secure_compare performs a &quot;constant time&quot; string comparison, which renders it safe from certain timing attacks against regular equality operators.</li>
 </ul>
-<h3 id='throttling'>Throttling</h3>
+<h2 id='throttling'>Throttling</h2>
 <p>Usage of the Booking Experts API is virtually unlimited. However, to prevent fraud and abuse, requests to the API are throttled.
 By default you are allowed to call the API 500 times within a moving window of 15 minutes. Additionally, bursts of 100 calls per minute are allowed within this window.</p>
 
@@ -623,11 +617,29 @@ By default you are allowed to call the API 500 times within a moving window of 1
 If you exceed the limit, the API will respond with a 429 Too many requests response. This response contains a header Retry-After containing the time after which a new calls are allowed.</p>
 
 <p>If your use case requires more lenient rate limits, please contact us at <a href="mailto:connectivity@bookingexperts.nl">connectivity@bookingexperts.nl</a> to request a higher limit.</p>
-<h3 id='pagination'>Pagination</h3>
-<p>@TODO</p>
-<h3 id='field-sets'>Field sets</h3>
-<p>@TODO</p>
-<h3 id='filters'>Filters</h3>
+<h2 id='pagination'>Pagination</h2><div class="highlight"><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"links"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"self"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://api.bookingexperts.nl/v3/administrations/1/reservations?page%5Bnumber%5D=2"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"first"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://api.bookingexperts.nl/v3/administrations/1/reservations?page%5Bnumber%5D=1"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"last"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://api.bookingexperts.nl/v3/administrations/1/reservations?page%5Bnumber%5D=14"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"prev"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://api.bookingexperts.nl/v3/administrations/1/reservations?page%5Bnumber%5D=1"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"next"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://api.bookingexperts.nl/v3/administrations/1/reservations?page%5Bnumber%5D=3"</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+  </span><span class="nl">"data"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="err">...</span><span class="p">]</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div>
+<p>All collection responses include pagination. In the response body you will find a <code>links</code> node that contains links to <code>first</code>, <code>self</code>, <code>next</code>, <code>prev</code>, <code>last</code> pages.
+Most responses have 30 records per page.</p>
+<h2 id='field-sets'>Field sets</h2>
+<p>By default every request returns a quite complete set of fields (attributes and relationships). You can limit or expand this default set however. Per record type you can specify which fields to include. There are 2 ways of using this feature:</p>
+<h3 id='whitelist'>Whitelist</h3><div class="highlight"><pre class="highlight shell tab-shell"><code>curl <span class="nt">--request</span> GET <span class="se">\</span>
+  <span class="nt">--url</span> <span class="s1">'http://api.lvh.me:3000/v3/administrations?fields[administration]=name,description'</span> <span class="se">\</span>
+  <span class="nt">--header</span> <span class="s1">'accept: application/vnd.api+json'</span> <span class="se">\</span>
+  <span class="nt">--header</span> <span class="s1">'accept-language: en,nl'</span> <span class="se">\</span>
+  <span class="nt">--header</span> <span class="s1">'x-api-key: API_KEY'</span> | jsonpp
+</code></pre></div>
+<p>Will return only the name and description fields of every administration.</p>
+<h2 id='filters'>Filters</h2>
 <p>The following attribute filters are available on GET API calls:</p>
 
 <ul>
@@ -675,31 +687,18 @@ When this command is called, you will receive the following (additional) paramet
 <li><code>failure</code> - when the payment failed</li>
 </ul></li>
 </ul>
+<h2 id='get-acccess'>Get acccess</h2>
+<p>First of you need access to at least one Booking Experts organization.
+Inside the administration you can register a new application.</p>
 
-<p>Base URLs:</p>
+<p>By default this application is only accessible by the administrations of this organization.
+Very handy if you want to make a on the fly integration. But when your app is ready for other organizations to use, you can sign-up for validation to the marketplace.</p>
+<h3 id='authentication'>Authentication</h3>
+<p>You can authenticate on by using OAuth2. For on the fly needs you can make use of a simple authentication token but this has limited access to only the organization and it&#39;s administrations to which is registered.</p>
 
-<ul>
-<li><p><a href="https://api.bookingexperts.nl">https://api.bookingexperts.nl</a></p></li>
-<li><p><a href="https://api.staging.bookingexperts.nl">https://api.staging.bookingexperts.nl</a></p></li>
-</ul>
-
-<p>Email: <a href="mailto:connectivity@bookingexperts.nl">Connectivity team</a> Web: <a href="developers.bookingexperts.nl/contact">Connectivity team</a> </p>
-<h1 id='authentication'>Authentication</h1>
-<ul>
-<li><p>API Key (ApiKeyAuth)</p>
-
-<ul>
-<li>Parameter Name: <strong>X-API-KEY</strong>, in: header. </li>
-</ul></li>
-<li><p>oAuth2 authentication. </p>
-
-<ul>
-<li>Flow: authorizationCode</li>
-<li>Authorization URL = <a href="/oauth/authorize">/oauth/authorize</a></li>
-<li>Token URL = <a href="/oauth/token">/oauth/token</a></li>
-</ul></li>
-</ul>
-
+<p>If you want others to make use of your app you will need to support OAuth2.</p>
+<!-- Generator: Widdershins v4.0.1 -->
+<h3 id='authorization-scopes'>Authorization scopes</h3>
 <table><thead>
 <tr>
 <th>Scope</th>
@@ -1158,266 +1157,266 @@ When this command is called, you will receive the following (additional) paramet
 </tr>
 </thead><tbody>
 <tr>
-<td>» data</td>
+<td>— data</td>
 <td>[<a href="#schemaadministration">Administration</a>]</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» id</td>
+<td>—— id</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>ID</td>
 </tr>
 <tr>
-<td>»» type</td>
+<td>—— type</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Type</td>
 </tr>
 <tr>
-<td>»» attributes</td>
+<td>—— attributes</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>Attributes</td>
 </tr>
 <tr>
-<td>»»» name</td>
+<td>——— name</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» phone</td>
+<td>——— phone</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» website</td>
+<td>——— website</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» description</td>
+<td>——— description</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>A description of the administration</td>
 </tr>
 <tr>
-<td>»»»» nl</td>
+<td>———— nl</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» en</td>
+<td>———— en</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» de</td>
+<td>———— de</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» fr</td>
+<td>———— fr</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» da</td>
+<td>———— da</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» cs</td>
+<td>———— cs</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» es</td>
+<td>———— es</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» tr</td>
+<td>———— tr</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» pt</td>
+<td>———— pt</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» it</td>
+<td>———— it</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» surroundings_description</td>
+<td>——— surroundings_description</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>A description of the surroundings</td>
 </tr>
 <tr>
-<td>»»»» nl</td>
+<td>———— nl</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» en</td>
+<td>———— en</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» de</td>
+<td>———— de</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» fr</td>
+<td>———— fr</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» da</td>
+<td>———— da</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» cs</td>
+<td>———— cs</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» es</td>
+<td>———— es</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» tr</td>
+<td>———— tr</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» pt</td>
+<td>———— pt</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» it</td>
+<td>———— it</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» available_locales</td>
+<td>——— available_locales</td>
 <td>[string]</td>
 <td>false</td>
 <td>none</td>
 <td>Enabled locales</td>
 </tr>
 <tr>
-<td>»»» utc_offset</td>
+<td>——— utc_offset</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>The UTC offset of the administration, for example: +01:00</td>
 </tr>
 <tr>
-<td>»» links</td>
+<td>—— links</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>Links</td>
 </tr>
 <tr>
-<td>»»» self</td>
+<td>——— self</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Link to self</td>
 </tr>
 <tr>
-<td>» meta</td>
+<td>— meta</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» pagination</td>
+<td>—— pagination</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» total_records</td>
+<td>——— total_records</td>
 <td>integer</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» page</td>
+<td>——— page</td>
 <td>integer</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» size</td>
+<td>——— size</td>
 <td>integer</td>
 <td>false</td>
 <td>none</td>
@@ -1437,60 +1436,55 @@ When this command is called, you will receive the following (additional) paramet
 </tr>
 </thead><tbody>
 <tr>
-<td>» errors</td>
+<td>— errors</td>
 <td>[object]</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» status</td>
+<td>—— status</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>HTTP response code</td>
 </tr>
 <tr>
-<td>»» code</td>
+<td>—— code</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Internal error code</td>
 </tr>
 <tr>
-<td>»» title</td>
+<td>—— title</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Error title</td>
 </tr>
 <tr>
-<td>»» detail</td>
+<td>—— detail</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Error details</td>
 </tr>
 <tr>
-<td>»» source</td>
+<td>—— source</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» pointer</td>
+<td>——— pointer</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Pointer to error in resource</td>
 </tr>
 </tbody></table>
-
-<aside class="warning">
-To perform this operation, you must be authenticated by means of one of the following methods:
-ApiKeyAuth, OAuth2
-</aside>
 <h2 id='get-administration'>GET administration</h2>
 <p><a id="opIdAdministrations_Show"></a></p>
 
@@ -1793,231 +1787,231 @@ ApiKeyAuth, OAuth2
 </tr>
 </thead><tbody>
 <tr>
-<td>» data</td>
+<td>— data</td>
 <td><a href="#schemaadministration">Administration</a></td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» id</td>
+<td>—— id</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>ID</td>
 </tr>
 <tr>
-<td>»» type</td>
+<td>—— type</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Type</td>
 </tr>
 <tr>
-<td>»» attributes</td>
+<td>—— attributes</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>Attributes</td>
 </tr>
 <tr>
-<td>»»» name</td>
+<td>——— name</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» phone</td>
+<td>——— phone</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» website</td>
+<td>——— website</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» description</td>
+<td>——— description</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>A description of the administration</td>
 </tr>
 <tr>
-<td>»»»» nl</td>
+<td>———— nl</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» en</td>
+<td>———— en</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» de</td>
+<td>———— de</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» fr</td>
+<td>———— fr</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» da</td>
+<td>———— da</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» cs</td>
+<td>———— cs</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» es</td>
+<td>———— es</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» tr</td>
+<td>———— tr</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» pt</td>
+<td>———— pt</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» it</td>
+<td>———— it</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» surroundings_description</td>
+<td>——— surroundings_description</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>A description of the surroundings</td>
 </tr>
 <tr>
-<td>»»»» nl</td>
+<td>———— nl</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» en</td>
+<td>———— en</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» de</td>
+<td>———— de</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» fr</td>
+<td>———— fr</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» da</td>
+<td>———— da</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» cs</td>
+<td>———— cs</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» es</td>
+<td>———— es</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» tr</td>
+<td>———— tr</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» pt</td>
+<td>———— pt</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» it</td>
+<td>———— it</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» available_locales</td>
+<td>——— available_locales</td>
 <td>[string]</td>
 <td>false</td>
 <td>none</td>
 <td>Enabled locales</td>
 </tr>
 <tr>
-<td>»»» utc_offset</td>
+<td>——— utc_offset</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>The UTC offset of the administration, for example: +01:00</td>
 </tr>
 <tr>
-<td>»» links</td>
+<td>—— links</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>Links</td>
 </tr>
 <tr>
-<td>»»» self</td>
+<td>——— self</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
@@ -2037,60 +2031,55 @@ ApiKeyAuth, OAuth2
 </tr>
 </thead><tbody>
 <tr>
-<td>» errors</td>
+<td>— errors</td>
 <td>[object]</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» status</td>
+<td>—— status</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>HTTP response code</td>
 </tr>
 <tr>
-<td>»» code</td>
+<td>—— code</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Internal error code</td>
 </tr>
 <tr>
-<td>»» title</td>
+<td>—— title</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Error title</td>
 </tr>
 <tr>
-<td>»» detail</td>
+<td>—— detail</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Error details</td>
 </tr>
 <tr>
-<td>»» source</td>
+<td>—— source</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» pointer</td>
+<td>——— pointer</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Pointer to error in resource</td>
 </tr>
 </tbody></table>
-
-<aside class="warning">
-To perform this operation, you must be authenticated by means of one of the following methods:
-ApiKeyAuth, OAuth2
-</aside>
 
 <h1 id="booking-experts-contentapi-application-commands">Application Commands</h1>
 
@@ -2372,8 +2361,8 @@ ApiKeyAuth, OAuth2
         </span><span class="nl">"http_method"</span><span class="p">:</span><span class="w"> </span><span class="s2">"post"</span><span class="p">,</span><span class="w">
         </span><span class="nl">"target_url"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://myapp.lvh.me:3000/gate_cards"</span><span class="p">,</span><span class="w">
         </span><span class="nl">"enabled_script"</span><span class="p">:</span><span class="w"> </span><span class="s2">"reservation.dig(:data, :attributes, :state) == 'confirmed'"</span><span class="p">,</span><span class="w">
-        </span><span class="nl">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2020-06-09T07:58:26Z"</span><span class="p">,</span><span class="w">
-        </span><span class="nl">"updated_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2020-06-09T07:58:26Z"</span><span class="w">
+        </span><span class="nl">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2020-06-09T14:49:30Z"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"updated_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2020-06-09T14:49:30Z"</span><span class="w">
       </span><span class="p">},</span><span class="w">
       </span><span class="nl">"links"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
         </span><span class="nl">"self"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="w">
@@ -2427,280 +2416,280 @@ ApiKeyAuth, OAuth2
 </tr>
 </thead><tbody>
 <tr>
-<td>» data</td>
+<td>— data</td>
 <td>[<a href="#schemaapplicationcommand">ApplicationCommand</a>]</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» id</td>
+<td>—— id</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>ID</td>
 </tr>
 <tr>
-<td>»» type</td>
+<td>—— type</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Type</td>
 </tr>
 <tr>
-<td>»» attributes</td>
+<td>—— attributes</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>Attributes</td>
 </tr>
 <tr>
-<td>»»» identifier</td>
+<td>——— identifier</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» name</td>
+<td>——— name</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» nl</td>
+<td>———— nl</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» en</td>
+<td>———— en</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» de</td>
+<td>———— de</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» fr</td>
+<td>———— fr</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» da</td>
+<td>———— da</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» cs</td>
+<td>———— cs</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» es</td>
+<td>———— es</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» tr</td>
+<td>———— tr</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» pt</td>
+<td>———— pt</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» it</td>
+<td>———— it</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» description</td>
+<td>——— description</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» nl</td>
+<td>———— nl</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» en</td>
+<td>———— en</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» de</td>
+<td>———— de</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» fr</td>
+<td>———— fr</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» da</td>
+<td>———— da</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» cs</td>
+<td>———— cs</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» es</td>
+<td>———— es</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» tr</td>
+<td>———— tr</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» pt</td>
+<td>———— pt</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» it</td>
+<td>———— it</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» context_model</td>
+<td>——— context_model</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>One of: invoice, reservation, subscription</td>
 </tr>
 <tr>
-<td>»»» http_method</td>
+<td>——— http_method</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>One of: get, post, put, patch, delete</td>
 </tr>
 <tr>
-<td>»»» target_url</td>
+<td>——— target_url</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>This URL will be called by us using the <code>http_method</code> specified</td>
 </tr>
 <tr>
-<td>»»» enabled_script</td>
+<td>——— enabled_script</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>When set, this script will be evaluated to determine whether an action should be available to a user.<br>The last line of your script will be the result of the script. When the result is truthy, the command will be enabled.<br>The following variables will be available to you:<br><br>* The JSON serialized context model as defined in <code>context_model</code>. For example: <code>reservation</code>. Conforms to the documented schema.<br>* <code>current_user</code> - The JSON serialized current user (when present). Conforms to the documented User schema.<br><br>The script language <strong>MUST</strong> be Ruby. The list of method calls you are allowed to make is limited to the following:<br><br>* Allowed methods on any object:<br><code>==</code> <code>!=</code> <code>!</code> <code>present?</code> <code>blank?</code><br>* Allowed methods on hash objects:<br><code>[]</code> <code>dig</code><br>* Allowed calculation methods:<br><code>+</code> <code>-</code> <code>*</code> <code>/</code></td>
 </tr>
 <tr>
-<td>»»» created_at</td>
+<td>——— created_at</td>
 <td>string(date-time)</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» updated_at</td>
+<td>——— updated_at</td>
 <td>string(date-time)</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» links</td>
+<td>—— links</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>Links</td>
 </tr>
 <tr>
-<td>»»» self</td>
+<td>——— self</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Link to self</td>
 </tr>
 <tr>
-<td>» meta</td>
+<td>— meta</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» pagination</td>
+<td>—— pagination</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» total_records</td>
+<td>——— total_records</td>
 <td>integer</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» page</td>
+<td>——— page</td>
 <td>integer</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» size</td>
+<td>——— size</td>
 <td>integer</td>
 <td>false</td>
 <td>none</td>
@@ -2720,60 +2709,55 @@ ApiKeyAuth, OAuth2
 </tr>
 </thead><tbody>
 <tr>
-<td>» errors</td>
+<td>— errors</td>
 <td>[object]</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» status</td>
+<td>—— status</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>HTTP response code</td>
 </tr>
 <tr>
-<td>»» code</td>
+<td>—— code</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Internal error code</td>
 </tr>
 <tr>
-<td>»» title</td>
+<td>—— title</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Error title</td>
 </tr>
 <tr>
-<td>»» detail</td>
+<td>—— detail</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Error details</td>
 </tr>
 <tr>
-<td>»» source</td>
+<td>—— source</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» pointer</td>
+<td>——— pointer</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Pointer to error in resource</td>
 </tr>
 </tbody></table>
-
-<aside class="warning">
-To perform this operation, you must be authenticated by means of one of the following methods:
-ApiKeyAuth, OAuth2
-</aside>
 <h2 id='post-application-command'>POST application command</h2>
 <p><a id="opIdApplication Commands_Create"></a></p>
 
@@ -2989,210 +2973,210 @@ ApiKeyAuth, OAuth2
 <td>none</td>
 </tr>
 <tr>
-<td>» data</td>
+<td>— data</td>
 <td>body</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» type</td>
+<td>—— type</td>
 <td>body</td>
 <td>string</td>
 <td>false</td>
 <td>Type</td>
 </tr>
 <tr>
-<td>»» attributes</td>
+<td>—— attributes</td>
 <td>body</td>
 <td>object</td>
 <td>false</td>
 <td>Attributes</td>
 </tr>
 <tr>
-<td>»»» identifier</td>
+<td>——— identifier</td>
 <td>body</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» name</td>
+<td>——— name</td>
 <td>body</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» nl</td>
+<td>———— nl</td>
 <td>body</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» en</td>
+<td>———— en</td>
 <td>body</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» de</td>
+<td>———— de</td>
 <td>body</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» fr</td>
+<td>———— fr</td>
 <td>body</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» da</td>
+<td>———— da</td>
 <td>body</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» cs</td>
+<td>———— cs</td>
 <td>body</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» es</td>
+<td>———— es</td>
 <td>body</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» tr</td>
+<td>———— tr</td>
 <td>body</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» pt</td>
+<td>———— pt</td>
 <td>body</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» it</td>
+<td>———— it</td>
 <td>body</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» description</td>
+<td>——— description</td>
 <td>body</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» nl</td>
+<td>———— nl</td>
 <td>body</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» en</td>
+<td>———— en</td>
 <td>body</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» de</td>
+<td>———— de</td>
 <td>body</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» fr</td>
+<td>———— fr</td>
 <td>body</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» da</td>
+<td>———— da</td>
 <td>body</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» cs</td>
+<td>———— cs</td>
 <td>body</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» es</td>
+<td>———— es</td>
 <td>body</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» tr</td>
+<td>———— tr</td>
 <td>body</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» pt</td>
+<td>———— pt</td>
 <td>body</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» it</td>
+<td>———— it</td>
 <td>body</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» context_model</td>
+<td>——— context_model</td>
 <td>body</td>
 <td>string</td>
 <td>false</td>
 <td>One of: invoice, reservation, subscription</td>
 </tr>
 <tr>
-<td>»»» http_method</td>
+<td>——— http_method</td>
 <td>body</td>
 <td>string</td>
 <td>false</td>
 <td>One of: get, post, put, patch, delete</td>
 </tr>
 <tr>
-<td>»»» target_url</td>
+<td>——— target_url</td>
 <td>body</td>
 <td>string</td>
 <td>false</td>
 <td>This URL will be called by us using the <code>http_method</code> specified</td>
 </tr>
 <tr>
-<td>»»» enabled_script</td>
+<td>——— enabled_script</td>
 <td>body</td>
 <td>string</td>
 <td>false</td>
@@ -3200,7 +3184,7 @@ ApiKeyAuth, OAuth2
 </tr>
 </tbody></table>
 <h4 id='detailed-descriptions'>Detailed descriptions</h4>
-<p><strong>»»» enabled_script</strong>: When set, this script will be evaluated to determine whether an action should be available to a user.
+<p><strong>——— enabled_script</strong>: When set, this script will be evaluated to determine whether an action should be available to a user.
 The last line of your script will be the result of the script. When the result is truthy, the command will be enabled.
 The following variables will be available to you:</p>
 
@@ -3243,8 +3227,8 @@ The following variables will be available to you:</p>
       </span><span class="nl">"http_method"</span><span class="p">:</span><span class="w"> </span><span class="s2">"post"</span><span class="p">,</span><span class="w">
       </span><span class="nl">"target_url"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://myapp.lvh.me:3000/gate_cards"</span><span class="p">,</span><span class="w">
       </span><span class="nl">"enabled_script"</span><span class="p">:</span><span class="w"> </span><span class="s2">"reservation.dig(:data, :attributes, :state) == 'confirmed'"</span><span class="p">,</span><span class="w">
-      </span><span class="nl">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2020-06-09T07:58:26Z"</span><span class="p">,</span><span class="w">
-      </span><span class="nl">"updated_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2020-06-09T07:58:26Z"</span><span class="w">
+      </span><span class="nl">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2020-06-09T14:49:30Z"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"updated_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2020-06-09T14:49:30Z"</span><span class="w">
     </span><span class="p">},</span><span class="w">
     </span><span class="nl">"links"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
       </span><span class="nl">"self"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="w">
@@ -3290,245 +3274,245 @@ The following variables will be available to you:</p>
 </tr>
 </thead><tbody>
 <tr>
-<td>» data</td>
+<td>— data</td>
 <td><a href="#schemaapplicationcommand">ApplicationCommand</a></td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» id</td>
+<td>—— id</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>ID</td>
 </tr>
 <tr>
-<td>»» type</td>
+<td>—— type</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Type</td>
 </tr>
 <tr>
-<td>»» attributes</td>
+<td>—— attributes</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>Attributes</td>
 </tr>
 <tr>
-<td>»»» identifier</td>
+<td>——— identifier</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» name</td>
+<td>——— name</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» nl</td>
+<td>———— nl</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» en</td>
+<td>———— en</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» de</td>
+<td>———— de</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» fr</td>
+<td>———— fr</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» da</td>
+<td>———— da</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» cs</td>
+<td>———— cs</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» es</td>
+<td>———— es</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» tr</td>
+<td>———— tr</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» pt</td>
+<td>———— pt</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» it</td>
+<td>———— it</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» description</td>
+<td>——— description</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» nl</td>
+<td>———— nl</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» en</td>
+<td>———— en</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» de</td>
+<td>———— de</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» fr</td>
+<td>———— fr</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» da</td>
+<td>———— da</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» cs</td>
+<td>———— cs</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» es</td>
+<td>———— es</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» tr</td>
+<td>———— tr</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» pt</td>
+<td>———— pt</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» it</td>
+<td>———— it</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» context_model</td>
+<td>——— context_model</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>One of: invoice, reservation, subscription</td>
 </tr>
 <tr>
-<td>»»» http_method</td>
+<td>——— http_method</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>One of: get, post, put, patch, delete</td>
 </tr>
 <tr>
-<td>»»» target_url</td>
+<td>——— target_url</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>This URL will be called by us using the <code>http_method</code> specified</td>
 </tr>
 <tr>
-<td>»»» enabled_script</td>
+<td>——— enabled_script</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>When set, this script will be evaluated to determine whether an action should be available to a user.<br>The last line of your script will be the result of the script. When the result is truthy, the command will be enabled.<br>The following variables will be available to you:<br><br>* The JSON serialized context model as defined in <code>context_model</code>. For example: <code>reservation</code>. Conforms to the documented schema.<br>* <code>current_user</code> - The JSON serialized current user (when present). Conforms to the documented User schema.<br><br>The script language <strong>MUST</strong> be Ruby. The list of method calls you are allowed to make is limited to the following:<br><br>* Allowed methods on any object:<br><code>==</code> <code>!=</code> <code>!</code> <code>present?</code> <code>blank?</code><br>* Allowed methods on hash objects:<br><code>[]</code> <code>dig</code><br>* Allowed calculation methods:<br><code>+</code> <code>-</code> <code>*</code> <code>/</code></td>
 </tr>
 <tr>
-<td>»»» created_at</td>
+<td>——— created_at</td>
 <td>string(date-time)</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» updated_at</td>
+<td>——— updated_at</td>
 <td>string(date-time)</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» links</td>
+<td>—— links</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>Links</td>
 </tr>
 <tr>
-<td>»»» self</td>
+<td>——— self</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
@@ -3548,60 +3532,55 @@ The following variables will be available to you:</p>
 </tr>
 </thead><tbody>
 <tr>
-<td>» errors</td>
+<td>— errors</td>
 <td>[object]</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» status</td>
+<td>—— status</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>HTTP response code</td>
 </tr>
 <tr>
-<td>»» code</td>
+<td>—— code</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Internal error code</td>
 </tr>
 <tr>
-<td>»» title</td>
+<td>—— title</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Error title</td>
 </tr>
 <tr>
-<td>»» detail</td>
+<td>—— detail</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Error details</td>
 </tr>
 <tr>
-<td>»» source</td>
+<td>—— source</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» pointer</td>
+<td>——— pointer</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Pointer to error in resource</td>
 </tr>
 </tbody></table>
-
-<aside class="warning">
-To perform this operation, you must be authenticated by means of one of the following methods:
-ApiKeyAuth, OAuth2
-</aside>
 <h2 id='get-application-command'>GET application command</h2>
 <p><a id="opIdApplication Commands_Show"></a></p>
 
@@ -3855,8 +3834,8 @@ ApiKeyAuth, OAuth2
       </span><span class="nl">"http_method"</span><span class="p">:</span><span class="w"> </span><span class="s2">"post"</span><span class="p">,</span><span class="w">
       </span><span class="nl">"target_url"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://myapp.lvh.me:3000/gate_cards"</span><span class="p">,</span><span class="w">
       </span><span class="nl">"enabled_script"</span><span class="p">:</span><span class="w"> </span><span class="s2">"reservation.dig(:data, :attributes, :state) == 'confirmed'"</span><span class="p">,</span><span class="w">
-      </span><span class="nl">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2020-06-09T07:58:26Z"</span><span class="p">,</span><span class="w">
-      </span><span class="nl">"updated_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2020-06-09T07:58:26Z"</span><span class="w">
+      </span><span class="nl">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2020-06-09T14:49:30Z"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"updated_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2020-06-09T14:49:30Z"</span><span class="w">
     </span><span class="p">},</span><span class="w">
     </span><span class="nl">"links"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
       </span><span class="nl">"self"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="w">
@@ -3902,245 +3881,245 @@ ApiKeyAuth, OAuth2
 </tr>
 </thead><tbody>
 <tr>
-<td>» data</td>
+<td>— data</td>
 <td><a href="#schemaapplicationcommand">ApplicationCommand</a></td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» id</td>
+<td>—— id</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>ID</td>
 </tr>
 <tr>
-<td>»» type</td>
+<td>—— type</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Type</td>
 </tr>
 <tr>
-<td>»» attributes</td>
+<td>—— attributes</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>Attributes</td>
 </tr>
 <tr>
-<td>»»» identifier</td>
+<td>——— identifier</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» name</td>
+<td>——— name</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» nl</td>
+<td>———— nl</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» en</td>
+<td>———— en</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» de</td>
+<td>———— de</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» fr</td>
+<td>———— fr</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» da</td>
+<td>———— da</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» cs</td>
+<td>———— cs</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» es</td>
+<td>———— es</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» tr</td>
+<td>———— tr</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» pt</td>
+<td>———— pt</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» it</td>
+<td>———— it</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» description</td>
+<td>——— description</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» nl</td>
+<td>———— nl</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» en</td>
+<td>———— en</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» de</td>
+<td>———— de</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» fr</td>
+<td>———— fr</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» da</td>
+<td>———— da</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» cs</td>
+<td>———— cs</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» es</td>
+<td>———— es</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» tr</td>
+<td>———— tr</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» pt</td>
+<td>———— pt</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» it</td>
+<td>———— it</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» context_model</td>
+<td>——— context_model</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>One of: invoice, reservation, subscription</td>
 </tr>
 <tr>
-<td>»»» http_method</td>
+<td>——— http_method</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>One of: get, post, put, patch, delete</td>
 </tr>
 <tr>
-<td>»»» target_url</td>
+<td>——— target_url</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>This URL will be called by us using the <code>http_method</code> specified</td>
 </tr>
 <tr>
-<td>»»» enabled_script</td>
+<td>——— enabled_script</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>When set, this script will be evaluated to determine whether an action should be available to a user.<br>The last line of your script will be the result of the script. When the result is truthy, the command will be enabled.<br>The following variables will be available to you:<br><br>* The JSON serialized context model as defined in <code>context_model</code>. For example: <code>reservation</code>. Conforms to the documented schema.<br>* <code>current_user</code> - The JSON serialized current user (when present). Conforms to the documented User schema.<br><br>The script language <strong>MUST</strong> be Ruby. The list of method calls you are allowed to make is limited to the following:<br><br>* Allowed methods on any object:<br><code>==</code> <code>!=</code> <code>!</code> <code>present?</code> <code>blank?</code><br>* Allowed methods on hash objects:<br><code>[]</code> <code>dig</code><br>* Allowed calculation methods:<br><code>+</code> <code>-</code> <code>*</code> <code>/</code></td>
 </tr>
 <tr>
-<td>»»» created_at</td>
+<td>——— created_at</td>
 <td>string(date-time)</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» updated_at</td>
+<td>——— updated_at</td>
 <td>string(date-time)</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» links</td>
+<td>—— links</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>Links</td>
 </tr>
 <tr>
-<td>»»» self</td>
+<td>——— self</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
@@ -4160,60 +4139,55 @@ ApiKeyAuth, OAuth2
 </tr>
 </thead><tbody>
 <tr>
-<td>» errors</td>
+<td>— errors</td>
 <td>[object]</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» status</td>
+<td>—— status</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>HTTP response code</td>
 </tr>
 <tr>
-<td>»» code</td>
+<td>—— code</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Internal error code</td>
 </tr>
 <tr>
-<td>»» title</td>
+<td>—— title</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Error title</td>
 </tr>
 <tr>
-<td>»» detail</td>
+<td>—— detail</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Error details</td>
 </tr>
 <tr>
-<td>»» source</td>
+<td>—— source</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» pointer</td>
+<td>——— pointer</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Pointer to error in resource</td>
 </tr>
 </tbody></table>
-
-<aside class="warning">
-To perform this operation, you must be authenticated by means of one of the following methods:
-ApiKeyAuth, OAuth2
-</aside>
 <h2 id='patch-application-command'>PATCH application command</h2>
 <p><a id="opIdApplication Commands_Update"></a></p>
 
@@ -4424,217 +4398,217 @@ ApiKeyAuth, OAuth2
 <td>none</td>
 </tr>
 <tr>
-<td>» data</td>
+<td>— data</td>
 <td>body</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» id</td>
+<td>—— id</td>
 <td>body</td>
 <td>string</td>
 <td>false</td>
 <td>ID</td>
 </tr>
 <tr>
-<td>»» type</td>
+<td>—— type</td>
 <td>body</td>
 <td>string</td>
 <td>false</td>
 <td>Type</td>
 </tr>
 <tr>
-<td>»» attributes</td>
+<td>—— attributes</td>
 <td>body</td>
 <td>object</td>
 <td>false</td>
 <td>Attributes</td>
 </tr>
 <tr>
-<td>»»» identifier</td>
+<td>——— identifier</td>
 <td>body</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» name</td>
+<td>——— name</td>
 <td>body</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» nl</td>
+<td>———— nl</td>
 <td>body</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» en</td>
+<td>———— en</td>
 <td>body</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» de</td>
+<td>———— de</td>
 <td>body</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» fr</td>
+<td>———— fr</td>
 <td>body</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» da</td>
+<td>———— da</td>
 <td>body</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» cs</td>
+<td>———— cs</td>
 <td>body</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» es</td>
+<td>———— es</td>
 <td>body</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» tr</td>
+<td>———— tr</td>
 <td>body</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» pt</td>
+<td>———— pt</td>
 <td>body</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» it</td>
+<td>———— it</td>
 <td>body</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» description</td>
+<td>——— description</td>
 <td>body</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» nl</td>
+<td>———— nl</td>
 <td>body</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» en</td>
+<td>———— en</td>
 <td>body</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» de</td>
+<td>———— de</td>
 <td>body</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» fr</td>
+<td>———— fr</td>
 <td>body</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» da</td>
+<td>———— da</td>
 <td>body</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» cs</td>
+<td>———— cs</td>
 <td>body</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» es</td>
+<td>———— es</td>
 <td>body</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» tr</td>
+<td>———— tr</td>
 <td>body</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» pt</td>
+<td>———— pt</td>
 <td>body</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» it</td>
+<td>———— it</td>
 <td>body</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» context_model</td>
+<td>——— context_model</td>
 <td>body</td>
 <td>string</td>
 <td>false</td>
 <td>One of: invoice, reservation, subscription</td>
 </tr>
 <tr>
-<td>»»» http_method</td>
+<td>——— http_method</td>
 <td>body</td>
 <td>string</td>
 <td>false</td>
 <td>One of: get, post, put, patch, delete</td>
 </tr>
 <tr>
-<td>»»» target_url</td>
+<td>——— target_url</td>
 <td>body</td>
 <td>string</td>
 <td>false</td>
 <td>This URL will be called by us using the <code>http_method</code> specified</td>
 </tr>
 <tr>
-<td>»»» enabled_script</td>
+<td>——— enabled_script</td>
 <td>body</td>
 <td>string</td>
 <td>false</td>
@@ -4642,7 +4616,7 @@ ApiKeyAuth, OAuth2
 </tr>
 </tbody></table>
 <h4 id='detailed-descriptions-2'>Detailed descriptions</h4>
-<p><strong>»»» enabled_script</strong>: When set, this script will be evaluated to determine whether an action should be available to a user.
+<p><strong>——— enabled_script</strong>: When set, this script will be evaluated to determine whether an action should be available to a user.
 The last line of your script will be the result of the script. When the result is truthy, the command will be enabled.
 The following variables will be available to you:</p>
 
@@ -4685,8 +4659,8 @@ The following variables will be available to you:</p>
       </span><span class="nl">"http_method"</span><span class="p">:</span><span class="w"> </span><span class="s2">"post"</span><span class="p">,</span><span class="w">
       </span><span class="nl">"target_url"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://myapp.lvh.me:3000/gate_cards"</span><span class="p">,</span><span class="w">
       </span><span class="nl">"enabled_script"</span><span class="p">:</span><span class="w"> </span><span class="s2">"reservation.dig(:data, :attributes, :state) == 'confirmed'"</span><span class="p">,</span><span class="w">
-      </span><span class="nl">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2020-06-09T07:58:26Z"</span><span class="p">,</span><span class="w">
-      </span><span class="nl">"updated_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2020-06-09T07:58:26Z"</span><span class="w">
+      </span><span class="nl">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2020-06-09T14:49:30Z"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"updated_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2020-06-09T14:49:30Z"</span><span class="w">
     </span><span class="p">},</span><span class="w">
     </span><span class="nl">"links"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
       </span><span class="nl">"self"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="w">
@@ -4732,245 +4706,245 @@ The following variables will be available to you:</p>
 </tr>
 </thead><tbody>
 <tr>
-<td>» data</td>
+<td>— data</td>
 <td><a href="#schemaapplicationcommand">ApplicationCommand</a></td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» id</td>
+<td>—— id</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>ID</td>
 </tr>
 <tr>
-<td>»» type</td>
+<td>—— type</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Type</td>
 </tr>
 <tr>
-<td>»» attributes</td>
+<td>—— attributes</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>Attributes</td>
 </tr>
 <tr>
-<td>»»» identifier</td>
+<td>——— identifier</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» name</td>
+<td>——— name</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» nl</td>
+<td>———— nl</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» en</td>
+<td>———— en</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» de</td>
+<td>———— de</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» fr</td>
+<td>———— fr</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» da</td>
+<td>———— da</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» cs</td>
+<td>———— cs</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» es</td>
+<td>———— es</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» tr</td>
+<td>———— tr</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» pt</td>
+<td>———— pt</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» it</td>
+<td>———— it</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» description</td>
+<td>——— description</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» nl</td>
+<td>———— nl</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» en</td>
+<td>———— en</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» de</td>
+<td>———— de</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» fr</td>
+<td>———— fr</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» da</td>
+<td>———— da</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» cs</td>
+<td>———— cs</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» es</td>
+<td>———— es</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» tr</td>
+<td>———— tr</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» pt</td>
+<td>———— pt</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» it</td>
+<td>———— it</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» context_model</td>
+<td>——— context_model</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>One of: invoice, reservation, subscription</td>
 </tr>
 <tr>
-<td>»»» http_method</td>
+<td>——— http_method</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>One of: get, post, put, patch, delete</td>
 </tr>
 <tr>
-<td>»»» target_url</td>
+<td>——— target_url</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>This URL will be called by us using the <code>http_method</code> specified</td>
 </tr>
 <tr>
-<td>»»» enabled_script</td>
+<td>——— enabled_script</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>When set, this script will be evaluated to determine whether an action should be available to a user.<br>The last line of your script will be the result of the script. When the result is truthy, the command will be enabled.<br>The following variables will be available to you:<br><br>* The JSON serialized context model as defined in <code>context_model</code>. For example: <code>reservation</code>. Conforms to the documented schema.<br>* <code>current_user</code> - The JSON serialized current user (when present). Conforms to the documented User schema.<br><br>The script language <strong>MUST</strong> be Ruby. The list of method calls you are allowed to make is limited to the following:<br><br>* Allowed methods on any object:<br><code>==</code> <code>!=</code> <code>!</code> <code>present?</code> <code>blank?</code><br>* Allowed methods on hash objects:<br><code>[]</code> <code>dig</code><br>* Allowed calculation methods:<br><code>+</code> <code>-</code> <code>*</code> <code>/</code></td>
 </tr>
 <tr>
-<td>»»» created_at</td>
+<td>——— created_at</td>
 <td>string(date-time)</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» updated_at</td>
+<td>——— updated_at</td>
 <td>string(date-time)</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» links</td>
+<td>—— links</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>Links</td>
 </tr>
 <tr>
-<td>»»» self</td>
+<td>——— self</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
@@ -4990,60 +4964,55 @@ The following variables will be available to you:</p>
 </tr>
 </thead><tbody>
 <tr>
-<td>» errors</td>
+<td>— errors</td>
 <td>[object]</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» status</td>
+<td>—— status</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>HTTP response code</td>
 </tr>
 <tr>
-<td>»» code</td>
+<td>—— code</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Internal error code</td>
 </tr>
 <tr>
-<td>»» title</td>
+<td>—— title</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Error title</td>
 </tr>
 <tr>
-<td>»» detail</td>
+<td>—— detail</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Error details</td>
 </tr>
 <tr>
-<td>»» source</td>
+<td>—— source</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» pointer</td>
+<td>——— pointer</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Pointer to error in resource</td>
 </tr>
 </tbody></table>
-
-<aside class="warning">
-To perform this operation, you must be authenticated by means of one of the following methods:
-ApiKeyAuth, OAuth2
-</aside>
 <h2 id='delete-application-command'>DELETE application command</h2>
 <p><a id="opIdApplication Commands_Destroy"></a></p>
 
@@ -5261,60 +5230,55 @@ ApiKeyAuth, OAuth2
 </tr>
 </thead><tbody>
 <tr>
-<td>» errors</td>
+<td>— errors</td>
 <td>[object]</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» status</td>
+<td>—— status</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>HTTP response code</td>
 </tr>
 <tr>
-<td>»» code</td>
+<td>—— code</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Internal error code</td>
 </tr>
 <tr>
-<td>»» title</td>
+<td>—— title</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Error title</td>
 </tr>
 <tr>
-<td>»» detail</td>
+<td>—— detail</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Error details</td>
 </tr>
 <tr>
-<td>»» source</td>
+<td>—— source</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» pointer</td>
+<td>——— pointer</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Pointer to error in resource</td>
 </tr>
 </tbody></table>
-
-<aside class="warning">
-To perform this operation, you must be authenticated by means of one of the following methods:
-ApiKeyAuth, OAuth2
-</aside>
 
 <h1 id="booking-experts-contentapi-invoices">Invoices</h1>
 <h2 id='get-invoice'>GET invoice</h2>
@@ -5619,161 +5583,161 @@ ApiKeyAuth, OAuth2
 </tr>
 </thead><tbody>
 <tr>
-<td>» data</td>
+<td>— data</td>
 <td><a href="#schemainvoice">Invoice</a></td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» id</td>
+<td>—— id</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>ID</td>
 </tr>
 <tr>
-<td>»» type</td>
+<td>—— type</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Type</td>
 </tr>
 <tr>
-<td>»» attributes</td>
+<td>—— attributes</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>Attributes</td>
 </tr>
 <tr>
-<td>»»» invoice_nr</td>
+<td>——— invoice_nr</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» foreign_total</td>
+<td>——— foreign_total</td>
 <td>number(float)</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» foreign_total_open</td>
+<td>——— foreign_total_open</td>
 <td>number(float)</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» foreign_currency</td>
+<td>——— foreign_currency</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>An ISO 4217 currency code</td>
 </tr>
 <tr>
-<td>»» links</td>
+<td>—— links</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>Links</td>
 </tr>
 <tr>
-<td>»»» self</td>
+<td>——— self</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Link to self</td>
 </tr>
 <tr>
-<td>»» relationships</td>
+<td>—— relationships</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>Relationships</td>
 </tr>
 <tr>
-<td>»»» administration</td>
+<td>——— administration</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» data</td>
+<td>———— data</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»»» id</td>
+<td>————— id</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>administration ID</td>
 </tr>
 <tr>
-<td>»»»»» type</td>
+<td>————— type</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» links</td>
+<td>———— links</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»»» related</td>
+<td>————— related</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» reservation</td>
+<td>——— reservation</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» data</td>
+<td>———— data</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»»» id</td>
+<td>————— id</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>reservation ID</td>
 </tr>
 <tr>
-<td>»»»»» type</td>
+<td>————— type</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» links</td>
+<td>———— links</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»»» related</td>
+<td>————— related</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
@@ -5793,60 +5757,55 @@ ApiKeyAuth, OAuth2
 </tr>
 </thead><tbody>
 <tr>
-<td>» errors</td>
+<td>— errors</td>
 <td>[object]</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» status</td>
+<td>—— status</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>HTTP response code</td>
 </tr>
 <tr>
-<td>»» code</td>
+<td>—— code</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Internal error code</td>
 </tr>
 <tr>
-<td>»» title</td>
+<td>—— title</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Error title</td>
 </tr>
 <tr>
-<td>»» detail</td>
+<td>—— detail</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Error details</td>
 </tr>
 <tr>
-<td>»» source</td>
+<td>—— source</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» pointer</td>
+<td>——— pointer</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Pointer to error in resource</td>
 </tr>
 </tbody></table>
-
-<aside class="warning">
-To perform this operation, you must be authenticated by means of one of the following methods:
-ApiKeyAuth, OAuth2
-</aside>
 
 <h1 id="booking-experts-contentapi-orders">Orders</h1>
 <h2 id='get-order'>GET order</h2>
@@ -6179,231 +6138,231 @@ ApiKeyAuth, OAuth2
 </tr>
 </thead><tbody>
 <tr>
-<td>» data</td>
+<td>— data</td>
 <td><a href="#schemaadministration">Administration</a></td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» id</td>
+<td>—— id</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>ID</td>
 </tr>
 <tr>
-<td>»» type</td>
+<td>—— type</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Type</td>
 </tr>
 <tr>
-<td>»» attributes</td>
+<td>—— attributes</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>Attributes</td>
 </tr>
 <tr>
-<td>»»» name</td>
+<td>——— name</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» phone</td>
+<td>——— phone</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» website</td>
+<td>——— website</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» description</td>
+<td>——— description</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>A description of the administration</td>
 </tr>
 <tr>
-<td>»»»» nl</td>
+<td>———— nl</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» en</td>
+<td>———— en</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» de</td>
+<td>———— de</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» fr</td>
+<td>———— fr</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» da</td>
+<td>———— da</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» cs</td>
+<td>———— cs</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» es</td>
+<td>———— es</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» tr</td>
+<td>———— tr</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» pt</td>
+<td>———— pt</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» it</td>
+<td>———— it</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» surroundings_description</td>
+<td>——— surroundings_description</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>A description of the surroundings</td>
 </tr>
 <tr>
-<td>»»»» nl</td>
+<td>———— nl</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» en</td>
+<td>———— en</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» de</td>
+<td>———— de</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» fr</td>
+<td>———— fr</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» da</td>
+<td>———— da</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» cs</td>
+<td>———— cs</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» es</td>
+<td>———— es</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» tr</td>
+<td>———— tr</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» pt</td>
+<td>———— pt</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» it</td>
+<td>———— it</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» available_locales</td>
+<td>——— available_locales</td>
 <td>[string]</td>
 <td>false</td>
 <td>none</td>
 <td>Enabled locales</td>
 </tr>
 <tr>
-<td>»»» utc_offset</td>
+<td>——— utc_offset</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>The UTC offset of the administration, for example: +01:00</td>
 </tr>
 <tr>
-<td>»» links</td>
+<td>—— links</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>Links</td>
 </tr>
 <tr>
-<td>»»» self</td>
+<td>——— self</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
@@ -6423,60 +6382,55 @@ ApiKeyAuth, OAuth2
 </tr>
 </thead><tbody>
 <tr>
-<td>» errors</td>
+<td>— errors</td>
 <td>[object]</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» status</td>
+<td>—— status</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>HTTP response code</td>
 </tr>
 <tr>
-<td>»» code</td>
+<td>—— code</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Internal error code</td>
 </tr>
 <tr>
-<td>»» title</td>
+<td>—— title</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Error title</td>
 </tr>
 <tr>
-<td>»» detail</td>
+<td>—— detail</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Error details</td>
 </tr>
 <tr>
-<td>»» source</td>
+<td>—— source</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» pointer</td>
+<td>——— pointer</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Pointer to error in resource</td>
 </tr>
 </tbody></table>
-
-<aside class="warning">
-To perform this operation, you must be authenticated by means of one of the following methods:
-ApiKeyAuth, OAuth2
-</aside>
 
 <h1 id="booking-experts-contentapi-organizations">Organizations</h1>
 <h2 id='get-organization'>GET organization</h2>
@@ -6774,112 +6728,112 @@ ApiKeyAuth, OAuth2
 </tr>
 </thead><tbody>
 <tr>
-<td>» data</td>
+<td>— data</td>
 <td><a href="#schemaorganization">Organization</a></td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» id</td>
+<td>—— id</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>ID</td>
 </tr>
 <tr>
-<td>»» type</td>
+<td>—— type</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Type</td>
 </tr>
 <tr>
-<td>»» attributes</td>
+<td>—— attributes</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>Attributes</td>
 </tr>
 <tr>
-<td>»»» name</td>
+<td>——— name</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» website</td>
+<td>——— website</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» country_code</td>
+<td>——— country_code</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» phone</td>
+<td>——— phone</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» email</td>
+<td>——— email</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» weekend_behavior</td>
+<td>——— weekend_behavior</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» max_baby_age</td>
+<td>——— max_baby_age</td>
 <td>integer</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» max_child_age</td>
+<td>——— max_child_age</td>
 <td>integer</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» max_adolescent_age</td>
+<td>——— max_adolescent_age</td>
 <td>integer</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» min_senior_age</td>
+<td>——— min_senior_age</td>
 <td>integer</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» links</td>
+<td>—— links</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>Links</td>
 </tr>
 <tr>
-<td>»»» self</td>
+<td>——— self</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
@@ -6899,60 +6853,55 @@ ApiKeyAuth, OAuth2
 </tr>
 </thead><tbody>
 <tr>
-<td>» errors</td>
+<td>— errors</td>
 <td>[object]</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» status</td>
+<td>—— status</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>HTTP response code</td>
 </tr>
 <tr>
-<td>»» code</td>
+<td>—— code</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Internal error code</td>
 </tr>
 <tr>
-<td>»» title</td>
+<td>—— title</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Error title</td>
 </tr>
 <tr>
-<td>»» detail</td>
+<td>—— detail</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Error details</td>
 </tr>
 <tr>
-<td>»» source</td>
+<td>—— source</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» pointer</td>
+<td>——— pointer</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Pointer to error in resource</td>
 </tr>
 </tbody></table>
-
-<aside class="warning">
-To perform this operation, you must be authenticated by means of one of the following methods:
-ApiKeyAuth, OAuth2
-</aside>
 
 <h1 id="booking-experts-contentapi-payments">Payments</h1>
 <h2 id='get-payments'>GET payments</h2>
@@ -7253,133 +7202,133 @@ ApiKeyAuth, OAuth2
 </tr>
 </thead><tbody>
 <tr>
-<td>» data</td>
+<td>— data</td>
 <td>[<a href="#schemapayment">Payment</a>]</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» id</td>
+<td>—— id</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>ID</td>
 </tr>
 <tr>
-<td>»» type</td>
+<td>—— type</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Type</td>
 </tr>
 <tr>
-<td>»» attributes</td>
+<td>—— attributes</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>Attributes</td>
 </tr>
 <tr>
-<td>»»» paid_at</td>
+<td>——— paid_at</td>
 <td>string(date)</td>
 <td>false</td>
 <td>none</td>
 <td>Local payment date</td>
 </tr>
 <tr>
-<td>»»» foreign_price</td>
+<td>——— foreign_price</td>
 <td>number(float)</td>
 <td>false</td>
 <td>none</td>
 <td>Paid price in the same currency as the invoice currency</td>
 </tr>
 <tr>
-<td>»»» memo</td>
+<td>——— memo</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>An optional note</td>
 </tr>
 <tr>
-<td>»» relationships</td>
+<td>—— relationships</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>Relationships</td>
 </tr>
 <tr>
-<td>»»» invoice</td>
+<td>——— invoice</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» data</td>
+<td>———— data</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»»» id</td>
+<td>————— id</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>invoice ID</td>
 </tr>
 <tr>
-<td>»»»»» type</td>
+<td>————— type</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» links</td>
+<td>———— links</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»»» related</td>
+<td>————— related</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>» meta</td>
+<td>— meta</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» pagination</td>
+<td>—— pagination</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» total_records</td>
+<td>——— total_records</td>
 <td>integer</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» page</td>
+<td>——— page</td>
 <td>integer</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» size</td>
+<td>——— size</td>
 <td>integer</td>
 <td>false</td>
 <td>none</td>
@@ -7399,60 +7348,55 @@ ApiKeyAuth, OAuth2
 </tr>
 </thead><tbody>
 <tr>
-<td>» errors</td>
+<td>— errors</td>
 <td>[object]</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» status</td>
+<td>—— status</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>HTTP response code</td>
 </tr>
 <tr>
-<td>»» code</td>
+<td>—— code</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Internal error code</td>
 </tr>
 <tr>
-<td>»» title</td>
+<td>—— title</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Error title</td>
 </tr>
 <tr>
-<td>»» detail</td>
+<td>—— detail</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Error details</td>
 </tr>
 <tr>
-<td>»» source</td>
+<td>—— source</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» pointer</td>
+<td>——— pointer</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Pointer to error in resource</td>
 </tr>
 </tbody></table>
-
-<aside class="warning">
-To perform this operation, you must be authenticated by means of one of the following methods:
-ApiKeyAuth, OAuth2
-</aside>
 <h2 id='post-payment'>POST payment</h2>
 <p><a id="opIdPayments_Create"></a></p>
 
@@ -7670,91 +7614,91 @@ ApiKeyAuth, OAuth2
 <td>none</td>
 </tr>
 <tr>
-<td>» data</td>
+<td>— data</td>
 <td>body</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» type</td>
+<td>—— type</td>
 <td>body</td>
 <td>string</td>
 <td>false</td>
 <td>Type</td>
 </tr>
 <tr>
-<td>»» attributes</td>
+<td>—— attributes</td>
 <td>body</td>
 <td>object</td>
 <td>false</td>
 <td>Attributes</td>
 </tr>
 <tr>
-<td>»»» paid_at</td>
+<td>——— paid_at</td>
 <td>body</td>
 <td>string(date)</td>
 <td>false</td>
 <td>Local payment date</td>
 </tr>
 <tr>
-<td>»»» foreign_price</td>
+<td>——— foreign_price</td>
 <td>body</td>
 <td>number(float)</td>
 <td>false</td>
 <td>Paid price in the same currency as the invoice currency</td>
 </tr>
 <tr>
-<td>»»» memo</td>
+<td>——— memo</td>
 <td>body</td>
 <td>string</td>
 <td>false</td>
 <td>An optional note</td>
 </tr>
 <tr>
-<td>»» relationships</td>
+<td>—— relationships</td>
 <td>body</td>
 <td>object</td>
 <td>false</td>
 <td>Relationships</td>
 </tr>
 <tr>
-<td>»»» invoice</td>
+<td>——— invoice</td>
 <td>body</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» data</td>
+<td>———— data</td>
 <td>body</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»»» id</td>
+<td>————— id</td>
 <td>body</td>
 <td>string</td>
 <td>false</td>
 <td>invoice ID</td>
 </tr>
 <tr>
-<td>»»»»» type</td>
+<td>————— type</td>
 <td>body</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» links</td>
+<td>———— links</td>
 <td>body</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»»» related</td>
+<td>————— related</td>
 <td>body</td>
 <td>string</td>
 <td>false</td>
@@ -7828,98 +7772,98 @@ ApiKeyAuth, OAuth2
 </tr>
 </thead><tbody>
 <tr>
-<td>» data</td>
+<td>— data</td>
 <td><a href="#schemapayment">Payment</a></td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» id</td>
+<td>—— id</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>ID</td>
 </tr>
 <tr>
-<td>»» type</td>
+<td>—— type</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Type</td>
 </tr>
 <tr>
-<td>»» attributes</td>
+<td>—— attributes</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>Attributes</td>
 </tr>
 <tr>
-<td>»»» paid_at</td>
+<td>——— paid_at</td>
 <td>string(date)</td>
 <td>false</td>
 <td>none</td>
 <td>Local payment date</td>
 </tr>
 <tr>
-<td>»»» foreign_price</td>
+<td>——— foreign_price</td>
 <td>number(float)</td>
 <td>false</td>
 <td>none</td>
 <td>Paid price in the same currency as the invoice currency</td>
 </tr>
 <tr>
-<td>»»» memo</td>
+<td>——— memo</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>An optional note</td>
 </tr>
 <tr>
-<td>»» relationships</td>
+<td>—— relationships</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>Relationships</td>
 </tr>
 <tr>
-<td>»»» invoice</td>
+<td>——— invoice</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» data</td>
+<td>———— data</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»»» id</td>
+<td>————— id</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>invoice ID</td>
 </tr>
 <tr>
-<td>»»»»» type</td>
+<td>————— type</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» links</td>
+<td>———— links</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»»» related</td>
+<td>————— related</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
@@ -7939,60 +7883,55 @@ ApiKeyAuth, OAuth2
 </tr>
 </thead><tbody>
 <tr>
-<td>» errors</td>
+<td>— errors</td>
 <td>[object]</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» status</td>
+<td>—— status</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>HTTP response code</td>
 </tr>
 <tr>
-<td>»» code</td>
+<td>—— code</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Internal error code</td>
 </tr>
 <tr>
-<td>»» title</td>
+<td>—— title</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Error title</td>
 </tr>
 <tr>
-<td>»» detail</td>
+<td>—— detail</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Error details</td>
 </tr>
 <tr>
-<td>»» source</td>
+<td>—— source</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» pointer</td>
+<td>——— pointer</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Pointer to error in resource</td>
 </tr>
 </tbody></table>
-
-<aside class="warning">
-To perform this operation, you must be authenticated by means of one of the following methods:
-ApiKeyAuth, OAuth2
-</aside>
 <h2 id='get-payment'>GET payment</h2>
 <p><a id="opIdPayments_Show"></a></p>
 
@@ -8268,98 +8207,98 @@ ApiKeyAuth, OAuth2
 </tr>
 </thead><tbody>
 <tr>
-<td>» data</td>
+<td>— data</td>
 <td><a href="#schemapayment">Payment</a></td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» id</td>
+<td>—— id</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>ID</td>
 </tr>
 <tr>
-<td>»» type</td>
+<td>—— type</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Type</td>
 </tr>
 <tr>
-<td>»» attributes</td>
+<td>—— attributes</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>Attributes</td>
 </tr>
 <tr>
-<td>»»» paid_at</td>
+<td>——— paid_at</td>
 <td>string(date)</td>
 <td>false</td>
 <td>none</td>
 <td>Local payment date</td>
 </tr>
 <tr>
-<td>»»» foreign_price</td>
+<td>——— foreign_price</td>
 <td>number(float)</td>
 <td>false</td>
 <td>none</td>
 <td>Paid price in the same currency as the invoice currency</td>
 </tr>
 <tr>
-<td>»»» memo</td>
+<td>——— memo</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>An optional note</td>
 </tr>
 <tr>
-<td>»» relationships</td>
+<td>—— relationships</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>Relationships</td>
 </tr>
 <tr>
-<td>»»» invoice</td>
+<td>——— invoice</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» data</td>
+<td>———— data</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»»» id</td>
+<td>————— id</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>invoice ID</td>
 </tr>
 <tr>
-<td>»»»»» type</td>
+<td>————— type</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» links</td>
+<td>———— links</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»»» related</td>
+<td>————— related</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
@@ -8379,60 +8318,55 @@ ApiKeyAuth, OAuth2
 </tr>
 </thead><tbody>
 <tr>
-<td>» errors</td>
+<td>— errors</td>
 <td>[object]</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» status</td>
+<td>—— status</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>HTTP response code</td>
 </tr>
 <tr>
-<td>»» code</td>
+<td>—— code</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Internal error code</td>
 </tr>
 <tr>
-<td>»» title</td>
+<td>—— title</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Error title</td>
 </tr>
 <tr>
-<td>»» detail</td>
+<td>—— detail</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Error details</td>
 </tr>
 <tr>
-<td>»» source</td>
+<td>—— source</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» pointer</td>
+<td>——— pointer</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Pointer to error in resource</td>
 </tr>
 </tbody></table>
-
-<aside class="warning">
-To perform this operation, you must be authenticated by means of one of the following methods:
-ApiKeyAuth, OAuth2
-</aside>
 
 <h1 id="booking-experts-contentapi-reservations">Reservations</h1>
 <h2 id='get-reservations'>GET reservations</h2>
@@ -8717,8 +8651,8 @@ ApiKeyAuth, OAuth2
         </span><span class="nl">"end_date"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span><span class="w">
         </span><span class="nl">"state"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span><span class="w">
         </span><span class="nl">"rentable"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span><span class="w">
-        </span><span class="nl">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2020-06-09T07:58:26Z"</span><span class="p">,</span><span class="w">
-        </span><span class="nl">"updated_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2020-06-09T07:58:26Z"</span><span class="w">
+        </span><span class="nl">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2020-06-09T14:49:30Z"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"updated_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2020-06-09T14:49:30Z"</span><span class="w">
       </span><span class="p">},</span><span class="w">
       </span><span class="nl">"links"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
         </span><span class="nl">"self"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="w">
@@ -8792,224 +8726,224 @@ ApiKeyAuth, OAuth2
 </tr>
 </thead><tbody>
 <tr>
-<td>» data</td>
+<td>— data</td>
 <td>[<a href="#schemareservation">Reservation</a>]</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» id</td>
+<td>—— id</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>ID</td>
 </tr>
 <tr>
-<td>»» type</td>
+<td>—— type</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Type</td>
 </tr>
 <tr>
-<td>»» attributes</td>
+<td>—— attributes</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>Attributes</td>
 </tr>
 <tr>
-<td>»»» booking_nr</td>
+<td>——— booking_nr</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» last_name</td>
+<td>——— last_name</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» start_date</td>
+<td>——— start_date</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» end_date</td>
+<td>——— end_date</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» state</td>
+<td>——— state</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» rentable</td>
+<td>——— rentable</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» created_at</td>
+<td>——— created_at</td>
 <td>string(date-time)</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» updated_at</td>
+<td>——— updated_at</td>
 <td>string(date-time)</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» links</td>
+<td>—— links</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>Links</td>
 </tr>
 <tr>
-<td>»»» self</td>
+<td>——— self</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Link to self</td>
 </tr>
 <tr>
-<td>»» relationships</td>
+<td>—— relationships</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>Relationships</td>
 </tr>
 <tr>
-<td>»»» administration</td>
+<td>——— administration</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» data</td>
+<td>———— data</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»»» id</td>
+<td>————— id</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>administration ID</td>
 </tr>
 <tr>
-<td>»»»»» type</td>
+<td>————— type</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» links</td>
+<td>———— links</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»»» related</td>
+<td>————— related</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» order</td>
+<td>——— order</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» data</td>
+<td>———— data</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»»» id</td>
+<td>————— id</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>order ID</td>
 </tr>
 <tr>
-<td>»»»»» type</td>
+<td>————— type</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» links</td>
+<td>———— links</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»»» related</td>
+<td>————— related</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>» meta</td>
+<td>— meta</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» pagination</td>
+<td>—— pagination</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» total_records</td>
+<td>——— total_records</td>
 <td>integer</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» page</td>
+<td>——— page</td>
 <td>integer</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» size</td>
+<td>——— size</td>
 <td>integer</td>
 <td>false</td>
 <td>none</td>
@@ -9029,60 +8963,55 @@ ApiKeyAuth, OAuth2
 </tr>
 </thead><tbody>
 <tr>
-<td>» errors</td>
+<td>— errors</td>
 <td>[object]</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» status</td>
+<td>—— status</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>HTTP response code</td>
 </tr>
 <tr>
-<td>»» code</td>
+<td>—— code</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Internal error code</td>
 </tr>
 <tr>
-<td>»» title</td>
+<td>—— title</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Error title</td>
 </tr>
 <tr>
-<td>»» detail</td>
+<td>—— detail</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Error details</td>
 </tr>
 <tr>
-<td>»» source</td>
+<td>—— source</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» pointer</td>
+<td>——— pointer</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Pointer to error in resource</td>
 </tr>
 </tbody></table>
-
-<aside class="warning">
-To perform this operation, you must be authenticated by means of one of the following methods:
-ApiKeyAuth, OAuth2
-</aside>
 <h2 id='get-reservation'>GET reservation</h2>
 <p><a id="opIdReservations_Show"></a></p>
 
@@ -9350,8 +9279,8 @@ ApiKeyAuth, OAuth2
       </span><span class="nl">"end_date"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span><span class="w">
       </span><span class="nl">"state"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span><span class="w">
       </span><span class="nl">"rentable"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span><span class="w">
-      </span><span class="nl">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2020-06-09T07:58:26Z"</span><span class="p">,</span><span class="w">
-      </span><span class="nl">"updated_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2020-06-09T07:58:26Z"</span><span class="w">
+      </span><span class="nl">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2020-06-09T14:49:30Z"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"updated_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2020-06-09T14:49:30Z"</span><span class="w">
     </span><span class="p">},</span><span class="w">
     </span><span class="nl">"links"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
       </span><span class="nl">"self"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="w">
@@ -9417,189 +9346,189 @@ ApiKeyAuth, OAuth2
 </tr>
 </thead><tbody>
 <tr>
-<td>» data</td>
+<td>— data</td>
 <td><a href="#schemareservation">Reservation</a></td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» id</td>
+<td>—— id</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>ID</td>
 </tr>
 <tr>
-<td>»» type</td>
+<td>—— type</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Type</td>
 </tr>
 <tr>
-<td>»» attributes</td>
+<td>—— attributes</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>Attributes</td>
 </tr>
 <tr>
-<td>»»» booking_nr</td>
+<td>——— booking_nr</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» last_name</td>
+<td>——— last_name</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» start_date</td>
+<td>——— start_date</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» end_date</td>
+<td>——— end_date</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» state</td>
+<td>——— state</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» rentable</td>
+<td>——— rentable</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» created_at</td>
+<td>——— created_at</td>
 <td>string(date-time)</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» updated_at</td>
+<td>——— updated_at</td>
 <td>string(date-time)</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» links</td>
+<td>—— links</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>Links</td>
 </tr>
 <tr>
-<td>»»» self</td>
+<td>——— self</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Link to self</td>
 </tr>
 <tr>
-<td>»» relationships</td>
+<td>—— relationships</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>Relationships</td>
 </tr>
 <tr>
-<td>»»» administration</td>
+<td>——— administration</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» data</td>
+<td>———— data</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»»» id</td>
+<td>————— id</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>administration ID</td>
 </tr>
 <tr>
-<td>»»»»» type</td>
+<td>————— type</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» links</td>
+<td>———— links</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»»» related</td>
+<td>————— related</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» order</td>
+<td>——— order</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» data</td>
+<td>———— data</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»»» id</td>
+<td>————— id</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>order ID</td>
 </tr>
 <tr>
-<td>»»»»» type</td>
+<td>————— type</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» links</td>
+<td>———— links</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»»» related</td>
+<td>————— related</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
@@ -9619,60 +9548,55 @@ ApiKeyAuth, OAuth2
 </tr>
 </thead><tbody>
 <tr>
-<td>» errors</td>
+<td>— errors</td>
 <td>[object]</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» status</td>
+<td>—— status</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>HTTP response code</td>
 </tr>
 <tr>
-<td>»» code</td>
+<td>—— code</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Internal error code</td>
 </tr>
 <tr>
-<td>»» title</td>
+<td>—— title</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Error title</td>
 </tr>
 <tr>
-<td>»» detail</td>
+<td>—— detail</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Error details</td>
 </tr>
 <tr>
-<td>»» source</td>
+<td>—— source</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» pointer</td>
+<td>——— pointer</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Pointer to error in resource</td>
 </tr>
 </tbody></table>
-
-<aside class="warning">
-To perform this operation, you must be authenticated by means of one of the following methods:
-ApiKeyAuth, OAuth2
-</aside>
 
 <h1 id="booking-experts-contentapi-subscriptions">Subscriptions</h1>
 <h2 id='get-subscription'>GET subscription</h2>
@@ -9896,8 +9820,8 @@ ApiKeyAuth, OAuth2
     </span><span class="nl">"attributes"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
       </span><span class="nl">"authorized"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span><span class="w">
       </span><span class="nl">"user_locale"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span><span class="w">
-      </span><span class="nl">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2020-06-09T07:58:26Z"</span><span class="p">,</span><span class="w">
-      </span><span class="nl">"updated_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2020-06-09T07:58:26Z"</span><span class="w">
+      </span><span class="nl">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2020-06-09T14:49:30Z"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"updated_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2020-06-09T14:49:30Z"</span><span class="w">
     </span><span class="p">},</span><span class="w">
     </span><span class="nl">"links"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
       </span><span class="nl">"self"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span><span class="w">
@@ -9963,154 +9887,154 @@ ApiKeyAuth, OAuth2
 </tr>
 </thead><tbody>
 <tr>
-<td>» data</td>
+<td>— data</td>
 <td><a href="#schemasubscription">Subscription</a></td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» id</td>
+<td>—— id</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>ID</td>
 </tr>
 <tr>
-<td>»» type</td>
+<td>—— type</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Type</td>
 </tr>
 <tr>
-<td>»» attributes</td>
+<td>—— attributes</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>Attributes</td>
 </tr>
 <tr>
-<td>»»» authorized</td>
+<td>——— authorized</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Returns whether a user has authorized this subscription</td>
 </tr>
 <tr>
-<td>»»» user_locale</td>
+<td>——— user_locale</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>The locale of the user that created this subscription</td>
 </tr>
 <tr>
-<td>»»» created_at</td>
+<td>——— created_at</td>
 <td>string(date-time)</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» updated_at</td>
+<td>——— updated_at</td>
 <td>string(date-time)</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» links</td>
+<td>—— links</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>Links</td>
 </tr>
 <tr>
-<td>»»» self</td>
+<td>——— self</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Link to self</td>
 </tr>
 <tr>
-<td>»»» url</td>
+<td>——— url</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Link to url</td>
 </tr>
 <tr>
-<td>»» relationships</td>
+<td>—— relationships</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>Relationships</td>
 </tr>
 <tr>
-<td>»»» organization</td>
+<td>——— organization</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» data</td>
+<td>———— data</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»»» id</td>
+<td>————— id</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>organization ID</td>
 </tr>
 <tr>
-<td>»»»»» type</td>
+<td>————— type</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» links</td>
+<td>———— links</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»»» related</td>
+<td>————— related</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» administration_subscriptions</td>
+<td>——— administration_subscriptions</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»» data</td>
+<td>———— data</td>
 <td>[object]</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»»»» id</td>
+<td>————— id</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>administration_subscriptions ID</td>
 </tr>
 <tr>
-<td>»»»»» type</td>
+<td>————— type</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
@@ -10130,60 +10054,55 @@ ApiKeyAuth, OAuth2
 </tr>
 </thead><tbody>
 <tr>
-<td>» errors</td>
+<td>— errors</td>
 <td>[object]</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» status</td>
+<td>—— status</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>HTTP response code</td>
 </tr>
 <tr>
-<td>»» code</td>
+<td>—— code</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Internal error code</td>
 </tr>
 <tr>
-<td>»» title</td>
+<td>—— title</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Error title</td>
 </tr>
 <tr>
-<td>»» detail</td>
+<td>—— detail</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Error details</td>
 </tr>
 <tr>
-<td>»» source</td>
+<td>—— source</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» pointer</td>
+<td>——— pointer</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Pointer to error in resource</td>
 </tr>
 </tbody></table>
-
-<aside class="warning">
-To perform this operation, you must be authenticated by means of one of the following methods:
-ApiKeyAuth, OAuth2
-</aside>
 
 <h1 id="booking-experts-contentapi-webhook-endpoints">Webhook Endpoints</h1>
 <h2 id='get-webhook-endpoints'>GET webhook endpoints</h2>
@@ -10420,8 +10339,8 @@ ApiKeyAuth, OAuth2
           </span><span class="s2">"reservation|updated"</span><span class="p">,</span><span class="w">
           </span><span class="s2">"reservation|deleted"</span><span class="w">
         </span><span class="p">],</span><span class="w">
-        </span><span class="nl">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2020-06-09T07:58:26Z"</span><span class="p">,</span><span class="w">
-        </span><span class="nl">"updated_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2020-06-09T07:58:26Z"</span><span class="w">
+        </span><span class="nl">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2020-06-09T14:49:30Z"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"updated_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2020-06-09T14:49:30Z"</span><span class="w">
       </span><span class="p">},</span><span class="w">
       </span><span class="nl">"links"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
         </span><span class="nl">"self"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="w">
@@ -10475,112 +10394,112 @@ ApiKeyAuth, OAuth2
 </tr>
 </thead><tbody>
 <tr>
-<td>» data</td>
+<td>— data</td>
 <td>[<a href="#schemawebhookendpoint">WebhookEndpoint</a>]</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» id</td>
+<td>—— id</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>ID</td>
 </tr>
 <tr>
-<td>»» type</td>
+<td>—— type</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Type</td>
 </tr>
 <tr>
-<td>»» attributes</td>
+<td>—— attributes</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>Attributes</td>
 </tr>
 <tr>
-<td>»»» target_url</td>
+<td>——— target_url</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» confirm_strategy</td>
+<td>——— confirm_strategy</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>One of: wait_for_success, fire_and_forget</td>
 </tr>
 <tr>
-<td>»»» events</td>
+<td>——— events</td>
 <td>[string]</td>
 <td>false</td>
 <td>none</td>
 <td>One or more of:<br><br>* accommodation_subtype</td>
 </tr>
 <tr>
-<td>»»» created_at</td>
+<td>——— created_at</td>
 <td>string(date-time)</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» updated_at</td>
+<td>——— updated_at</td>
 <td>string(date-time)</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» links</td>
+<td>—— links</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>Links</td>
 </tr>
 <tr>
-<td>»»» self</td>
+<td>——— self</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Link to self</td>
 </tr>
 <tr>
-<td>» meta</td>
+<td>— meta</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» pagination</td>
+<td>—— pagination</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» total_records</td>
+<td>——— total_records</td>
 <td>integer</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» page</td>
+<td>——— page</td>
 <td>integer</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» size</td>
+<td>——— size</td>
 <td>integer</td>
 <td>false</td>
 <td>none</td>
@@ -10600,60 +10519,55 @@ ApiKeyAuth, OAuth2
 </tr>
 </thead><tbody>
 <tr>
-<td>» errors</td>
+<td>— errors</td>
 <td>[object]</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» status</td>
+<td>—— status</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>HTTP response code</td>
 </tr>
 <tr>
-<td>»» code</td>
+<td>—— code</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Internal error code</td>
 </tr>
 <tr>
-<td>»» title</td>
+<td>—— title</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Error title</td>
 </tr>
 <tr>
-<td>»» detail</td>
+<td>—— detail</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Error details</td>
 </tr>
 <tr>
-<td>»» source</td>
+<td>—— source</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» pointer</td>
+<td>——— pointer</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Pointer to error in resource</td>
 </tr>
 </tbody></table>
-
-<aside class="warning">
-To perform this operation, you must be authenticated by means of one of the following methods:
-ApiKeyAuth, OAuth2
-</aside>
 <h2 id='post-webhook-endpoint'>POST webhook endpoint</h2>
 <p><a id="opIdWebhook Endpoints_Create"></a></p>
 
@@ -10864,42 +10778,42 @@ ApiKeyAuth, OAuth2
 <td>none</td>
 </tr>
 <tr>
-<td>» data</td>
+<td>— data</td>
 <td>body</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» type</td>
+<td>—— type</td>
 <td>body</td>
 <td>string</td>
 <td>false</td>
 <td>Type</td>
 </tr>
 <tr>
-<td>»» attributes</td>
+<td>—— attributes</td>
 <td>body</td>
 <td>object</td>
 <td>false</td>
 <td>Attributes</td>
 </tr>
 <tr>
-<td>»»» target_url</td>
+<td>——— target_url</td>
 <td>body</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» confirm_strategy</td>
+<td>——— confirm_strategy</td>
 <td>body</td>
 <td>string</td>
 <td>false</td>
 <td>One of: wait_for_success, fire_and_forget</td>
 </tr>
 <tr>
-<td>»»» events</td>
+<td>——— events</td>
 <td>body</td>
 <td>[string]</td>
 <td>false</td>
@@ -10907,7 +10821,7 @@ ApiKeyAuth, OAuth2
 </tr>
 </tbody></table>
 <h4 id='detailed-descriptions-3'>Detailed descriptions</h4>
-<p><strong>»»» events</strong>: One or more of:</p>
+<p><strong>——— events</strong>: One or more of:</p>
 
 <ul>
 <li>accommodation_subtype|created</li>
@@ -11019,8 +10933,8 @@ ApiKeyAuth, OAuth2
         </span><span class="s2">"reservation|updated"</span><span class="p">,</span><span class="w">
         </span><span class="s2">"reservation|deleted"</span><span class="w">
       </span><span class="p">],</span><span class="w">
-      </span><span class="nl">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2020-06-09T07:58:26Z"</span><span class="p">,</span><span class="w">
-      </span><span class="nl">"updated_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2020-06-09T07:58:26Z"</span><span class="w">
+      </span><span class="nl">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2020-06-09T14:49:30Z"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"updated_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2020-06-09T14:49:30Z"</span><span class="w">
     </span><span class="p">},</span><span class="w">
     </span><span class="nl">"links"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
       </span><span class="nl">"self"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="w">
@@ -11066,77 +10980,77 @@ ApiKeyAuth, OAuth2
 </tr>
 </thead><tbody>
 <tr>
-<td>» data</td>
+<td>— data</td>
 <td><a href="#schemawebhookendpoint">WebhookEndpoint</a></td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» id</td>
+<td>—— id</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>ID</td>
 </tr>
 <tr>
-<td>»» type</td>
+<td>—— type</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Type</td>
 </tr>
 <tr>
-<td>»» attributes</td>
+<td>—— attributes</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>Attributes</td>
 </tr>
 <tr>
-<td>»»» target_url</td>
+<td>——— target_url</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» confirm_strategy</td>
+<td>——— confirm_strategy</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>One of: wait_for_success, fire_and_forget</td>
 </tr>
 <tr>
-<td>»»» events</td>
+<td>——— events</td>
 <td>[string]</td>
 <td>false</td>
 <td>none</td>
 <td>One or more of:<br><br>* accommodation_subtype</td>
 </tr>
 <tr>
-<td>»»» created_at</td>
+<td>——— created_at</td>
 <td>string(date-time)</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» updated_at</td>
+<td>——— updated_at</td>
 <td>string(date-time)</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» links</td>
+<td>—— links</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>Links</td>
 </tr>
 <tr>
-<td>»»» self</td>
+<td>——— self</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
@@ -11156,60 +11070,55 @@ ApiKeyAuth, OAuth2
 </tr>
 </thead><tbody>
 <tr>
-<td>» errors</td>
+<td>— errors</td>
 <td>[object]</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» status</td>
+<td>—— status</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>HTTP response code</td>
 </tr>
 <tr>
-<td>»» code</td>
+<td>—— code</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Internal error code</td>
 </tr>
 <tr>
-<td>»» title</td>
+<td>—— title</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Error title</td>
 </tr>
 <tr>
-<td>»» detail</td>
+<td>—— detail</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Error details</td>
 </tr>
 <tr>
-<td>»» source</td>
+<td>—— source</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» pointer</td>
+<td>——— pointer</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Pointer to error in resource</td>
 </tr>
 </tbody></table>
-
-<aside class="warning">
-To perform this operation, you must be authenticated by means of one of the following methods:
-ApiKeyAuth, OAuth2
-</aside>
 <h2 id='get-webhook-endpoint'>GET webhook endpoint</h2>
 <p><a id="opIdWebhook Endpoints_Show"></a></p>
 
@@ -11429,8 +11338,8 @@ ApiKeyAuth, OAuth2
         </span><span class="s2">"reservation|updated"</span><span class="p">,</span><span class="w">
         </span><span class="s2">"reservation|deleted"</span><span class="w">
       </span><span class="p">],</span><span class="w">
-      </span><span class="nl">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2020-06-09T07:58:26Z"</span><span class="p">,</span><span class="w">
-      </span><span class="nl">"updated_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2020-06-09T07:58:26Z"</span><span class="w">
+      </span><span class="nl">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2020-06-09T14:49:30Z"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"updated_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2020-06-09T14:49:30Z"</span><span class="w">
     </span><span class="p">},</span><span class="w">
     </span><span class="nl">"links"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
       </span><span class="nl">"self"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="w">
@@ -11476,77 +11385,77 @@ ApiKeyAuth, OAuth2
 </tr>
 </thead><tbody>
 <tr>
-<td>» data</td>
+<td>— data</td>
 <td><a href="#schemawebhookendpoint">WebhookEndpoint</a></td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» id</td>
+<td>—— id</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>ID</td>
 </tr>
 <tr>
-<td>»» type</td>
+<td>—— type</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Type</td>
 </tr>
 <tr>
-<td>»» attributes</td>
+<td>—— attributes</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>Attributes</td>
 </tr>
 <tr>
-<td>»»» target_url</td>
+<td>——— target_url</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» confirm_strategy</td>
+<td>——— confirm_strategy</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>One of: wait_for_success, fire_and_forget</td>
 </tr>
 <tr>
-<td>»»» events</td>
+<td>——— events</td>
 <td>[string]</td>
 <td>false</td>
 <td>none</td>
 <td>One or more of:<br><br>* accommodation_subtype</td>
 </tr>
 <tr>
-<td>»»» created_at</td>
+<td>——— created_at</td>
 <td>string(date-time)</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» updated_at</td>
+<td>——— updated_at</td>
 <td>string(date-time)</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» links</td>
+<td>—— links</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>Links</td>
 </tr>
 <tr>
-<td>»»» self</td>
+<td>——— self</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
@@ -11566,60 +11475,55 @@ ApiKeyAuth, OAuth2
 </tr>
 </thead><tbody>
 <tr>
-<td>» errors</td>
+<td>— errors</td>
 <td>[object]</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» status</td>
+<td>—— status</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>HTTP response code</td>
 </tr>
 <tr>
-<td>»» code</td>
+<td>—— code</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Internal error code</td>
 </tr>
 <tr>
-<td>»» title</td>
+<td>—— title</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Error title</td>
 </tr>
 <tr>
-<td>»» detail</td>
+<td>—— detail</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Error details</td>
 </tr>
 <tr>
-<td>»» source</td>
+<td>—— source</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» pointer</td>
+<td>——— pointer</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Pointer to error in resource</td>
 </tr>
 </tbody></table>
-
-<aside class="warning">
-To perform this operation, you must be authenticated by means of one of the following methods:
-ApiKeyAuth, OAuth2
-</aside>
 <h2 id='patch-webhook-endpoint'>PATCH webhook endpoint</h2>
 <p><a id="opIdWebhook Endpoints_Update"></a></p>
 
@@ -11824,49 +11728,49 @@ ApiKeyAuth, OAuth2
 <td>none</td>
 </tr>
 <tr>
-<td>» data</td>
+<td>— data</td>
 <td>body</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» id</td>
+<td>—— id</td>
 <td>body</td>
 <td>string</td>
 <td>false</td>
 <td>ID</td>
 </tr>
 <tr>
-<td>»» type</td>
+<td>—— type</td>
 <td>body</td>
 <td>string</td>
 <td>false</td>
 <td>Type</td>
 </tr>
 <tr>
-<td>»» attributes</td>
+<td>—— attributes</td>
 <td>body</td>
 <td>object</td>
 <td>false</td>
 <td>Attributes</td>
 </tr>
 <tr>
-<td>»»» target_url</td>
+<td>——— target_url</td>
 <td>body</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» confirm_strategy</td>
+<td>——— confirm_strategy</td>
 <td>body</td>
 <td>string</td>
 <td>false</td>
 <td>One of: wait_for_success, fire_and_forget</td>
 </tr>
 <tr>
-<td>»»» events</td>
+<td>——— events</td>
 <td>body</td>
 <td>[string]</td>
 <td>false</td>
@@ -11874,7 +11778,7 @@ ApiKeyAuth, OAuth2
 </tr>
 </tbody></table>
 <h4 id='detailed-descriptions-4'>Detailed descriptions</h4>
-<p><strong>»»» events</strong>: One or more of:</p>
+<p><strong>——— events</strong>: One or more of:</p>
 
 <ul>
 <li>accommodation_subtype|created</li>
@@ -11986,8 +11890,8 @@ ApiKeyAuth, OAuth2
         </span><span class="s2">"reservation|updated"</span><span class="p">,</span><span class="w">
         </span><span class="s2">"reservation|deleted"</span><span class="w">
       </span><span class="p">],</span><span class="w">
-      </span><span class="nl">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2020-06-09T07:58:26Z"</span><span class="p">,</span><span class="w">
-      </span><span class="nl">"updated_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2020-06-09T07:58:26Z"</span><span class="w">
+      </span><span class="nl">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2020-06-09T14:49:30Z"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"updated_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2020-06-09T14:49:30Z"</span><span class="w">
     </span><span class="p">},</span><span class="w">
     </span><span class="nl">"links"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
       </span><span class="nl">"self"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="w">
@@ -12033,77 +11937,77 @@ ApiKeyAuth, OAuth2
 </tr>
 </thead><tbody>
 <tr>
-<td>» data</td>
+<td>— data</td>
 <td><a href="#schemawebhookendpoint">WebhookEndpoint</a></td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» id</td>
+<td>—— id</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>ID</td>
 </tr>
 <tr>
-<td>»» type</td>
+<td>—— type</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Type</td>
 </tr>
 <tr>
-<td>»» attributes</td>
+<td>—— attributes</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>Attributes</td>
 </tr>
 <tr>
-<td>»»» target_url</td>
+<td>——— target_url</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» confirm_strategy</td>
+<td>——— confirm_strategy</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>One of: wait_for_success, fire_and_forget</td>
 </tr>
 <tr>
-<td>»»» events</td>
+<td>——— events</td>
 <td>[string]</td>
 <td>false</td>
 <td>none</td>
 <td>One or more of:<br><br>* accommodation_subtype</td>
 </tr>
 <tr>
-<td>»»» created_at</td>
+<td>——— created_at</td>
 <td>string(date-time)</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» updated_at</td>
+<td>——— updated_at</td>
 <td>string(date-time)</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» links</td>
+<td>—— links</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>Links</td>
 </tr>
 <tr>
-<td>»»» self</td>
+<td>——— self</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
@@ -12123,60 +12027,55 @@ ApiKeyAuth, OAuth2
 </tr>
 </thead><tbody>
 <tr>
-<td>» errors</td>
+<td>— errors</td>
 <td>[object]</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» status</td>
+<td>—— status</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>HTTP response code</td>
 </tr>
 <tr>
-<td>»» code</td>
+<td>—— code</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Internal error code</td>
 </tr>
 <tr>
-<td>»» title</td>
+<td>—— title</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Error title</td>
 </tr>
 <tr>
-<td>»» detail</td>
+<td>—— detail</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Error details</td>
 </tr>
 <tr>
-<td>»» source</td>
+<td>—— source</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» pointer</td>
+<td>——— pointer</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Pointer to error in resource</td>
 </tr>
 </tbody></table>
-
-<aside class="warning">
-To perform this operation, you must be authenticated by means of one of the following methods:
-ApiKeyAuth, OAuth2
-</aside>
 <h2 id='delete-webhook-endpoint'>DELETE webhook endpoint</h2>
 <p><a id="opIdWebhook Endpoints_Destroy"></a></p>
 
@@ -12394,60 +12293,55 @@ ApiKeyAuth, OAuth2
 </tr>
 </thead><tbody>
 <tr>
-<td>» errors</td>
+<td>— errors</td>
 <td>[object]</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» status</td>
+<td>—— status</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>HTTP response code</td>
 </tr>
 <tr>
-<td>»» code</td>
+<td>—— code</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Internal error code</td>
 </tr>
 <tr>
-<td>»» title</td>
+<td>—— title</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Error title</td>
 </tr>
 <tr>
-<td>»» detail</td>
+<td>—— detail</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Error details</td>
 </tr>
 <tr>
-<td>»» source</td>
+<td>—— source</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» pointer</td>
+<td>——— pointer</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Pointer to error in resource</td>
 </tr>
 </tbody></table>
-
-<aside class="warning">
-To perform this operation, you must be authenticated by means of one of the following methods:
-ApiKeyAuth, OAuth2
-</aside>
 <h1 id='schemas'>Schemas</h1>
 <h2 id="tocS_AccommodationSubtype">AccommodationSubtype</h2>
 
@@ -12560,189 +12454,189 @@ ApiKeyAuth, OAuth2
 <td>Attributes</td>
 </tr>
 <tr>
-<td>» name</td>
+<td>— name</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>» phone</td>
+<td>— phone</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>» website</td>
+<td>— website</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>» description</td>
+<td>— description</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>A description of the administration</td>
 </tr>
 <tr>
-<td>»» nl</td>
+<td>—— nl</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» en</td>
+<td>—— en</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» de</td>
+<td>—— de</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» fr</td>
+<td>—— fr</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» da</td>
+<td>—— da</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» cs</td>
+<td>—— cs</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» es</td>
+<td>—— es</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» tr</td>
+<td>—— tr</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» pt</td>
+<td>—— pt</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» it</td>
+<td>—— it</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>» surroundings_description</td>
+<td>— surroundings_description</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>A description of the surroundings</td>
 </tr>
 <tr>
-<td>»» nl</td>
+<td>—— nl</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» en</td>
+<td>—— en</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» de</td>
+<td>—— de</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» fr</td>
+<td>—— fr</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» da</td>
+<td>—— da</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» cs</td>
+<td>—— cs</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» es</td>
+<td>—— es</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» tr</td>
+<td>—— tr</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» pt</td>
+<td>—— pt</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» it</td>
+<td>—— it</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>» available_locales</td>
+<td>— available_locales</td>
 <td>[string]</td>
 <td>false</td>
 <td>none</td>
 <td>Enabled locales</td>
 </tr>
 <tr>
-<td>» utc_offset</td>
+<td>— utc_offset</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
@@ -12756,7 +12650,7 @@ ApiKeyAuth, OAuth2
 <td>Links</td>
 </tr>
 <tr>
-<td>» self</td>
+<td>— self</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
@@ -12816,56 +12710,56 @@ ApiKeyAuth, OAuth2
 <td>Relationships</td>
 </tr>
 <tr>
-<td>» administration</td>
+<td>— administration</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» data</td>
+<td>—— data</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» id</td>
+<td>——— id</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>administration ID</td>
 </tr>
 <tr>
-<td>»»» type</td>
+<td>——— type</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>» channel</td>
+<td>— channel</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» data</td>
+<td>—— data</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» id</td>
+<td>——— id</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>channel ID</td>
 </tr>
 <tr>
-<td>»»» type</td>
+<td>——— type</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
@@ -12932,8 +12826,8 @@ ApiKeyAuth, OAuth2
   <span class="na">http_method</span><span class="pi">:</span> <span class="s">post</span>
   <span class="na">target_url</span><span class="pi">:</span> <span class="s">https://myapp.lvh.me:3000/gate_cards</span>
   <span class="na">enabled_script</span><span class="pi">:</span> <span class="s">reservation.dig(:data, :attributes, :state) == 'confirmed'</span>
-  <span class="na">created_at</span><span class="pi">:</span> <span class="s">2020-06-09T07:58:26Z</span>
-  <span class="na">updated_at</span><span class="pi">:</span> <span class="s">2020-06-09T07:58:26Z</span>
+  <span class="na">created_at</span><span class="pi">:</span> <span class="s">2020-06-09T14:49:30Z</span>
+  <span class="na">updated_at</span><span class="pi">:</span> <span class="s">2020-06-09T14:49:30Z</span>
 <span class="na">links</span><span class="pi">:</span>
   <span class="na">self</span><span class="pi">:</span> <span class="s">string</span>
 
@@ -12969,203 +12863,203 @@ ApiKeyAuth, OAuth2
 <td>Attributes</td>
 </tr>
 <tr>
-<td>» identifier</td>
+<td>— identifier</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>» name</td>
+<td>— name</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» nl</td>
+<td>—— nl</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» en</td>
+<td>—— en</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» de</td>
+<td>—— de</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» fr</td>
+<td>—— fr</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» da</td>
+<td>—— da</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» cs</td>
+<td>—— cs</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» es</td>
+<td>—— es</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» tr</td>
+<td>—— tr</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» pt</td>
+<td>—— pt</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» it</td>
+<td>—— it</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>» description</td>
+<td>— description</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» nl</td>
+<td>—— nl</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» en</td>
+<td>—— en</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» de</td>
+<td>—— de</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» fr</td>
+<td>—— fr</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» da</td>
+<td>—— da</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» cs</td>
+<td>—— cs</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» es</td>
+<td>—— es</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» tr</td>
+<td>—— tr</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» pt</td>
+<td>—— pt</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» it</td>
+<td>—— it</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>» context_model</td>
+<td>— context_model</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>One of: invoice, reservation, subscription</td>
 </tr>
 <tr>
-<td>» http_method</td>
+<td>— http_method</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>One of: get, post, put, patch, delete</td>
 </tr>
 <tr>
-<td>» target_url</td>
+<td>— target_url</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>This URL will be called by us using the <code>http_method</code> specified</td>
 </tr>
 <tr>
-<td>» enabled_script</td>
+<td>— enabled_script</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>When set, this script will be evaluated to determine whether an action should be available to a user.<br>The last line of your script will be the result of the script. When the result is truthy, the command will be enabled.<br>The following variables will be available to you:<br><br>* The JSON serialized context model as defined in <code>context_model</code>. For example: <code>reservation</code>. Conforms to the documented schema.<br>* <code>current_user</code> - The JSON serialized current user (when present). Conforms to the documented User schema.<br><br>The script language <strong>MUST</strong> be Ruby. The list of method calls you are allowed to make is limited to the following:<br><br>* Allowed methods on any object:<br><code>==</code> <code>!=</code> <code>!</code> <code>present?</code> <code>blank?</code><br>* Allowed methods on hash objects:<br><code>[]</code> <code>dig</code><br>* Allowed calculation methods:<br><code>+</code> <code>-</code> <code>*</code> <code>/</code></td>
 </tr>
 <tr>
-<td>» created_at</td>
+<td>— created_at</td>
 <td>string(date-time)</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>» updated_at</td>
+<td>— updated_at</td>
 <td>string(date-time)</td>
 <td>false</td>
 <td>none</td>
@@ -13179,7 +13073,7 @@ ApiKeyAuth, OAuth2
 <td>Links</td>
 </tr>
 <tr>
-<td>» self</td>
+<td>— self</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
@@ -13335,63 +13229,63 @@ ApiKeyAuth, OAuth2
 <td>Attributes</td>
 </tr>
 <tr>
-<td>» start_date</td>
+<td>— start_date</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>» los</td>
+<td>— los</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>» checkin_time</td>
+<td>— checkin_time</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>» checkout_time</td>
+<td>— checkout_time</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>» price</td>
+<td>— price</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>» original_price</td>
+<td>— original_price</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>» rent_price</td>
+<td>— rent_price</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>» original_rent_price</td>
+<td>— original_rent_price</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>» stock</td>
+<td>— stock</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
@@ -13405,140 +13299,140 @@ ApiKeyAuth, OAuth2
 <td>Relationships</td>
 </tr>
 <tr>
-<td>» administration</td>
+<td>— administration</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» data</td>
+<td>—— data</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» id</td>
+<td>——— id</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>administration ID</td>
 </tr>
 <tr>
-<td>»»» type</td>
+<td>——— type</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>» category</td>
+<td>— category</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» data</td>
+<td>—— data</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» id</td>
+<td>——— id</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>category ID</td>
 </tr>
 <tr>
-<td>»»» type</td>
+<td>——— type</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>» discount_campaign</td>
+<td>— discount_campaign</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» data</td>
+<td>—— data</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» id</td>
+<td>——— id</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>discount_campaign ID</td>
 </tr>
 <tr>
-<td>»»» type</td>
+<td>——— type</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>» missing_tags</td>
+<td>— missing_tags</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» data</td>
+<td>—— data</td>
 <td>[object]</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» id</td>
+<td>——— id</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>missing_tags ID</td>
 </tr>
 <tr>
-<td>»»» type</td>
+<td>——— type</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>» rentables</td>
+<td>— rentables</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» data</td>
+<td>—— data</td>
 <td>[object]</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» id</td>
+<td>——— id</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>rentables ID</td>
 </tr>
 <tr>
-<td>»»» type</td>
+<td>——— type</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
@@ -13800,175 +13694,175 @@ ApiKeyAuth, OAuth2
 <td>Attributes</td>
 </tr>
 <tr>
-<td>» name</td>
+<td>— name</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» nl</td>
+<td>—— nl</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» en</td>
+<td>—— en</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» de</td>
+<td>—— de</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» fr</td>
+<td>—— fr</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» da</td>
+<td>—— da</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» cs</td>
+<td>—— cs</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» es</td>
+<td>—— es</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» tr</td>
+<td>—— tr</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» pt</td>
+<td>—— pt</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» it</td>
+<td>—— it</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>» description</td>
+<td>— description</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» nl</td>
+<td>—— nl</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» en</td>
+<td>—— en</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» de</td>
+<td>—— de</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» fr</td>
+<td>—— fr</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» da</td>
+<td>—— da</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» cs</td>
+<td>—— cs</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» es</td>
+<td>—— es</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» tr</td>
+<td>—— tr</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» pt</td>
+<td>—— pt</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» it</td>
+<td>—— it</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>» invoiced_as</td>
+<td>— invoiced_as</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>» cost_type</td>
+<td>— cost_type</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>» if_stay_overlaps</td>
+<td>— if_stay_overlaps</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
@@ -14171,280 +14065,280 @@ ApiKeyAuth, OAuth2
 <td>Attributes</td>
 </tr>
 <tr>
-<td>» name</td>
+<td>— name</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» nl</td>
+<td>—— nl</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» en</td>
+<td>—— en</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» de</td>
+<td>—— de</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» fr</td>
+<td>—— fr</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» da</td>
+<td>—— da</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» cs</td>
+<td>—— cs</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» es</td>
+<td>—— es</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» tr</td>
+<td>—— tr</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» pt</td>
+<td>—— pt</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» it</td>
+<td>—— it</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>» description</td>
+<td>— description</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» nl</td>
+<td>—— nl</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» en</td>
+<td>—— en</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» de</td>
+<td>—— de</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» fr</td>
+<td>—— fr</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» da</td>
+<td>—— da</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» cs</td>
+<td>—— cs</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» es</td>
+<td>—— es</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» tr</td>
+<td>—— tr</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» pt</td>
+<td>—— pt</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» it</td>
+<td>—— it</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>» memo_description</td>
+<td>— memo_description</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» nl</td>
+<td>—— nl</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» en</td>
+<td>—— en</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» de</td>
+<td>—— de</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» fr</td>
+<td>—— fr</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» da</td>
+<td>—— da</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» cs</td>
+<td>—— cs</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» es</td>
+<td>—— es</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» tr</td>
+<td>—— tr</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» pt</td>
+<td>—— pt</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» it</td>
+<td>—— it</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>» invoiced_as</td>
+<td>— invoiced_as</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>» selectable</td>
+<td>— selectable</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>» confirm_by_guest</td>
+<td>— confirm_by_guest</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>» extra_type</td>
+<td>— extra_type</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>» quantity_required</td>
+<td>— quantity_required</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>» memo_required</td>
+<td>— memo_required</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>» maximum_quantity</td>
+<td>— maximum_quantity</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
@@ -14515,28 +14409,28 @@ ApiKeyAuth, OAuth2
 <td>Attributes</td>
 </tr>
 <tr>
-<td>» invoice_nr</td>
+<td>— invoice_nr</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>» foreign_total</td>
+<td>— foreign_total</td>
 <td>number(float)</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>» foreign_total_open</td>
+<td>— foreign_total_open</td>
 <td>number(float)</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>» foreign_currency</td>
+<td>— foreign_currency</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
@@ -14550,7 +14444,7 @@ ApiKeyAuth, OAuth2
 <td>Links</td>
 </tr>
 <tr>
-<td>» self</td>
+<td>— self</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
@@ -14564,84 +14458,84 @@ ApiKeyAuth, OAuth2
 <td>Relationships</td>
 </tr>
 <tr>
-<td>» administration</td>
+<td>— administration</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» data</td>
+<td>—— data</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» id</td>
+<td>——— id</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>administration ID</td>
 </tr>
 <tr>
-<td>»»» type</td>
+<td>——— type</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» links</td>
+<td>—— links</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» related</td>
+<td>——— related</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>» reservation</td>
+<td>— reservation</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» data</td>
+<td>—— data</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» id</td>
+<td>——— id</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>reservation ID</td>
 </tr>
 <tr>
-<td>»»» type</td>
+<td>——— type</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» links</td>
+<td>—— links</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» related</td>
+<td>——— related</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
@@ -14714,42 +14608,42 @@ ApiKeyAuth, OAuth2
 <td>Attributes</td>
 </tr>
 <tr>
-<td>» reservation_days</td>
+<td>— reservation_days</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>» packaged_date_range</td>
+<td>— packaged_date_range</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>» primary_package_id</td>
+<td>— primary_package_id</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>» extra_package_ids</td>
+<td>— extra_package_ids</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>» currency</td>
+<td>— currency</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>» total</td>
+<td>— total</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
@@ -14763,7 +14657,7 @@ ApiKeyAuth, OAuth2
 <td>Links</td>
 </tr>
 <tr>
-<td>» self</td>
+<td>— self</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
@@ -14777,84 +14671,84 @@ ApiKeyAuth, OAuth2
 <td>Relationships</td>
 </tr>
 <tr>
-<td>» administration</td>
+<td>— administration</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» data</td>
+<td>—— data</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» id</td>
+<td>——— id</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>administration ID</td>
 </tr>
 <tr>
-<td>»»» type</td>
+<td>——— type</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>» main_order_items</td>
+<td>— main_order_items</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» data</td>
+<td>—— data</td>
 <td>[object]</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» id</td>
+<td>——— id</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>main_order_items ID</td>
 </tr>
 <tr>
-<td>»»» type</td>
+<td>——— type</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>» extra_order_items</td>
+<td>— extra_order_items</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» data</td>
+<td>—— data</td>
 <td>[object]</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» id</td>
+<td>——— id</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>extra_order_items ID</td>
 </tr>
 <tr>
-<td>»»» type</td>
+<td>——— type</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
@@ -14918,70 +14812,70 @@ ApiKeyAuth, OAuth2
 <td>Attributes</td>
 </tr>
 <tr>
-<td>» name</td>
+<td>— name</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>» website</td>
+<td>— website</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>» country_code</td>
+<td>— country_code</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>» phone</td>
+<td>— phone</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>» email</td>
+<td>— email</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>» weekend_behavior</td>
+<td>— weekend_behavior</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>» max_baby_age</td>
+<td>— max_baby_age</td>
 <td>integer</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>» max_child_age</td>
+<td>— max_child_age</td>
 <td>integer</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>» max_adolescent_age</td>
+<td>— max_adolescent_age</td>
 <td>integer</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>» min_senior_age</td>
+<td>— min_senior_age</td>
 <td>integer</td>
 <td>false</td>
 <td>none</td>
@@ -14995,7 +14889,7 @@ ApiKeyAuth, OAuth2
 <td>Links</td>
 </tr>
 <tr>
-<td>» self</td>
+<td>— self</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
@@ -15168,21 +15062,21 @@ ApiKeyAuth, OAuth2
 <td>Attributes</td>
 </tr>
 <tr>
-<td>» paid_at</td>
+<td>— paid_at</td>
 <td>string(date)</td>
 <td>false</td>
 <td>none</td>
 <td>Local payment date</td>
 </tr>
 <tr>
-<td>» foreign_price</td>
+<td>— foreign_price</td>
 <td>number(float)</td>
 <td>false</td>
 <td>none</td>
 <td>Paid price in the same currency as the invoice currency</td>
 </tr>
 <tr>
-<td>» memo</td>
+<td>— memo</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
@@ -15196,42 +15090,42 @@ ApiKeyAuth, OAuth2
 <td>Relationships</td>
 </tr>
 <tr>
-<td>» invoice</td>
+<td>— invoice</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» data</td>
+<td>—— data</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» id</td>
+<td>——— id</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>invoice ID</td>
 </tr>
 <tr>
-<td>»»» type</td>
+<td>——— type</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» links</td>
+<td>—— links</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» related</td>
+<td>——— related</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
@@ -15404,8 +15298,8 @@ ApiKeyAuth, OAuth2
   <span class="na">end_date</span><span class="pi">:</span> <span class="s">string</span>
   <span class="na">state</span><span class="pi">:</span> <span class="s">string</span>
   <span class="na">rentable</span><span class="pi">:</span> <span class="s">string</span>
-  <span class="na">created_at</span><span class="pi">:</span> <span class="s">2020-06-09T07:58:26Z</span>
-  <span class="na">updated_at</span><span class="pi">:</span> <span class="s">2020-06-09T07:58:26Z</span>
+  <span class="na">created_at</span><span class="pi">:</span> <span class="s">2020-06-09T14:49:30Z</span>
+  <span class="na">updated_at</span><span class="pi">:</span> <span class="s">2020-06-09T14:49:30Z</span>
 <span class="na">links</span><span class="pi">:</span>
   <span class="na">self</span><span class="pi">:</span> <span class="s">string</span>
 <span class="na">relationships</span><span class="pi">:</span>
@@ -15454,56 +15348,56 @@ ApiKeyAuth, OAuth2
 <td>Attributes</td>
 </tr>
 <tr>
-<td>» booking_nr</td>
+<td>— booking_nr</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>» last_name</td>
+<td>— last_name</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>» start_date</td>
+<td>— start_date</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>» end_date</td>
+<td>— end_date</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>» state</td>
+<td>— state</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>» rentable</td>
+<td>— rentable</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>» created_at</td>
+<td>— created_at</td>
 <td>string(date-time)</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>» updated_at</td>
+<td>— updated_at</td>
 <td>string(date-time)</td>
 <td>false</td>
 <td>none</td>
@@ -15517,7 +15411,7 @@ ApiKeyAuth, OAuth2
 <td>Links</td>
 </tr>
 <tr>
-<td>» self</td>
+<td>— self</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
@@ -15531,84 +15425,84 @@ ApiKeyAuth, OAuth2
 <td>Relationships</td>
 </tr>
 <tr>
-<td>» administration</td>
+<td>— administration</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» data</td>
+<td>—— data</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» id</td>
+<td>——— id</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>administration ID</td>
 </tr>
 <tr>
-<td>»»» type</td>
+<td>——— type</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» links</td>
+<td>—— links</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» related</td>
+<td>——— related</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>» order</td>
+<td>— order</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» data</td>
+<td>—— data</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» id</td>
+<td>——— id</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>order ID</td>
 </tr>
 <tr>
-<td>»»» type</td>
+<td>——— type</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» links</td>
+<td>—— links</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» related</td>
+<td>——— related</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
@@ -15740,8 +15634,8 @@ ApiKeyAuth, OAuth2
 <span class="na">attributes</span><span class="pi">:</span>
   <span class="na">authorized</span><span class="pi">:</span> <span class="s">string</span>
   <span class="na">user_locale</span><span class="pi">:</span> <span class="s">string</span>
-  <span class="na">created_at</span><span class="pi">:</span> <span class="s">2020-06-09T07:58:26Z</span>
-  <span class="na">updated_at</span><span class="pi">:</span> <span class="s">2020-06-09T07:58:26Z</span>
+  <span class="na">created_at</span><span class="pi">:</span> <span class="s">2020-06-09T14:49:30Z</span>
+  <span class="na">updated_at</span><span class="pi">:</span> <span class="s">2020-06-09T14:49:30Z</span>
 <span class="na">links</span><span class="pi">:</span>
   <span class="na">self</span><span class="pi">:</span> <span class="s">string</span>
   <span class="na">url</span><span class="pi">:</span> <span class="s">string</span>
@@ -15789,28 +15683,28 @@ ApiKeyAuth, OAuth2
 <td>Attributes</td>
 </tr>
 <tr>
-<td>» authorized</td>
+<td>— authorized</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Returns whether a user has authorized this subscription</td>
 </tr>
 <tr>
-<td>» user_locale</td>
+<td>— user_locale</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>The locale of the user that created this subscription</td>
 </tr>
 <tr>
-<td>» created_at</td>
+<td>— created_at</td>
 <td>string(date-time)</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>» updated_at</td>
+<td>— updated_at</td>
 <td>string(date-time)</td>
 <td>false</td>
 <td>none</td>
@@ -15824,14 +15718,14 @@ ApiKeyAuth, OAuth2
 <td>Links</td>
 </tr>
 <tr>
-<td>» self</td>
+<td>— self</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>Link to self</td>
 </tr>
 <tr>
-<td>» url</td>
+<td>— url</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
@@ -15845,70 +15739,70 @@ ApiKeyAuth, OAuth2
 <td>Relationships</td>
 </tr>
 <tr>
-<td>» organization</td>
+<td>— organization</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» data</td>
+<td>—— data</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» id</td>
+<td>——— id</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>organization ID</td>
 </tr>
 <tr>
-<td>»»» type</td>
+<td>——— type</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» links</td>
+<td>—— links</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» related</td>
+<td>——— related</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>» administration_subscriptions</td>
+<td>— administration_subscriptions</td>
 <td>object</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»» data</td>
+<td>—— data</td>
 <td>[object]</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>»»» id</td>
+<td>——— id</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>administration_subscriptions ID</td>
 </tr>
 <tr>
-<td>»»» type</td>
+<td>——— type</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
@@ -16001,28 +15895,28 @@ ApiKeyAuth, OAuth2
 <td>Attributes</td>
 </tr>
 <tr>
-<td>» email</td>
+<td>— email</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>» name</td>
+<td>— name</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>» locale</td>
+<td>— locale</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>» timezone</td>
+<td>— timezone</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
@@ -16047,8 +15941,8 @@ ApiKeyAuth, OAuth2
     <span class="pi">-</span> <span class="s">reservation|created</span>
     <span class="pi">-</span> <span class="s">reservation|updated</span>
     <span class="pi">-</span> <span class="s">reservation|deleted</span>
-  <span class="na">created_at</span><span class="pi">:</span> <span class="s">2020-06-09T07:58:26Z</span>
-  <span class="na">updated_at</span><span class="pi">:</span> <span class="s">2020-06-09T07:58:26Z</span>
+  <span class="na">created_at</span><span class="pi">:</span> <span class="s">2020-06-09T14:49:30Z</span>
+  <span class="na">updated_at</span><span class="pi">:</span> <span class="s">2020-06-09T14:49:30Z</span>
 <span class="na">links</span><span class="pi">:</span>
   <span class="na">self</span><span class="pi">:</span> <span class="s">string</span>
 
@@ -16084,35 +15978,35 @@ ApiKeyAuth, OAuth2
 <td>Attributes</td>
 </tr>
 <tr>
-<td>» target_url</td>
+<td>— target_url</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>» confirm_strategy</td>
+<td>— confirm_strategy</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
 <td>One of: wait_for_success, fire_and_forget</td>
 </tr>
 <tr>
-<td>» events</td>
+<td>— events</td>
 <td>[string]</td>
 <td>false</td>
 <td>none</td>
 <td>One or more of:<br><br>* accommodation_subtype</td>
 </tr>
 <tr>
-<td>» created_at</td>
+<td>— created_at</td>
 <td>string(date-time)</td>
 <td>false</td>
 <td>none</td>
 <td>none</td>
 </tr>
 <tr>
-<td>» updated_at</td>
+<td>— updated_at</td>
 <td>string(date-time)</td>
 <td>false</td>
 <td>none</td>
@@ -16126,7 +16020,7 @@ ApiKeyAuth, OAuth2
 <td>Links</td>
 </tr>
 <tr>
-<td>» self</td>
+<td>— self</td>
 <td>string</td>
 <td>false</td>
 <td>none</td>
