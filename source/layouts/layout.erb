@@ -16,10 +16,10 @@ under the License.
 <% language_tabs = current_page.data.language_tabs || [] %>
 <% page_content = yield %>
 <%
-  if current_page.data.includes
-    current_page.data.includes.each do |include|
-      page_content += partial("includes/#{include}")
-    end
+  if includes = current_page.data.includes
+    before = includes.before.map { |i| partial("includes/#{i}") }.join
+    after  = includes.after.map { |i| partial("includes/#{i}") }.join
+    page_content = before + page_content + after
   end
 %>
 

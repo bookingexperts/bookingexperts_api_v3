@@ -12,7 +12,10 @@ language_tabs:
 toc_footers:
   - <a href="https://www.bookingexperts.nl">Booking Experts</a>
 includes:
-  - release_notes
+  before:
+    - overview
+  after:
+    - release_notes
 search: false
 highlight_theme: darkula
 headingLevel: 2
@@ -21,188 +24,7 @@ headingLevel: 2
 
 <!-- Generator: Widdershins v4.0.1 -->
 
-<h1 id="booking-experts-contentapi">Booking Experts ContentAPI v1.0.0</h1>
-
-> Scroll down for code samples, example requests and responses. Select a language for code samples from the tabs above or the mobile navigation menu.
-
-## Introduction
-
-**DRAFT: this is a draft version and should not be used because this specification will change a lot.**
-
-This API is an interface for querying information from and enacting change inside a Booking Experts administration.
-Use it on the fly for ad-hoc needs, or build a Booking Experts App which is exposed to all users of Booking Experts through a marketplace.
-
-If you're a online tour operator, agency or just want to show available accommodations, price etc. you might want to have a look at a more focused API scope, the [Tour operator API](https://tour-operator-api.bookingexperts.com/).
-
-The goal of these API's is to maximize collaboration between all parties involved in leisure.
-So in case you think that you miss data or API endpoints, please let us know by sending us a e-mail at [connectivity@bookingexperts.nl](mailto:connectivity@bookingexperts.nl).
-
-## Standards
-
-The Booking Experts API is organized around [REST](http://en.wikipedia.org/wiki/Representational_State_Transfer) and it follows the [JSON API specification](http://jsonapi.org/).
-The API has predictable, resource-oriented URLs, and uses HTTP response codes to indicate API errors.
-
-Documentation is standardized by using the [Open API 3 (OAS3) specification](https://swagger.io/specification/), this allows you to inspect the API using other clients like for example Swagger UI and Postman.
-The specification is hosted here: `https://api.webhooks.bookingexperts.nl/v3/oas3.json`
-
-## Get acccess
-
-First of you need access to at least one Booking Experts organization.
-Inside the administration you can register a new application.
-
-By default this application is only accessible by the administrations of this organization.
-Very handy if you want to make a on the fly integration. But when your app is ready for other organizations to use, you can sign-up for validation to the marketplace.
-
-## Basics
-
-### Authorization
-
-You can authorize on behalf of a user by using OAuth2.
-For on the fly needs you can make use of a simple authentication token but has limited access to the organization and it's administrations to which is registered.
-If you want other to make use of your app you will need to support OAuth2.
-
-### Responses
-
-```shell
-curl https://api.bookingexperts.nl/v3/administrations             -H 'Accept: application/vnd.api+json'             -H 'Accept-Language: en,nl'             -H 'X-API-KEY: API_KEY'
-```
-
-> Produces the following output
-
-```json
-{
-  "errors": [
-    {
-      "status": 401,
-      "title": "Unauthorized error",
-      "detail": "Please make sure to set the Authorization HTTP header"
-    }
-  ]
-}
-```
-
-The Booking Experts API will always respond with a HTTP status code.
-The API can return the following codes:
-
-Code  | Semantic             | Meaning
------ | -------              | -------
-`200` | OK                   | Request was successful
-`400` | Bad Request          | Parameters for the request are missing or malformed. Body contains the errors.
-`401` | Unauthorized         | Your API key is wrong
-`403` | Forbidden            | IP is blacklisted for API usage, see Throttling information
-`404` | Not Found            | Entity not found
-`422` | Unprocessable entity | Saving the entity in the database failed due to validation errors. Body contains the errors.
-`429` | Too Many Requests    | You're requesting too many kittens! Slow down!
-`5XX` | Server Errors        | Something went wrong on Booking Experts's end. We are probably already busy solving the issue. It's your responsibility to retry the request at a later point.
-
-### Accept Language
-
-You can always pass an Accept-Language header containing a comma separated list of locales. This
-will limit the result of 'localized' attributes to the locales specified.
-
-### HTTP_X_BE_SIGNATURE header
-
-When your application receives a request from Booking Experts, for example when a webhook or application command is called, the `HTTP_X_BE_SIGNATURE`
-is passed to allow you to verify that the request was sent by our systems. It uses a HMAC hexdigest to compute the hash based on your Client Secret.
-
-To verify a request, your code should like something like this:
-
-```ruby
-def verify_signature(payload_body)
-  signature = 'sha1=' + OpenSSL::HMAC.hexdigest(OpenSSL::Digest.new('sha1'), ENV['OAUTH_CLIENT_SECRET'], payload_body)
-  return halt 500, "Signatures didn't match!" unless Rack::Utils.secure_compare(signature, request.env['HTTP_X_BE_SIGNATURE'])
-end
-```
-@TODO curl example (is this even possible?)
-@TODO python example
-@TODO php example
-
-* No matter which implementation you use, the hash signature starts with sha1=, using the key of your Client Secret and your payload body.
-* Using a plain == operator is not advised. A method like secure_compare performs a "constant time" string comparison, which renders it safe from certain timing attacks against regular equality operators.
-
-### Throttling
-
-Usage of the Booking Experts API is virtually unlimited. However, to prevent fraud and abuse, requests to the API are throttled.
-By default you are allowed to call the API 500 times within a moving window of 15 minutes. Additionally, bursts of 100 calls per minute are allowed within this window.
-
-While within the limit, each response contains a `X-RateLimit-Limit` and a `X-RateLimit-Remaining` header containing the set limit & the remaining allowance in the window.
-If you exceed the limit, the API will respond with a 429 Too many requests response. This response contains a header Retry-After containing the time after which a new calls are allowed.
-
-If your use case requires more lenient rate limits, please contact us at [connectivity@bookingexperts.nl](mailto:connectivity@bookingexperts.nl) to request a higher limit.
-
-### Pagination
-
-@TODO
-
-### Field sets
-
-@TODO
-
-### Filters
-
-The following attribute filters are available on GET API calls:
-
-- `attr=term`: attr = 'term'
-- `attr=~term`: attr LIKE '%term%'
-- `attr=term,term`: attr IN ('term', 'term')
-- `attr=a..b`: BETWEEN 'a' AND 'b'
-
-All expressions can be inverted by prefixing a `!`, this holds for the entire expression.
-
-## Use cases
-
-There are many use cases of this API that we are aware of:
-
-- Access control
-- Thermostats
-- Channel management
-- Tour operators
-- Websites
-- Payment providers
-- etc.
-
-Some use cases are quite specific.
-
-### Payment provider
-
-#### Payment provider requirements
-
-Apps that act as a payment provider **must** provide an application command with identifier `initiate_payment` and context model `invoice`.
-When this command is called, you will receive the following (additional) parameters:
-
-* `amount` - The requested amount to be paid
-* `currency` - The currency of the amount as an ISO 4217 currency code
-
-The response of this command **must** be a redirect URL to a payment page when no issues occur, otherwise it should return a notice or an alert.
-
-#### Handling a payment
-
-* The redirect URL you have specified will be called with a `back_url`, which should be called after a payment attempt has been done
-* The app itself must handle all callbacks and create a payment in Booking Experts when the invoice has been paid
-* After (partial) payment, the `back_url` **must** be called with a `status` parameter, which is set to one of the following values:
-  * `success` - when the payment was successful
-  * `open_but_confirmed` - when a payment has been made, but is still pending
-  * `open` - when no payment has been made yet
-  * `failure` - when the payment failed
-
-Base URLs:
-
-* <a href="https://api.bookingexperts.nl">https://api.bookingexperts.nl</a>
-
-* <a href="https://api.staging.bookingexperts.nl">https://api.staging.bookingexperts.nl</a>
-
-Email: <a href="mailto:connectivity@bookingexperts.nl">Connectivity team</a> Web: <a href="developers.bookingexperts.nl/contact">Connectivity team</a> 
-
-# Authentication
-
-* API Key (ApiKeyAuth)
-    - Parameter Name: **X-API-KEY**, in: header. 
-
-- oAuth2 authentication. 
-
-    - Flow: authorizationCode
-    - Authorization URL = [/oauth/authorize](/oauth/authorize)
-    - Token URL = [/oauth/token](/oauth/token)
+### Authorization scopes
 
 |Scope|Scope Description|
 |---|---|
@@ -484,61 +306,56 @@ Status Code **200**
 
 |Name|Type|Required|Restrictions|Description|
 |---|---|---|---|---|
-|» data|[[Administration](#schemaadministration)]|false|none|none|
-|»» id|string|false|none|ID|
-|»» type|string|false|none|Type|
-|»» attributes|object|false|none|Attributes|
-|»»» name|string|false|none|none|
-|»»» phone|string|false|none|none|
-|»»» website|string|false|none|none|
-|»»» description|object|false|none|A description of the administration|
-|»»»» nl|string|false|none|none|
-|»»»» en|string|false|none|none|
-|»»»» de|string|false|none|none|
-|»»»» fr|string|false|none|none|
-|»»»» da|string|false|none|none|
-|»»»» cs|string|false|none|none|
-|»»»» es|string|false|none|none|
-|»»»» tr|string|false|none|none|
-|»»»» pt|string|false|none|none|
-|»»»» it|string|false|none|none|
-|»»» surroundings_description|object|false|none|A description of the surroundings|
-|»»»» nl|string|false|none|none|
-|»»»» en|string|false|none|none|
-|»»»» de|string|false|none|none|
-|»»»» fr|string|false|none|none|
-|»»»» da|string|false|none|none|
-|»»»» cs|string|false|none|none|
-|»»»» es|string|false|none|none|
-|»»»» tr|string|false|none|none|
-|»»»» pt|string|false|none|none|
-|»»»» it|string|false|none|none|
-|»»» available_locales|[string]|false|none|Enabled locales|
-|»»» utc_offset|string|false|none|The UTC offset of the administration, for example: +01:00|
-|»» links|object|false|none|Links|
-|»»» self|string|false|none|Link to self|
-|» meta|object|false|none|none|
-|»» pagination|object|false|none|none|
-|»»» total_records|integer|false|none|none|
-|»»» page|integer|false|none|none|
-|»»» size|integer|false|none|none|
+|— data|[[Administration](#schemaadministration)]|false|none|none|
+|—— id|string|false|none|ID|
+|—— type|string|false|none|Type|
+|—— attributes|object|false|none|Attributes|
+|——— name|string|false|none|none|
+|——— phone|string|false|none|none|
+|——— website|string|false|none|none|
+|——— description|object|false|none|A description of the administration|
+|———— nl|string|false|none|none|
+|———— en|string|false|none|none|
+|———— de|string|false|none|none|
+|———— fr|string|false|none|none|
+|———— da|string|false|none|none|
+|———— cs|string|false|none|none|
+|———— es|string|false|none|none|
+|———— tr|string|false|none|none|
+|———— pt|string|false|none|none|
+|———— it|string|false|none|none|
+|——— surroundings_description|object|false|none|A description of the surroundings|
+|———— nl|string|false|none|none|
+|———— en|string|false|none|none|
+|———— de|string|false|none|none|
+|———— fr|string|false|none|none|
+|———— da|string|false|none|none|
+|———— cs|string|false|none|none|
+|———— es|string|false|none|none|
+|———— tr|string|false|none|none|
+|———— pt|string|false|none|none|
+|———— it|string|false|none|none|
+|——— available_locales|[string]|false|none|Enabled locales|
+|——— utc_offset|string|false|none|The UTC offset of the administration, for example: +01:00|
+|—— links|object|false|none|Links|
+|——— self|string|false|none|Link to self|
+|— meta|object|false|none|none|
+|—— pagination|object|false|none|none|
+|——— total_records|integer|false|none|none|
+|——— page|integer|false|none|none|
+|——— size|integer|false|none|none|
 
 Status Code **default**
 
 |Name|Type|Required|Restrictions|Description|
 |---|---|---|---|---|
-|» errors|[object]|false|none|none|
-|»» status|string|false|none|HTTP response code|
-|»» code|string|false|none|Internal error code|
-|»» title|string|false|none|Error title|
-|»» detail|string|false|none|Error details|
-|»» source|object|false|none|none|
-|»»» pointer|string|false|none|Pointer to error in resource|
-
-<aside class="warning">
-To perform this operation, you must be authenticated by means of one of the following methods:
-ApiKeyAuth, OAuth2
-</aside>
+|— errors|[object]|false|none|none|
+|—— status|string|false|none|HTTP response code|
+|—— code|string|false|none|Internal error code|
+|—— title|string|false|none|Error title|
+|—— detail|string|false|none|Error details|
+|—— source|object|false|none|none|
+|——— pointer|string|false|none|Pointer to error in resource|
 
 ## GET administration
 
@@ -773,56 +590,51 @@ Status Code **200**
 
 |Name|Type|Required|Restrictions|Description|
 |---|---|---|---|---|
-|» data|[Administration](#schemaadministration)|false|none|none|
-|»» id|string|false|none|ID|
-|»» type|string|false|none|Type|
-|»» attributes|object|false|none|Attributes|
-|»»» name|string|false|none|none|
-|»»» phone|string|false|none|none|
-|»»» website|string|false|none|none|
-|»»» description|object|false|none|A description of the administration|
-|»»»» nl|string|false|none|none|
-|»»»» en|string|false|none|none|
-|»»»» de|string|false|none|none|
-|»»»» fr|string|false|none|none|
-|»»»» da|string|false|none|none|
-|»»»» cs|string|false|none|none|
-|»»»» es|string|false|none|none|
-|»»»» tr|string|false|none|none|
-|»»»» pt|string|false|none|none|
-|»»»» it|string|false|none|none|
-|»»» surroundings_description|object|false|none|A description of the surroundings|
-|»»»» nl|string|false|none|none|
-|»»»» en|string|false|none|none|
-|»»»» de|string|false|none|none|
-|»»»» fr|string|false|none|none|
-|»»»» da|string|false|none|none|
-|»»»» cs|string|false|none|none|
-|»»»» es|string|false|none|none|
-|»»»» tr|string|false|none|none|
-|»»»» pt|string|false|none|none|
-|»»»» it|string|false|none|none|
-|»»» available_locales|[string]|false|none|Enabled locales|
-|»»» utc_offset|string|false|none|The UTC offset of the administration, for example: +01:00|
-|»» links|object|false|none|Links|
-|»»» self|string|false|none|Link to self|
+|— data|[Administration](#schemaadministration)|false|none|none|
+|—— id|string|false|none|ID|
+|—— type|string|false|none|Type|
+|—— attributes|object|false|none|Attributes|
+|——— name|string|false|none|none|
+|——— phone|string|false|none|none|
+|——— website|string|false|none|none|
+|——— description|object|false|none|A description of the administration|
+|———— nl|string|false|none|none|
+|———— en|string|false|none|none|
+|———— de|string|false|none|none|
+|———— fr|string|false|none|none|
+|———— da|string|false|none|none|
+|———— cs|string|false|none|none|
+|———— es|string|false|none|none|
+|———— tr|string|false|none|none|
+|———— pt|string|false|none|none|
+|———— it|string|false|none|none|
+|——— surroundings_description|object|false|none|A description of the surroundings|
+|———— nl|string|false|none|none|
+|———— en|string|false|none|none|
+|———— de|string|false|none|none|
+|———— fr|string|false|none|none|
+|———— da|string|false|none|none|
+|———— cs|string|false|none|none|
+|———— es|string|false|none|none|
+|———— tr|string|false|none|none|
+|———— pt|string|false|none|none|
+|———— it|string|false|none|none|
+|——— available_locales|[string]|false|none|Enabled locales|
+|——— utc_offset|string|false|none|The UTC offset of the administration, for example: +01:00|
+|—— links|object|false|none|Links|
+|——— self|string|false|none|Link to self|
 
 Status Code **default**
 
 |Name|Type|Required|Restrictions|Description|
 |---|---|---|---|---|
-|» errors|[object]|false|none|none|
-|»» status|string|false|none|HTTP response code|
-|»» code|string|false|none|Internal error code|
-|»» title|string|false|none|Error title|
-|»» detail|string|false|none|Error details|
-|»» source|object|false|none|none|
-|»»» pointer|string|false|none|Pointer to error in resource|
-
-<aside class="warning">
-To perform this operation, you must be authenticated by means of one of the following methods:
-ApiKeyAuth, OAuth2
-</aside>
+|— errors|[object]|false|none|none|
+|—— status|string|false|none|HTTP response code|
+|—— code|string|false|none|Internal error code|
+|—— title|string|false|none|Error title|
+|—— detail|string|false|none|Error details|
+|—— source|object|false|none|none|
+|——— pointer|string|false|none|Pointer to error in resource|
 
 <h1 id="booking-experts-contentapi-application-commands">Application Commands</h1>
 
@@ -1034,8 +846,8 @@ Returns application commands you have registered
         "http_method": "post",
         "target_url": "https://myapp.lvh.me:3000/gate_cards",
         "enabled_script": "reservation.dig(:data, :attributes, :state) == 'confirmed'",
-        "created_at": "2020-06-09T07:58:26Z",
-        "updated_at": "2020-06-09T07:58:26Z"
+        "created_at": "2020-06-09T14:49:30Z",
+        "updated_at": "2020-06-09T14:49:30Z"
       },
       "links": {
         "self": "string"
@@ -1065,63 +877,58 @@ Status Code **200**
 
 |Name|Type|Required|Restrictions|Description|
 |---|---|---|---|---|
-|» data|[[ApplicationCommand](#schemaapplicationcommand)]|false|none|none|
-|»» id|string|false|none|ID|
-|»» type|string|false|none|Type|
-|»» attributes|object|false|none|Attributes|
-|»»» identifier|string|false|none|none|
-|»»» name|object|false|none|none|
-|»»»» nl|string|false|none|none|
-|»»»» en|string|false|none|none|
-|»»»» de|string|false|none|none|
-|»»»» fr|string|false|none|none|
-|»»»» da|string|false|none|none|
-|»»»» cs|string|false|none|none|
-|»»»» es|string|false|none|none|
-|»»»» tr|string|false|none|none|
-|»»»» pt|string|false|none|none|
-|»»»» it|string|false|none|none|
-|»»» description|object|false|none|none|
-|»»»» nl|string|false|none|none|
-|»»»» en|string|false|none|none|
-|»»»» de|string|false|none|none|
-|»»»» fr|string|false|none|none|
-|»»»» da|string|false|none|none|
-|»»»» cs|string|false|none|none|
-|»»»» es|string|false|none|none|
-|»»»» tr|string|false|none|none|
-|»»»» pt|string|false|none|none|
-|»»»» it|string|false|none|none|
-|»»» context_model|string|false|none|One of: invoice, reservation, subscription|
-|»»» http_method|string|false|none|One of: get, post, put, patch, delete|
-|»»» target_url|string|false|none|This URL will be called by us using the `http_method` specified|
-|»»» enabled_script|string|false|none|When set, this script will be evaluated to determine whether an action should be available to a user.<br>The last line of your script will be the result of the script. When the result is truthy, the command will be enabled.<br>The following variables will be available to you:<br><br>* The JSON serialized context model as defined in `context_model`. For example: `reservation`. Conforms to the documented schema.<br>* `current_user` - The JSON serialized current user (when present). Conforms to the documented User schema.<br><br>The script language **MUST** be Ruby. The list of method calls you are allowed to make is limited to the following:<br><br>* Allowed methods on any object:<br>`==` `!=` `!` `present?` `blank?`<br>* Allowed methods on hash objects:<br>`[]` `dig`<br>* Allowed calculation methods:<br>`+` `-` `*` `/`|
-|»»» created_at|string(date-time)|false|none|none|
-|»»» updated_at|string(date-time)|false|none|none|
-|»» links|object|false|none|Links|
-|»»» self|string|false|none|Link to self|
-|» meta|object|false|none|none|
-|»» pagination|object|false|none|none|
-|»»» total_records|integer|false|none|none|
-|»»» page|integer|false|none|none|
-|»»» size|integer|false|none|none|
+|— data|[[ApplicationCommand](#schemaapplicationcommand)]|false|none|none|
+|—— id|string|false|none|ID|
+|—— type|string|false|none|Type|
+|—— attributes|object|false|none|Attributes|
+|——— identifier|string|false|none|none|
+|——— name|object|false|none|none|
+|———— nl|string|false|none|none|
+|———— en|string|false|none|none|
+|———— de|string|false|none|none|
+|———— fr|string|false|none|none|
+|———— da|string|false|none|none|
+|———— cs|string|false|none|none|
+|———— es|string|false|none|none|
+|———— tr|string|false|none|none|
+|———— pt|string|false|none|none|
+|———— it|string|false|none|none|
+|——— description|object|false|none|none|
+|———— nl|string|false|none|none|
+|———— en|string|false|none|none|
+|———— de|string|false|none|none|
+|———— fr|string|false|none|none|
+|———— da|string|false|none|none|
+|———— cs|string|false|none|none|
+|———— es|string|false|none|none|
+|———— tr|string|false|none|none|
+|———— pt|string|false|none|none|
+|———— it|string|false|none|none|
+|——— context_model|string|false|none|One of: invoice, reservation, subscription|
+|——— http_method|string|false|none|One of: get, post, put, patch, delete|
+|——— target_url|string|false|none|This URL will be called by us using the `http_method` specified|
+|——— enabled_script|string|false|none|When set, this script will be evaluated to determine whether an action should be available to a user.<br>The last line of your script will be the result of the script. When the result is truthy, the command will be enabled.<br>The following variables will be available to you:<br><br>* The JSON serialized context model as defined in `context_model`. For example: `reservation`. Conforms to the documented schema.<br>* `current_user` - The JSON serialized current user (when present). Conforms to the documented User schema.<br><br>The script language **MUST** be Ruby. The list of method calls you are allowed to make is limited to the following:<br><br>* Allowed methods on any object:<br>`==` `!=` `!` `present?` `blank?`<br>* Allowed methods on hash objects:<br>`[]` `dig`<br>* Allowed calculation methods:<br>`+` `-` `*` `/`|
+|——— created_at|string(date-time)|false|none|none|
+|——— updated_at|string(date-time)|false|none|none|
+|—— links|object|false|none|Links|
+|——— self|string|false|none|Link to self|
+|— meta|object|false|none|none|
+|—— pagination|object|false|none|none|
+|——— total_records|integer|false|none|none|
+|——— page|integer|false|none|none|
+|——— size|integer|false|none|none|
 
 Status Code **default**
 
 |Name|Type|Required|Restrictions|Description|
 |---|---|---|---|---|
-|» errors|[object]|false|none|none|
-|»» status|string|false|none|HTTP response code|
-|»» code|string|false|none|Internal error code|
-|»» title|string|false|none|Error title|
-|»» detail|string|false|none|Error details|
-|»» source|object|false|none|none|
-|»»» pointer|string|false|none|Pointer to error in resource|
-
-<aside class="warning">
-To perform this operation, you must be authenticated by means of one of the following methods:
-ApiKeyAuth, OAuth2
-</aside>
+|— errors|[object]|false|none|none|
+|—— status|string|false|none|HTTP response code|
+|—— code|string|false|none|Internal error code|
+|—— title|string|false|none|Error title|
+|—— detail|string|false|none|Error details|
+|—— source|object|false|none|none|
+|——— pointer|string|false|none|Pointer to error in resource|
 
 ## POST application command
 
@@ -1340,40 +1147,40 @@ Application commands **MUST** respond with one of the following **JSON** respons
 |---|---|---|---|---|
 |Accept-Language|header|string|false|Supported languages. A comma separated list with one or more of the following locales: nl, en, de, fr, da, cs, es, tr, pt, it. Default: 'en'.|
 |body|body|object|true|none|
-|» data|body|object|false|none|
-|»» type|body|string|false|Type|
-|»» attributes|body|object|false|Attributes|
-|»»» identifier|body|string|false|none|
-|»»» name|body|object|false|none|
-|»»»» nl|body|string|false|none|
-|»»»» en|body|string|false|none|
-|»»»» de|body|string|false|none|
-|»»»» fr|body|string|false|none|
-|»»»» da|body|string|false|none|
-|»»»» cs|body|string|false|none|
-|»»»» es|body|string|false|none|
-|»»»» tr|body|string|false|none|
-|»»»» pt|body|string|false|none|
-|»»»» it|body|string|false|none|
-|»»» description|body|object|false|none|
-|»»»» nl|body|string|false|none|
-|»»»» en|body|string|false|none|
-|»»»» de|body|string|false|none|
-|»»»» fr|body|string|false|none|
-|»»»» da|body|string|false|none|
-|»»»» cs|body|string|false|none|
-|»»»» es|body|string|false|none|
-|»»»» tr|body|string|false|none|
-|»»»» pt|body|string|false|none|
-|»»»» it|body|string|false|none|
-|»»» context_model|body|string|false|One of: invoice, reservation, subscription|
-|»»» http_method|body|string|false|One of: get, post, put, patch, delete|
-|»»» target_url|body|string|false|This URL will be called by us using the `http_method` specified|
-|»»» enabled_script|body|string|false|When set, this script will be evaluated to determine whether an action should be available to a user.|
+|— data|body|object|false|none|
+|—— type|body|string|false|Type|
+|—— attributes|body|object|false|Attributes|
+|——— identifier|body|string|false|none|
+|——— name|body|object|false|none|
+|———— nl|body|string|false|none|
+|———— en|body|string|false|none|
+|———— de|body|string|false|none|
+|———— fr|body|string|false|none|
+|———— da|body|string|false|none|
+|———— cs|body|string|false|none|
+|———— es|body|string|false|none|
+|———— tr|body|string|false|none|
+|———— pt|body|string|false|none|
+|———— it|body|string|false|none|
+|——— description|body|object|false|none|
+|———— nl|body|string|false|none|
+|———— en|body|string|false|none|
+|———— de|body|string|false|none|
+|———— fr|body|string|false|none|
+|———— da|body|string|false|none|
+|———— cs|body|string|false|none|
+|———— es|body|string|false|none|
+|———— tr|body|string|false|none|
+|———— pt|body|string|false|none|
+|———— it|body|string|false|none|
+|——— context_model|body|string|false|One of: invoice, reservation, subscription|
+|——— http_method|body|string|false|One of: get, post, put, patch, delete|
+|——— target_url|body|string|false|This URL will be called by us using the `http_method` specified|
+|——— enabled_script|body|string|false|When set, this script will be evaluated to determine whether an action should be available to a user.|
 
 #### Detailed descriptions
 
-**»»» enabled_script**: When set, this script will be evaluated to determine whether an action should be available to a user.
+**——— enabled_script**: When set, this script will be evaluated to determine whether an action should be available to a user.
 The last line of your script will be the result of the script. When the result is truthy, the command will be enabled.
 The following variables will be available to you:
 
@@ -1412,8 +1219,8 @@ The script language **MUST** be Ruby. The list of method calls you are allowed t
       "http_method": "post",
       "target_url": "https://myapp.lvh.me:3000/gate_cards",
       "enabled_script": "reservation.dig(:data, :attributes, :state) == 'confirmed'",
-      "created_at": "2020-06-09T07:58:26Z",
-      "updated_at": "2020-06-09T07:58:26Z"
+      "created_at": "2020-06-09T14:49:30Z",
+      "updated_at": "2020-06-09T14:49:30Z"
     },
     "links": {
       "self": "string"
@@ -1435,58 +1242,53 @@ Status Code **200**
 
 |Name|Type|Required|Restrictions|Description|
 |---|---|---|---|---|
-|» data|[ApplicationCommand](#schemaapplicationcommand)|false|none|none|
-|»» id|string|false|none|ID|
-|»» type|string|false|none|Type|
-|»» attributes|object|false|none|Attributes|
-|»»» identifier|string|false|none|none|
-|»»» name|object|false|none|none|
-|»»»» nl|string|false|none|none|
-|»»»» en|string|false|none|none|
-|»»»» de|string|false|none|none|
-|»»»» fr|string|false|none|none|
-|»»»» da|string|false|none|none|
-|»»»» cs|string|false|none|none|
-|»»»» es|string|false|none|none|
-|»»»» tr|string|false|none|none|
-|»»»» pt|string|false|none|none|
-|»»»» it|string|false|none|none|
-|»»» description|object|false|none|none|
-|»»»» nl|string|false|none|none|
-|»»»» en|string|false|none|none|
-|»»»» de|string|false|none|none|
-|»»»» fr|string|false|none|none|
-|»»»» da|string|false|none|none|
-|»»»» cs|string|false|none|none|
-|»»»» es|string|false|none|none|
-|»»»» tr|string|false|none|none|
-|»»»» pt|string|false|none|none|
-|»»»» it|string|false|none|none|
-|»»» context_model|string|false|none|One of: invoice, reservation, subscription|
-|»»» http_method|string|false|none|One of: get, post, put, patch, delete|
-|»»» target_url|string|false|none|This URL will be called by us using the `http_method` specified|
-|»»» enabled_script|string|false|none|When set, this script will be evaluated to determine whether an action should be available to a user.<br>The last line of your script will be the result of the script. When the result is truthy, the command will be enabled.<br>The following variables will be available to you:<br><br>* The JSON serialized context model as defined in `context_model`. For example: `reservation`. Conforms to the documented schema.<br>* `current_user` - The JSON serialized current user (when present). Conforms to the documented User schema.<br><br>The script language **MUST** be Ruby. The list of method calls you are allowed to make is limited to the following:<br><br>* Allowed methods on any object:<br>`==` `!=` `!` `present?` `blank?`<br>* Allowed methods on hash objects:<br>`[]` `dig`<br>* Allowed calculation methods:<br>`+` `-` `*` `/`|
-|»»» created_at|string(date-time)|false|none|none|
-|»»» updated_at|string(date-time)|false|none|none|
-|»» links|object|false|none|Links|
-|»»» self|string|false|none|Link to self|
+|— data|[ApplicationCommand](#schemaapplicationcommand)|false|none|none|
+|—— id|string|false|none|ID|
+|—— type|string|false|none|Type|
+|—— attributes|object|false|none|Attributes|
+|——— identifier|string|false|none|none|
+|——— name|object|false|none|none|
+|———— nl|string|false|none|none|
+|———— en|string|false|none|none|
+|———— de|string|false|none|none|
+|———— fr|string|false|none|none|
+|———— da|string|false|none|none|
+|———— cs|string|false|none|none|
+|———— es|string|false|none|none|
+|———— tr|string|false|none|none|
+|———— pt|string|false|none|none|
+|———— it|string|false|none|none|
+|——— description|object|false|none|none|
+|———— nl|string|false|none|none|
+|———— en|string|false|none|none|
+|———— de|string|false|none|none|
+|———— fr|string|false|none|none|
+|———— da|string|false|none|none|
+|———— cs|string|false|none|none|
+|———— es|string|false|none|none|
+|———— tr|string|false|none|none|
+|———— pt|string|false|none|none|
+|———— it|string|false|none|none|
+|——— context_model|string|false|none|One of: invoice, reservation, subscription|
+|——— http_method|string|false|none|One of: get, post, put, patch, delete|
+|——— target_url|string|false|none|This URL will be called by us using the `http_method` specified|
+|——— enabled_script|string|false|none|When set, this script will be evaluated to determine whether an action should be available to a user.<br>The last line of your script will be the result of the script. When the result is truthy, the command will be enabled.<br>The following variables will be available to you:<br><br>* The JSON serialized context model as defined in `context_model`. For example: `reservation`. Conforms to the documented schema.<br>* `current_user` - The JSON serialized current user (when present). Conforms to the documented User schema.<br><br>The script language **MUST** be Ruby. The list of method calls you are allowed to make is limited to the following:<br><br>* Allowed methods on any object:<br>`==` `!=` `!` `present?` `blank?`<br>* Allowed methods on hash objects:<br>`[]` `dig`<br>* Allowed calculation methods:<br>`+` `-` `*` `/`|
+|——— created_at|string(date-time)|false|none|none|
+|——— updated_at|string(date-time)|false|none|none|
+|—— links|object|false|none|Links|
+|——— self|string|false|none|Link to self|
 
 Status Code **default**
 
 |Name|Type|Required|Restrictions|Description|
 |---|---|---|---|---|
-|» errors|[object]|false|none|none|
-|»» status|string|false|none|HTTP response code|
-|»» code|string|false|none|Internal error code|
-|»» title|string|false|none|Error title|
-|»» detail|string|false|none|Error details|
-|»» source|object|false|none|none|
-|»»» pointer|string|false|none|Pointer to error in resource|
-
-<aside class="warning">
-To perform this operation, you must be authenticated by means of one of the following methods:
-ApiKeyAuth, OAuth2
-</aside>
+|— errors|[object]|false|none|none|
+|—— status|string|false|none|HTTP response code|
+|—— code|string|false|none|Internal error code|
+|—— title|string|false|none|Error title|
+|—— detail|string|false|none|Error details|
+|—— source|object|false|none|none|
+|——— pointer|string|false|none|Pointer to error in resource|
 
 ## GET application command
 
@@ -1684,8 +1486,8 @@ Returns the application command for the given ID
       "http_method": "post",
       "target_url": "https://myapp.lvh.me:3000/gate_cards",
       "enabled_script": "reservation.dig(:data, :attributes, :state) == 'confirmed'",
-      "created_at": "2020-06-09T07:58:26Z",
-      "updated_at": "2020-06-09T07:58:26Z"
+      "created_at": "2020-06-09T14:49:30Z",
+      "updated_at": "2020-06-09T14:49:30Z"
     },
     "links": {
       "self": "string"
@@ -1707,58 +1509,53 @@ Status Code **200**
 
 |Name|Type|Required|Restrictions|Description|
 |---|---|---|---|---|
-|» data|[ApplicationCommand](#schemaapplicationcommand)|false|none|none|
-|»» id|string|false|none|ID|
-|»» type|string|false|none|Type|
-|»» attributes|object|false|none|Attributes|
-|»»» identifier|string|false|none|none|
-|»»» name|object|false|none|none|
-|»»»» nl|string|false|none|none|
-|»»»» en|string|false|none|none|
-|»»»» de|string|false|none|none|
-|»»»» fr|string|false|none|none|
-|»»»» da|string|false|none|none|
-|»»»» cs|string|false|none|none|
-|»»»» es|string|false|none|none|
-|»»»» tr|string|false|none|none|
-|»»»» pt|string|false|none|none|
-|»»»» it|string|false|none|none|
-|»»» description|object|false|none|none|
-|»»»» nl|string|false|none|none|
-|»»»» en|string|false|none|none|
-|»»»» de|string|false|none|none|
-|»»»» fr|string|false|none|none|
-|»»»» da|string|false|none|none|
-|»»»» cs|string|false|none|none|
-|»»»» es|string|false|none|none|
-|»»»» tr|string|false|none|none|
-|»»»» pt|string|false|none|none|
-|»»»» it|string|false|none|none|
-|»»» context_model|string|false|none|One of: invoice, reservation, subscription|
-|»»» http_method|string|false|none|One of: get, post, put, patch, delete|
-|»»» target_url|string|false|none|This URL will be called by us using the `http_method` specified|
-|»»» enabled_script|string|false|none|When set, this script will be evaluated to determine whether an action should be available to a user.<br>The last line of your script will be the result of the script. When the result is truthy, the command will be enabled.<br>The following variables will be available to you:<br><br>* The JSON serialized context model as defined in `context_model`. For example: `reservation`. Conforms to the documented schema.<br>* `current_user` - The JSON serialized current user (when present). Conforms to the documented User schema.<br><br>The script language **MUST** be Ruby. The list of method calls you are allowed to make is limited to the following:<br><br>* Allowed methods on any object:<br>`==` `!=` `!` `present?` `blank?`<br>* Allowed methods on hash objects:<br>`[]` `dig`<br>* Allowed calculation methods:<br>`+` `-` `*` `/`|
-|»»» created_at|string(date-time)|false|none|none|
-|»»» updated_at|string(date-time)|false|none|none|
-|»» links|object|false|none|Links|
-|»»» self|string|false|none|Link to self|
+|— data|[ApplicationCommand](#schemaapplicationcommand)|false|none|none|
+|—— id|string|false|none|ID|
+|—— type|string|false|none|Type|
+|—— attributes|object|false|none|Attributes|
+|——— identifier|string|false|none|none|
+|——— name|object|false|none|none|
+|———— nl|string|false|none|none|
+|———— en|string|false|none|none|
+|———— de|string|false|none|none|
+|———— fr|string|false|none|none|
+|———— da|string|false|none|none|
+|———— cs|string|false|none|none|
+|———— es|string|false|none|none|
+|———— tr|string|false|none|none|
+|———— pt|string|false|none|none|
+|———— it|string|false|none|none|
+|——— description|object|false|none|none|
+|———— nl|string|false|none|none|
+|———— en|string|false|none|none|
+|———— de|string|false|none|none|
+|———— fr|string|false|none|none|
+|———— da|string|false|none|none|
+|———— cs|string|false|none|none|
+|———— es|string|false|none|none|
+|———— tr|string|false|none|none|
+|———— pt|string|false|none|none|
+|———— it|string|false|none|none|
+|——— context_model|string|false|none|One of: invoice, reservation, subscription|
+|——— http_method|string|false|none|One of: get, post, put, patch, delete|
+|——— target_url|string|false|none|This URL will be called by us using the `http_method` specified|
+|——— enabled_script|string|false|none|When set, this script will be evaluated to determine whether an action should be available to a user.<br>The last line of your script will be the result of the script. When the result is truthy, the command will be enabled.<br>The following variables will be available to you:<br><br>* The JSON serialized context model as defined in `context_model`. For example: `reservation`. Conforms to the documented schema.<br>* `current_user` - The JSON serialized current user (when present). Conforms to the documented User schema.<br><br>The script language **MUST** be Ruby. The list of method calls you are allowed to make is limited to the following:<br><br>* Allowed methods on any object:<br>`==` `!=` `!` `present?` `blank?`<br>* Allowed methods on hash objects:<br>`[]` `dig`<br>* Allowed calculation methods:<br>`+` `-` `*` `/`|
+|——— created_at|string(date-time)|false|none|none|
+|——— updated_at|string(date-time)|false|none|none|
+|—— links|object|false|none|Links|
+|——— self|string|false|none|Link to self|
 
 Status Code **default**
 
 |Name|Type|Required|Restrictions|Description|
 |---|---|---|---|---|
-|» errors|[object]|false|none|none|
-|»» status|string|false|none|HTTP response code|
-|»» code|string|false|none|Internal error code|
-|»» title|string|false|none|Error title|
-|»» detail|string|false|none|Error details|
-|»» source|object|false|none|none|
-|»»» pointer|string|false|none|Pointer to error in resource|
-
-<aside class="warning">
-To perform this operation, you must be authenticated by means of one of the following methods:
-ApiKeyAuth, OAuth2
-</aside>
+|— errors|[object]|false|none|none|
+|—— status|string|false|none|HTTP response code|
+|—— code|string|false|none|Internal error code|
+|—— title|string|false|none|Error title|
+|—— detail|string|false|none|Error details|
+|—— source|object|false|none|none|
+|——— pointer|string|false|none|Pointer to error in resource|
 
 ## PATCH application command
 
@@ -1968,41 +1765,41 @@ Update an application command
 |id|path|string|true|Resource ID|
 |Accept-Language|header|string|false|Supported languages. A comma separated list with one or more of the following locales: nl, en, de, fr, da, cs, es, tr, pt, it. Default: 'en'.|
 |body|body|object|true|none|
-|» data|body|object|false|none|
-|»» id|body|string|false|ID|
-|»» type|body|string|false|Type|
-|»» attributes|body|object|false|Attributes|
-|»»» identifier|body|string|false|none|
-|»»» name|body|object|false|none|
-|»»»» nl|body|string|false|none|
-|»»»» en|body|string|false|none|
-|»»»» de|body|string|false|none|
-|»»»» fr|body|string|false|none|
-|»»»» da|body|string|false|none|
-|»»»» cs|body|string|false|none|
-|»»»» es|body|string|false|none|
-|»»»» tr|body|string|false|none|
-|»»»» pt|body|string|false|none|
-|»»»» it|body|string|false|none|
-|»»» description|body|object|false|none|
-|»»»» nl|body|string|false|none|
-|»»»» en|body|string|false|none|
-|»»»» de|body|string|false|none|
-|»»»» fr|body|string|false|none|
-|»»»» da|body|string|false|none|
-|»»»» cs|body|string|false|none|
-|»»»» es|body|string|false|none|
-|»»»» tr|body|string|false|none|
-|»»»» pt|body|string|false|none|
-|»»»» it|body|string|false|none|
-|»»» context_model|body|string|false|One of: invoice, reservation, subscription|
-|»»» http_method|body|string|false|One of: get, post, put, patch, delete|
-|»»» target_url|body|string|false|This URL will be called by us using the `http_method` specified|
-|»»» enabled_script|body|string|false|When set, this script will be evaluated to determine whether an action should be available to a user.|
+|— data|body|object|false|none|
+|—— id|body|string|false|ID|
+|—— type|body|string|false|Type|
+|—— attributes|body|object|false|Attributes|
+|——— identifier|body|string|false|none|
+|——— name|body|object|false|none|
+|———— nl|body|string|false|none|
+|———— en|body|string|false|none|
+|———— de|body|string|false|none|
+|———— fr|body|string|false|none|
+|———— da|body|string|false|none|
+|———— cs|body|string|false|none|
+|———— es|body|string|false|none|
+|———— tr|body|string|false|none|
+|———— pt|body|string|false|none|
+|———— it|body|string|false|none|
+|——— description|body|object|false|none|
+|———— nl|body|string|false|none|
+|———— en|body|string|false|none|
+|———— de|body|string|false|none|
+|———— fr|body|string|false|none|
+|———— da|body|string|false|none|
+|———— cs|body|string|false|none|
+|———— es|body|string|false|none|
+|———— tr|body|string|false|none|
+|———— pt|body|string|false|none|
+|———— it|body|string|false|none|
+|——— context_model|body|string|false|One of: invoice, reservation, subscription|
+|——— http_method|body|string|false|One of: get, post, put, patch, delete|
+|——— target_url|body|string|false|This URL will be called by us using the `http_method` specified|
+|——— enabled_script|body|string|false|When set, this script will be evaluated to determine whether an action should be available to a user.|
 
 #### Detailed descriptions
 
-**»»» enabled_script**: When set, this script will be evaluated to determine whether an action should be available to a user.
+**——— enabled_script**: When set, this script will be evaluated to determine whether an action should be available to a user.
 The last line of your script will be the result of the script. When the result is truthy, the command will be enabled.
 The following variables will be available to you:
 
@@ -2041,8 +1838,8 @@ The script language **MUST** be Ruby. The list of method calls you are allowed t
       "http_method": "post",
       "target_url": "https://myapp.lvh.me:3000/gate_cards",
       "enabled_script": "reservation.dig(:data, :attributes, :state) == 'confirmed'",
-      "created_at": "2020-06-09T07:58:26Z",
-      "updated_at": "2020-06-09T07:58:26Z"
+      "created_at": "2020-06-09T14:49:30Z",
+      "updated_at": "2020-06-09T14:49:30Z"
     },
     "links": {
       "self": "string"
@@ -2064,58 +1861,53 @@ Status Code **200**
 
 |Name|Type|Required|Restrictions|Description|
 |---|---|---|---|---|
-|» data|[ApplicationCommand](#schemaapplicationcommand)|false|none|none|
-|»» id|string|false|none|ID|
-|»» type|string|false|none|Type|
-|»» attributes|object|false|none|Attributes|
-|»»» identifier|string|false|none|none|
-|»»» name|object|false|none|none|
-|»»»» nl|string|false|none|none|
-|»»»» en|string|false|none|none|
-|»»»» de|string|false|none|none|
-|»»»» fr|string|false|none|none|
-|»»»» da|string|false|none|none|
-|»»»» cs|string|false|none|none|
-|»»»» es|string|false|none|none|
-|»»»» tr|string|false|none|none|
-|»»»» pt|string|false|none|none|
-|»»»» it|string|false|none|none|
-|»»» description|object|false|none|none|
-|»»»» nl|string|false|none|none|
-|»»»» en|string|false|none|none|
-|»»»» de|string|false|none|none|
-|»»»» fr|string|false|none|none|
-|»»»» da|string|false|none|none|
-|»»»» cs|string|false|none|none|
-|»»»» es|string|false|none|none|
-|»»»» tr|string|false|none|none|
-|»»»» pt|string|false|none|none|
-|»»»» it|string|false|none|none|
-|»»» context_model|string|false|none|One of: invoice, reservation, subscription|
-|»»» http_method|string|false|none|One of: get, post, put, patch, delete|
-|»»» target_url|string|false|none|This URL will be called by us using the `http_method` specified|
-|»»» enabled_script|string|false|none|When set, this script will be evaluated to determine whether an action should be available to a user.<br>The last line of your script will be the result of the script. When the result is truthy, the command will be enabled.<br>The following variables will be available to you:<br><br>* The JSON serialized context model as defined in `context_model`. For example: `reservation`. Conforms to the documented schema.<br>* `current_user` - The JSON serialized current user (when present). Conforms to the documented User schema.<br><br>The script language **MUST** be Ruby. The list of method calls you are allowed to make is limited to the following:<br><br>* Allowed methods on any object:<br>`==` `!=` `!` `present?` `blank?`<br>* Allowed methods on hash objects:<br>`[]` `dig`<br>* Allowed calculation methods:<br>`+` `-` `*` `/`|
-|»»» created_at|string(date-time)|false|none|none|
-|»»» updated_at|string(date-time)|false|none|none|
-|»» links|object|false|none|Links|
-|»»» self|string|false|none|Link to self|
+|— data|[ApplicationCommand](#schemaapplicationcommand)|false|none|none|
+|—— id|string|false|none|ID|
+|—— type|string|false|none|Type|
+|—— attributes|object|false|none|Attributes|
+|——— identifier|string|false|none|none|
+|——— name|object|false|none|none|
+|———— nl|string|false|none|none|
+|———— en|string|false|none|none|
+|———— de|string|false|none|none|
+|———— fr|string|false|none|none|
+|———— da|string|false|none|none|
+|———— cs|string|false|none|none|
+|———— es|string|false|none|none|
+|———— tr|string|false|none|none|
+|———— pt|string|false|none|none|
+|———— it|string|false|none|none|
+|——— description|object|false|none|none|
+|———— nl|string|false|none|none|
+|———— en|string|false|none|none|
+|———— de|string|false|none|none|
+|———— fr|string|false|none|none|
+|———— da|string|false|none|none|
+|———— cs|string|false|none|none|
+|———— es|string|false|none|none|
+|———— tr|string|false|none|none|
+|———— pt|string|false|none|none|
+|———— it|string|false|none|none|
+|——— context_model|string|false|none|One of: invoice, reservation, subscription|
+|——— http_method|string|false|none|One of: get, post, put, patch, delete|
+|——— target_url|string|false|none|This URL will be called by us using the `http_method` specified|
+|——— enabled_script|string|false|none|When set, this script will be evaluated to determine whether an action should be available to a user.<br>The last line of your script will be the result of the script. When the result is truthy, the command will be enabled.<br>The following variables will be available to you:<br><br>* The JSON serialized context model as defined in `context_model`. For example: `reservation`. Conforms to the documented schema.<br>* `current_user` - The JSON serialized current user (when present). Conforms to the documented User schema.<br><br>The script language **MUST** be Ruby. The list of method calls you are allowed to make is limited to the following:<br><br>* Allowed methods on any object:<br>`==` `!=` `!` `present?` `blank?`<br>* Allowed methods on hash objects:<br>`[]` `dig`<br>* Allowed calculation methods:<br>`+` `-` `*` `/`|
+|——— created_at|string(date-time)|false|none|none|
+|——— updated_at|string(date-time)|false|none|none|
+|—— links|object|false|none|Links|
+|——— self|string|false|none|Link to self|
 
 Status Code **default**
 
 |Name|Type|Required|Restrictions|Description|
 |---|---|---|---|---|
-|» errors|[object]|false|none|none|
-|»» status|string|false|none|HTTP response code|
-|»» code|string|false|none|Internal error code|
-|»» title|string|false|none|Error title|
-|»» detail|string|false|none|Error details|
-|»» source|object|false|none|none|
-|»»» pointer|string|false|none|Pointer to error in resource|
-
-<aside class="warning">
-To perform this operation, you must be authenticated by means of one of the following methods:
-ApiKeyAuth, OAuth2
-</aside>
+|— errors|[object]|false|none|none|
+|—— status|string|false|none|HTTP response code|
+|—— code|string|false|none|Internal error code|
+|—— title|string|false|none|Error title|
+|—— detail|string|false|none|Error details|
+|—— source|object|false|none|none|
+|——— pointer|string|false|none|Pointer to error in resource|
 
 ## DELETE application command
 
@@ -2313,18 +2105,13 @@ Status Code **default**
 
 |Name|Type|Required|Restrictions|Description|
 |---|---|---|---|---|
-|» errors|[object]|false|none|none|
-|»» status|string|false|none|HTTP response code|
-|»» code|string|false|none|Internal error code|
-|»» title|string|false|none|Error title|
-|»» detail|string|false|none|Error details|
-|»» source|object|false|none|none|
-|»»» pointer|string|false|none|Pointer to error in resource|
-
-<aside class="warning">
-To perform this operation, you must be authenticated by means of one of the following methods:
-ApiKeyAuth, OAuth2
-</aside>
+|— errors|[object]|false|none|none|
+|—— status|string|false|none|HTTP response code|
+|—— code|string|false|none|Internal error code|
+|—— title|string|false|none|Error title|
+|—— detail|string|false|none|Error details|
+|—— source|object|false|none|none|
+|——— pointer|string|false|none|Pointer to error in resource|
 
 <h1 id="booking-experts-contentapi-invoices">Invoices</h1>
 
@@ -2555,46 +2342,41 @@ Status Code **200**
 
 |Name|Type|Required|Restrictions|Description|
 |---|---|---|---|---|
-|» data|[Invoice](#schemainvoice)|false|none|none|
-|»» id|string|false|none|ID|
-|»» type|string|false|none|Type|
-|»» attributes|object|false|none|Attributes|
-|»»» invoice_nr|string|false|none|none|
-|»»» foreign_total|number(float)|false|none|none|
-|»»» foreign_total_open|number(float)|false|none|none|
-|»»» foreign_currency|string|false|none|An ISO 4217 currency code|
-|»» links|object|false|none|Links|
-|»»» self|string|false|none|Link to self|
-|»» relationships|object|false|none|Relationships|
-|»»» administration|object|false|none|none|
-|»»»» data|object|false|none|none|
-|»»»»» id|string|false|none|administration ID|
-|»»»»» type|string|false|none|none|
-|»»»» links|object|false|none|none|
-|»»»»» related|string|false|none|none|
-|»»» reservation|object|false|none|none|
-|»»»» data|object|false|none|none|
-|»»»»» id|string|false|none|reservation ID|
-|»»»»» type|string|false|none|none|
-|»»»» links|object|false|none|none|
-|»»»»» related|string|false|none|none|
+|— data|[Invoice](#schemainvoice)|false|none|none|
+|—— id|string|false|none|ID|
+|—— type|string|false|none|Type|
+|—— attributes|object|false|none|Attributes|
+|——— invoice_nr|string|false|none|none|
+|——— foreign_total|number(float)|false|none|none|
+|——— foreign_total_open|number(float)|false|none|none|
+|——— foreign_currency|string|false|none|An ISO 4217 currency code|
+|—— links|object|false|none|Links|
+|——— self|string|false|none|Link to self|
+|—— relationships|object|false|none|Relationships|
+|——— administration|object|false|none|none|
+|———— data|object|false|none|none|
+|————— id|string|false|none|administration ID|
+|————— type|string|false|none|none|
+|———— links|object|false|none|none|
+|————— related|string|false|none|none|
+|——— reservation|object|false|none|none|
+|———— data|object|false|none|none|
+|————— id|string|false|none|reservation ID|
+|————— type|string|false|none|none|
+|———— links|object|false|none|none|
+|————— related|string|false|none|none|
 
 Status Code **default**
 
 |Name|Type|Required|Restrictions|Description|
 |---|---|---|---|---|
-|» errors|[object]|false|none|none|
-|»» status|string|false|none|HTTP response code|
-|»» code|string|false|none|Internal error code|
-|»» title|string|false|none|Error title|
-|»» detail|string|false|none|Error details|
-|»» source|object|false|none|none|
-|»»» pointer|string|false|none|Pointer to error in resource|
-
-<aside class="warning">
-To perform this operation, you must be authenticated by means of one of the following methods:
-ApiKeyAuth, OAuth2
-</aside>
+|— errors|[object]|false|none|none|
+|—— status|string|false|none|HTTP response code|
+|—— code|string|false|none|Internal error code|
+|—— title|string|false|none|Error title|
+|—— detail|string|false|none|Error details|
+|—— source|object|false|none|none|
+|——— pointer|string|false|none|Pointer to error in resource|
 
 <h1 id="booking-experts-contentapi-orders">Orders</h1>
 
@@ -2835,56 +2617,51 @@ Status Code **200**
 
 |Name|Type|Required|Restrictions|Description|
 |---|---|---|---|---|
-|» data|[Administration](#schemaadministration)|false|none|none|
-|»» id|string|false|none|ID|
-|»» type|string|false|none|Type|
-|»» attributes|object|false|none|Attributes|
-|»»» name|string|false|none|none|
-|»»» phone|string|false|none|none|
-|»»» website|string|false|none|none|
-|»»» description|object|false|none|A description of the administration|
-|»»»» nl|string|false|none|none|
-|»»»» en|string|false|none|none|
-|»»»» de|string|false|none|none|
-|»»»» fr|string|false|none|none|
-|»»»» da|string|false|none|none|
-|»»»» cs|string|false|none|none|
-|»»»» es|string|false|none|none|
-|»»»» tr|string|false|none|none|
-|»»»» pt|string|false|none|none|
-|»»»» it|string|false|none|none|
-|»»» surroundings_description|object|false|none|A description of the surroundings|
-|»»»» nl|string|false|none|none|
-|»»»» en|string|false|none|none|
-|»»»» de|string|false|none|none|
-|»»»» fr|string|false|none|none|
-|»»»» da|string|false|none|none|
-|»»»» cs|string|false|none|none|
-|»»»» es|string|false|none|none|
-|»»»» tr|string|false|none|none|
-|»»»» pt|string|false|none|none|
-|»»»» it|string|false|none|none|
-|»»» available_locales|[string]|false|none|Enabled locales|
-|»»» utc_offset|string|false|none|The UTC offset of the administration, for example: +01:00|
-|»» links|object|false|none|Links|
-|»»» self|string|false|none|Link to self|
+|— data|[Administration](#schemaadministration)|false|none|none|
+|—— id|string|false|none|ID|
+|—— type|string|false|none|Type|
+|—— attributes|object|false|none|Attributes|
+|——— name|string|false|none|none|
+|——— phone|string|false|none|none|
+|——— website|string|false|none|none|
+|——— description|object|false|none|A description of the administration|
+|———— nl|string|false|none|none|
+|———— en|string|false|none|none|
+|———— de|string|false|none|none|
+|———— fr|string|false|none|none|
+|———— da|string|false|none|none|
+|———— cs|string|false|none|none|
+|———— es|string|false|none|none|
+|———— tr|string|false|none|none|
+|———— pt|string|false|none|none|
+|———— it|string|false|none|none|
+|——— surroundings_description|object|false|none|A description of the surroundings|
+|———— nl|string|false|none|none|
+|———— en|string|false|none|none|
+|———— de|string|false|none|none|
+|———— fr|string|false|none|none|
+|———— da|string|false|none|none|
+|———— cs|string|false|none|none|
+|———— es|string|false|none|none|
+|———— tr|string|false|none|none|
+|———— pt|string|false|none|none|
+|———— it|string|false|none|none|
+|——— available_locales|[string]|false|none|Enabled locales|
+|——— utc_offset|string|false|none|The UTC offset of the administration, for example: +01:00|
+|—— links|object|false|none|Links|
+|——— self|string|false|none|Link to self|
 
 Status Code **default**
 
 |Name|Type|Required|Restrictions|Description|
 |---|---|---|---|---|
-|» errors|[object]|false|none|none|
-|»» status|string|false|none|HTTP response code|
-|»» code|string|false|none|Internal error code|
-|»» title|string|false|none|Error title|
-|»» detail|string|false|none|Error details|
-|»» source|object|false|none|none|
-|»»» pointer|string|false|none|Pointer to error in resource|
-
-<aside class="warning">
-To perform this operation, you must be authenticated by means of one of the following methods:
-ApiKeyAuth, OAuth2
-</aside>
+|— errors|[object]|false|none|none|
+|—— status|string|false|none|HTTP response code|
+|—— code|string|false|none|Internal error code|
+|—— title|string|false|none|Error title|
+|—— detail|string|false|none|Error details|
+|—— source|object|false|none|none|
+|——— pointer|string|false|none|Pointer to error in resource|
 
 <h1 id="booking-experts-contentapi-organizations">Organizations</h1>
 
@@ -3102,39 +2879,34 @@ Status Code **200**
 
 |Name|Type|Required|Restrictions|Description|
 |---|---|---|---|---|
-|» data|[Organization](#schemaorganization)|false|none|none|
-|»» id|string|false|none|ID|
-|»» type|string|false|none|Type|
-|»» attributes|object|false|none|Attributes|
-|»»» name|string|false|none|none|
-|»»» website|string|false|none|none|
-|»»» country_code|string|false|none|none|
-|»»» phone|string|false|none|none|
-|»»» email|string|false|none|none|
-|»»» weekend_behavior|string|false|none|none|
-|»»» max_baby_age|integer|false|none|none|
-|»»» max_child_age|integer|false|none|none|
-|»»» max_adolescent_age|integer|false|none|none|
-|»»» min_senior_age|integer|false|none|none|
-|»» links|object|false|none|Links|
-|»»» self|string|false|none|Link to self|
+|— data|[Organization](#schemaorganization)|false|none|none|
+|—— id|string|false|none|ID|
+|—— type|string|false|none|Type|
+|—— attributes|object|false|none|Attributes|
+|——— name|string|false|none|none|
+|——— website|string|false|none|none|
+|——— country_code|string|false|none|none|
+|——— phone|string|false|none|none|
+|——— email|string|false|none|none|
+|——— weekend_behavior|string|false|none|none|
+|——— max_baby_age|integer|false|none|none|
+|——— max_child_age|integer|false|none|none|
+|——— max_adolescent_age|integer|false|none|none|
+|——— min_senior_age|integer|false|none|none|
+|—— links|object|false|none|Links|
+|——— self|string|false|none|Link to self|
 
 Status Code **default**
 
 |Name|Type|Required|Restrictions|Description|
 |---|---|---|---|---|
-|» errors|[object]|false|none|none|
-|»» status|string|false|none|HTTP response code|
-|»» code|string|false|none|Internal error code|
-|»» title|string|false|none|Error title|
-|»» detail|string|false|none|Error details|
-|»» source|object|false|none|none|
-|»»» pointer|string|false|none|Pointer to error in resource|
-
-<aside class="warning">
-To perform this operation, you must be authenticated by means of one of the following methods:
-ApiKeyAuth, OAuth2
-</aside>
+|— errors|[object]|false|none|none|
+|—— status|string|false|none|HTTP response code|
+|—— code|string|false|none|Internal error code|
+|—— title|string|false|none|Error title|
+|—— detail|string|false|none|Error details|
+|—— source|object|false|none|none|
+|——— pointer|string|false|none|Pointer to error in resource|
 
 <h1 id="booking-experts-contentapi-payments">Payments</h1>
 
@@ -3361,42 +3133,37 @@ Status Code **200**
 
 |Name|Type|Required|Restrictions|Description|
 |---|---|---|---|---|
-|» data|[[Payment](#schemapayment)]|false|none|none|
-|»» id|string|false|none|ID|
-|»» type|string|false|none|Type|
-|»» attributes|object|false|none|Attributes|
-|»»» paid_at|string(date)|false|none|Local payment date|
-|»»» foreign_price|number(float)|false|none|Paid price in the same currency as the invoice currency|
-|»»» memo|string|false|none|An optional note|
-|»» relationships|object|false|none|Relationships|
-|»»» invoice|object|false|none|none|
-|»»»» data|object|false|none|none|
-|»»»»» id|string|false|none|invoice ID|
-|»»»»» type|string|false|none|none|
-|»»»» links|object|false|none|none|
-|»»»»» related|string|false|none|none|
-|» meta|object|false|none|none|
-|»» pagination|object|false|none|none|
-|»»» total_records|integer|false|none|none|
-|»»» page|integer|false|none|none|
-|»»» size|integer|false|none|none|
+|— data|[[Payment](#schemapayment)]|false|none|none|
+|—— id|string|false|none|ID|
+|—— type|string|false|none|Type|
+|—— attributes|object|false|none|Attributes|
+|——— paid_at|string(date)|false|none|Local payment date|
+|——— foreign_price|number(float)|false|none|Paid price in the same currency as the invoice currency|
+|——— memo|string|false|none|An optional note|
+|—— relationships|object|false|none|Relationships|
+|——— invoice|object|false|none|none|
+|———— data|object|false|none|none|
+|————— id|string|false|none|invoice ID|
+|————— type|string|false|none|none|
+|———— links|object|false|none|none|
+|————— related|string|false|none|none|
+|— meta|object|false|none|none|
+|—— pagination|object|false|none|none|
+|——— total_records|integer|false|none|none|
+|——— page|integer|false|none|none|
+|——— size|integer|false|none|none|
 
 Status Code **default**
 
 |Name|Type|Required|Restrictions|Description|
 |---|---|---|---|---|
-|» errors|[object]|false|none|none|
-|»» status|string|false|none|HTTP response code|
-|»» code|string|false|none|Internal error code|
-|»» title|string|false|none|Error title|
-|»» detail|string|false|none|Error details|
-|»» source|object|false|none|none|
-|»»» pointer|string|false|none|Pointer to error in resource|
-
-<aside class="warning">
-To perform this operation, you must be authenticated by means of one of the following methods:
-ApiKeyAuth, OAuth2
-</aside>
+|— errors|[object]|false|none|none|
+|—— status|string|false|none|HTTP response code|
+|—— code|string|false|none|Internal error code|
+|—— title|string|false|none|Error title|
+|—— detail|string|false|none|Error details|
+|—— source|object|false|none|none|
+|——— pointer|string|false|none|Pointer to error in resource|
 
 ## POST payment
 
@@ -3607,19 +3374,19 @@ Create a new payment
 |Accept-Language|header|string|false|Supported languages. A comma separated list with one or more of the following locales: nl, en, de, fr, da, cs, es, tr, pt, it. Default: 'en'.|
 |send_notification|query|boolean|false|Send a notification to the customer after creation|
 |body|body|object|true|none|
-|» data|body|object|false|none|
-|»» type|body|string|false|Type|
-|»» attributes|body|object|false|Attributes|
-|»»» paid_at|body|string(date)|false|Local payment date|
-|»»» foreign_price|body|number(float)|false|Paid price in the same currency as the invoice currency|
-|»»» memo|body|string|false|An optional note|
-|»» relationships|body|object|false|Relationships|
-|»»» invoice|body|object|false|none|
-|»»»» data|body|object|false|none|
-|»»»»» id|body|string|false|invoice ID|
-|»»»»» type|body|string|false|none|
-|»»»» links|body|object|false|none|
-|»»»»» related|body|string|false|none|
+|— data|body|object|false|none|
+|—— type|body|string|false|Type|
+|—— attributes|body|object|false|Attributes|
+|——— paid_at|body|string(date)|false|Local payment date|
+|——— foreign_price|body|number(float)|false|Paid price in the same currency as the invoice currency|
+|——— memo|body|string|false|An optional note|
+|—— relationships|body|object|false|Relationships|
+|——— invoice|body|object|false|none|
+|———— data|body|object|false|none|
+|————— id|body|string|false|invoice ID|
+|————— type|body|string|false|none|
+|———— links|body|object|false|none|
+|————— related|body|string|false|none|
 
 > Example responses
 
@@ -3663,37 +3430,32 @@ Status Code **200**
 
 |Name|Type|Required|Restrictions|Description|
 |---|---|---|---|---|
-|» data|[Payment](#schemapayment)|false|none|none|
-|»» id|string|false|none|ID|
-|»» type|string|false|none|Type|
-|»» attributes|object|false|none|Attributes|
-|»»» paid_at|string(date)|false|none|Local payment date|
-|»»» foreign_price|number(float)|false|none|Paid price in the same currency as the invoice currency|
-|»»» memo|string|false|none|An optional note|
-|»» relationships|object|false|none|Relationships|
-|»»» invoice|object|false|none|none|
-|»»»» data|object|false|none|none|
-|»»»»» id|string|false|none|invoice ID|
-|»»»»» type|string|false|none|none|
-|»»»» links|object|false|none|none|
-|»»»»» related|string|false|none|none|
+|— data|[Payment](#schemapayment)|false|none|none|
+|—— id|string|false|none|ID|
+|—— type|string|false|none|Type|
+|—— attributes|object|false|none|Attributes|
+|——— paid_at|string(date)|false|none|Local payment date|
+|——— foreign_price|number(float)|false|none|Paid price in the same currency as the invoice currency|
+|——— memo|string|false|none|An optional note|
+|—— relationships|object|false|none|Relationships|
+|——— invoice|object|false|none|none|
+|———— data|object|false|none|none|
+|————— id|string|false|none|invoice ID|
+|————— type|string|false|none|none|
+|———— links|object|false|none|none|
+|————— related|string|false|none|none|
 
 Status Code **default**
 
 |Name|Type|Required|Restrictions|Description|
 |---|---|---|---|---|
-|» errors|[object]|false|none|none|
-|»» status|string|false|none|HTTP response code|
-|»» code|string|false|none|Internal error code|
-|»» title|string|false|none|Error title|
-|»» detail|string|false|none|Error details|
-|»» source|object|false|none|none|
-|»»» pointer|string|false|none|Pointer to error in resource|
-
-<aside class="warning">
-To perform this operation, you must be authenticated by means of one of the following methods:
-ApiKeyAuth, OAuth2
-</aside>
+|— errors|[object]|false|none|none|
+|—— status|string|false|none|HTTP response code|
+|—— code|string|false|none|Internal error code|
+|—— title|string|false|none|Error title|
+|—— detail|string|false|none|Error details|
+|—— source|object|false|none|none|
+|——— pointer|string|false|none|Pointer to error in resource|
 
 ## GET payment
 
@@ -3907,37 +3669,32 @@ Status Code **200**
 
 |Name|Type|Required|Restrictions|Description|
 |---|---|---|---|---|
-|» data|[Payment](#schemapayment)|false|none|none|
-|»» id|string|false|none|ID|
-|»» type|string|false|none|Type|
-|»» attributes|object|false|none|Attributes|
-|»»» paid_at|string(date)|false|none|Local payment date|
-|»»» foreign_price|number(float)|false|none|Paid price in the same currency as the invoice currency|
-|»»» memo|string|false|none|An optional note|
-|»» relationships|object|false|none|Relationships|
-|»»» invoice|object|false|none|none|
-|»»»» data|object|false|none|none|
-|»»»»» id|string|false|none|invoice ID|
-|»»»»» type|string|false|none|none|
-|»»»» links|object|false|none|none|
-|»»»»» related|string|false|none|none|
+|— data|[Payment](#schemapayment)|false|none|none|
+|—— id|string|false|none|ID|
+|—— type|string|false|none|Type|
+|—— attributes|object|false|none|Attributes|
+|——— paid_at|string(date)|false|none|Local payment date|
+|——— foreign_price|number(float)|false|none|Paid price in the same currency as the invoice currency|
+|——— memo|string|false|none|An optional note|
+|—— relationships|object|false|none|Relationships|
+|——— invoice|object|false|none|none|
+|———— data|object|false|none|none|
+|————— id|string|false|none|invoice ID|
+|————— type|string|false|none|none|
+|———— links|object|false|none|none|
+|————— related|string|false|none|none|
 
 Status Code **default**
 
 |Name|Type|Required|Restrictions|Description|
 |---|---|---|---|---|
-|» errors|[object]|false|none|none|
-|»» status|string|false|none|HTTP response code|
-|»» code|string|false|none|Internal error code|
-|»» title|string|false|none|Error title|
-|»» detail|string|false|none|Error details|
-|»» source|object|false|none|none|
-|»»» pointer|string|false|none|Pointer to error in resource|
-
-<aside class="warning">
-To perform this operation, you must be authenticated by means of one of the following methods:
-ApiKeyAuth, OAuth2
-</aside>
+|— errors|[object]|false|none|none|
+|—— status|string|false|none|HTTP response code|
+|—— code|string|false|none|Internal error code|
+|—— title|string|false|none|Error title|
+|—— detail|string|false|none|Error details|
+|—— source|object|false|none|none|
+|——— pointer|string|false|none|Pointer to error in resource|
 
 <h1 id="booking-experts-contentapi-reservations">Reservations</h1>
 
@@ -4136,8 +3893,8 @@ Returns all reservations of the administration
         "end_date": "string",
         "state": "string",
         "rentable": "string",
-        "created_at": "2020-06-09T07:58:26Z",
-        "updated_at": "2020-06-09T07:58:26Z"
+        "created_at": "2020-06-09T14:49:30Z",
+        "updated_at": "2020-06-09T14:49:30Z"
       },
       "links": {
         "self": "string"
@@ -4187,55 +3944,50 @@ Status Code **200**
 
 |Name|Type|Required|Restrictions|Description|
 |---|---|---|---|---|
-|» data|[[Reservation](#schemareservation)]|false|none|none|
-|»» id|string|false|none|ID|
-|»» type|string|false|none|Type|
-|»» attributes|object|false|none|Attributes|
-|»»» booking_nr|string|false|none|none|
-|»»» last_name|string|false|none|none|
-|»»» start_date|string|false|none|none|
-|»»» end_date|string|false|none|none|
-|»»» state|string|false|none|none|
-|»»» rentable|string|false|none|none|
-|»»» created_at|string(date-time)|false|none|none|
-|»»» updated_at|string(date-time)|false|none|none|
-|»» links|object|false|none|Links|
-|»»» self|string|false|none|Link to self|
-|»» relationships|object|false|none|Relationships|
-|»»» administration|object|false|none|none|
-|»»»» data|object|false|none|none|
-|»»»»» id|string|false|none|administration ID|
-|»»»»» type|string|false|none|none|
-|»»»» links|object|false|none|none|
-|»»»»» related|string|false|none|none|
-|»»» order|object|false|none|none|
-|»»»» data|object|false|none|none|
-|»»»»» id|string|false|none|order ID|
-|»»»»» type|string|false|none|none|
-|»»»» links|object|false|none|none|
-|»»»»» related|string|false|none|none|
-|» meta|object|false|none|none|
-|»» pagination|object|false|none|none|
-|»»» total_records|integer|false|none|none|
-|»»» page|integer|false|none|none|
-|»»» size|integer|false|none|none|
+|— data|[[Reservation](#schemareservation)]|false|none|none|
+|—— id|string|false|none|ID|
+|—— type|string|false|none|Type|
+|—— attributes|object|false|none|Attributes|
+|——— booking_nr|string|false|none|none|
+|——— last_name|string|false|none|none|
+|——— start_date|string|false|none|none|
+|——— end_date|string|false|none|none|
+|——— state|string|false|none|none|
+|——— rentable|string|false|none|none|
+|——— created_at|string(date-time)|false|none|none|
+|——— updated_at|string(date-time)|false|none|none|
+|—— links|object|false|none|Links|
+|——— self|string|false|none|Link to self|
+|—— relationships|object|false|none|Relationships|
+|——— administration|object|false|none|none|
+|———— data|object|false|none|none|
+|————— id|string|false|none|administration ID|
+|————— type|string|false|none|none|
+|———— links|object|false|none|none|
+|————— related|string|false|none|none|
+|——— order|object|false|none|none|
+|———— data|object|false|none|none|
+|————— id|string|false|none|order ID|
+|————— type|string|false|none|none|
+|———— links|object|false|none|none|
+|————— related|string|false|none|none|
+|— meta|object|false|none|none|
+|—— pagination|object|false|none|none|
+|——— total_records|integer|false|none|none|
+|——— page|integer|false|none|none|
+|——— size|integer|false|none|none|
 
 Status Code **default**
 
 |Name|Type|Required|Restrictions|Description|
 |---|---|---|---|---|
-|» errors|[object]|false|none|none|
-|»» status|string|false|none|HTTP response code|
-|»» code|string|false|none|Internal error code|
-|»» title|string|false|none|Error title|
-|»» detail|string|false|none|Error details|
-|»» source|object|false|none|none|
-|»»» pointer|string|false|none|Pointer to error in resource|
-
-<aside class="warning">
-To perform this operation, you must be authenticated by means of one of the following methods:
-ApiKeyAuth, OAuth2
-</aside>
+|— errors|[object]|false|none|none|
+|—— status|string|false|none|HTTP response code|
+|—— code|string|false|none|Internal error code|
+|—— title|string|false|none|Error title|
+|—— detail|string|false|none|Error details|
+|—— source|object|false|none|none|
+|——— pointer|string|false|none|Pointer to error in resource|
 
 ## GET reservation
 
@@ -4429,8 +4181,8 @@ Returns a reservation
       "end_date": "string",
       "state": "string",
       "rentable": "string",
-      "created_at": "2020-06-09T07:58:26Z",
-      "updated_at": "2020-06-09T07:58:26Z"
+      "created_at": "2020-06-09T14:49:30Z",
+      "updated_at": "2020-06-09T14:49:30Z"
     },
     "links": {
       "self": "string"
@@ -4472,50 +4224,45 @@ Status Code **200**
 
 |Name|Type|Required|Restrictions|Description|
 |---|---|---|---|---|
-|» data|[Reservation](#schemareservation)|false|none|none|
-|»» id|string|false|none|ID|
-|»» type|string|false|none|Type|
-|»» attributes|object|false|none|Attributes|
-|»»» booking_nr|string|false|none|none|
-|»»» last_name|string|false|none|none|
-|»»» start_date|string|false|none|none|
-|»»» end_date|string|false|none|none|
-|»»» state|string|false|none|none|
-|»»» rentable|string|false|none|none|
-|»»» created_at|string(date-time)|false|none|none|
-|»»» updated_at|string(date-time)|false|none|none|
-|»» links|object|false|none|Links|
-|»»» self|string|false|none|Link to self|
-|»» relationships|object|false|none|Relationships|
-|»»» administration|object|false|none|none|
-|»»»» data|object|false|none|none|
-|»»»»» id|string|false|none|administration ID|
-|»»»»» type|string|false|none|none|
-|»»»» links|object|false|none|none|
-|»»»»» related|string|false|none|none|
-|»»» order|object|false|none|none|
-|»»»» data|object|false|none|none|
-|»»»»» id|string|false|none|order ID|
-|»»»»» type|string|false|none|none|
-|»»»» links|object|false|none|none|
-|»»»»» related|string|false|none|none|
+|— data|[Reservation](#schemareservation)|false|none|none|
+|—— id|string|false|none|ID|
+|—— type|string|false|none|Type|
+|—— attributes|object|false|none|Attributes|
+|——— booking_nr|string|false|none|none|
+|——— last_name|string|false|none|none|
+|——— start_date|string|false|none|none|
+|——— end_date|string|false|none|none|
+|——— state|string|false|none|none|
+|——— rentable|string|false|none|none|
+|——— created_at|string(date-time)|false|none|none|
+|——— updated_at|string(date-time)|false|none|none|
+|—— links|object|false|none|Links|
+|——— self|string|false|none|Link to self|
+|—— relationships|object|false|none|Relationships|
+|——— administration|object|false|none|none|
+|———— data|object|false|none|none|
+|————— id|string|false|none|administration ID|
+|————— type|string|false|none|none|
+|———— links|object|false|none|none|
+|————— related|string|false|none|none|
+|——— order|object|false|none|none|
+|———— data|object|false|none|none|
+|————— id|string|false|none|order ID|
+|————— type|string|false|none|none|
+|———— links|object|false|none|none|
+|————— related|string|false|none|none|
 
 Status Code **default**
 
 |Name|Type|Required|Restrictions|Description|
 |---|---|---|---|---|
-|» errors|[object]|false|none|none|
-|»» status|string|false|none|HTTP response code|
-|»» code|string|false|none|Internal error code|
-|»» title|string|false|none|Error title|
-|»» detail|string|false|none|Error details|
-|»» source|object|false|none|none|
-|»»» pointer|string|false|none|Pointer to error in resource|
-
-<aside class="warning">
-To perform this operation, you must be authenticated by means of one of the following methods:
-ApiKeyAuth, OAuth2
-</aside>
+|— errors|[object]|false|none|none|
+|—— status|string|false|none|HTTP response code|
+|—— code|string|false|none|Internal error code|
+|—— title|string|false|none|Error title|
+|—— detail|string|false|none|Error details|
+|—— source|object|false|none|none|
+|——— pointer|string|false|none|Pointer to error in resource|
 
 <h1 id="booking-experts-contentapi-subscriptions">Subscriptions</h1>
 
@@ -4701,8 +4448,8 @@ Returns the subscription of the current organization
     "attributes": {
       "authorized": "string",
       "user_locale": "string",
-      "created_at": "2020-06-09T07:58:26Z",
-      "updated_at": "2020-06-09T07:58:26Z"
+      "created_at": "2020-06-09T14:49:30Z",
+      "updated_at": "2020-06-09T14:49:30Z"
     },
     "links": {
       "self": "string",
@@ -4744,45 +4491,40 @@ Status Code **200**
 
 |Name|Type|Required|Restrictions|Description|
 |---|---|---|---|---|
-|» data|[Subscription](#schemasubscription)|false|none|none|
-|»» id|string|false|none|ID|
-|»» type|string|false|none|Type|
-|»» attributes|object|false|none|Attributes|
-|»»» authorized|string|false|none|Returns whether a user has authorized this subscription|
-|»»» user_locale|string|false|none|The locale of the user that created this subscription|
-|»»» created_at|string(date-time)|false|none|none|
-|»»» updated_at|string(date-time)|false|none|none|
-|»» links|object|false|none|Links|
-|»»» self|string|false|none|Link to self|
-|»»» url|string|false|none|Link to url|
-|»» relationships|object|false|none|Relationships|
-|»»» organization|object|false|none|none|
-|»»»» data|object|false|none|none|
-|»»»»» id|string|false|none|organization ID|
-|»»»»» type|string|false|none|none|
-|»»»» links|object|false|none|none|
-|»»»»» related|string|false|none|none|
-|»»» administration_subscriptions|object|false|none|none|
-|»»»» data|[object]|false|none|none|
-|»»»»» id|string|false|none|administration_subscriptions ID|
-|»»»»» type|string|false|none|none|
+|— data|[Subscription](#schemasubscription)|false|none|none|
+|—— id|string|false|none|ID|
+|—— type|string|false|none|Type|
+|—— attributes|object|false|none|Attributes|
+|——— authorized|string|false|none|Returns whether a user has authorized this subscription|
+|——— user_locale|string|false|none|The locale of the user that created this subscription|
+|——— created_at|string(date-time)|false|none|none|
+|——— updated_at|string(date-time)|false|none|none|
+|—— links|object|false|none|Links|
+|——— self|string|false|none|Link to self|
+|——— url|string|false|none|Link to url|
+|—— relationships|object|false|none|Relationships|
+|——— organization|object|false|none|none|
+|———— data|object|false|none|none|
+|————— id|string|false|none|organization ID|
+|————— type|string|false|none|none|
+|———— links|object|false|none|none|
+|————— related|string|false|none|none|
+|——— administration_subscriptions|object|false|none|none|
+|———— data|[object]|false|none|none|
+|————— id|string|false|none|administration_subscriptions ID|
+|————— type|string|false|none|none|
 
 Status Code **default**
 
 |Name|Type|Required|Restrictions|Description|
 |---|---|---|---|---|
-|» errors|[object]|false|none|none|
-|»» status|string|false|none|HTTP response code|
-|»» code|string|false|none|Internal error code|
-|»» title|string|false|none|Error title|
-|»» detail|string|false|none|Error details|
-|»» source|object|false|none|none|
-|»»» pointer|string|false|none|Pointer to error in resource|
-
-<aside class="warning">
-To perform this operation, you must be authenticated by means of one of the following methods:
-ApiKeyAuth, OAuth2
-</aside>
+|— errors|[object]|false|none|none|
+|—— status|string|false|none|HTTP response code|
+|—— code|string|false|none|Internal error code|
+|—— title|string|false|none|Error title|
+|—— detail|string|false|none|Error details|
+|—— source|object|false|none|none|
+|——— pointer|string|false|none|Pointer to error in resource|
 
 <h1 id="booking-experts-contentapi-webhook-endpoints">Webhook Endpoints</h1>
 
@@ -4975,8 +4717,8 @@ Returns the webhook endpoints you have registered for the current application
           "reservation|updated",
           "reservation|deleted"
         ],
-        "created_at": "2020-06-09T07:58:26Z",
-        "updated_at": "2020-06-09T07:58:26Z"
+        "created_at": "2020-06-09T14:49:30Z",
+        "updated_at": "2020-06-09T14:49:30Z"
       },
       "links": {
         "self": "string"
@@ -5006,39 +4748,34 @@ Status Code **200**
 
 |Name|Type|Required|Restrictions|Description|
 |---|---|---|---|---|
-|» data|[[WebhookEndpoint](#schemawebhookendpoint)]|false|none|none|
-|»» id|string|false|none|ID|
-|»» type|string|false|none|Type|
-|»» attributes|object|false|none|Attributes|
-|»»» target_url|string|false|none|none|
-|»»» confirm_strategy|string|false|none|One of: wait_for_success, fire_and_forget|
-|»»» events|[string]|false|none|One or more of:<br><br>* accommodation_subtype|created<br>* accommodation_subtype|deleted<br>* accommodation_subtype|updated<br>* administration|created<br>* administration|deleted<br>* administration|updated<br>* agenda_period|created<br>* agenda_period|deleted<br>* agenda_period|updated<br>* area_type|created<br>* area_type|deleted<br>* area_type|updated<br>* arrival_checkout_date|created<br>* arrival_checkout_date|deleted<br>* arrival_checkout_date|updated<br>* category_group|created<br>* category_group|deleted<br>* category_group|updated<br>* category|created<br>* category|deleted<br>* category|reindexed<br>* category|updated<br>* channel|created<br>* channel|deleted<br>* channel|updated<br>* city|created<br>* city|deleted<br>* city|updated<br>* cost|created<br>* cost|deleted<br>* cost|updated<br>* currency_conversion|created<br>* currency_conversion|deleted<br>* currency_conversion|updated<br>* discount_action|created<br>* discount_action|deleted<br>* discount_action|updated<br>* extra|created<br>* extra|deleted<br>* extra|updated<br>* invoice|created<br>* invoice|deleted<br>* invoice|updated<br>* organization|created<br>* organization|deleted<br>* organization|updated<br>* package_entry|created<br>* package_entry|deleted<br>* package_entry|updated<br>* package|created<br>* package|deleted<br>* package|updated<br>* payment_method|created<br>* payment_method|deleted<br>* payment_method|updated<br>* payment|created<br>* payment|deleted<br>* payment|updated<br>* period|created<br>* period|deleted<br>* period|updated<br>* region|created<br>* region|deleted<br>* region|updated<br>* rentable_identity|created<br>* rentable_identity|deleted<br>* rentable_identity|updated<br>* rentable|created<br>* rentable|deleted<br>* rentable|updated<br>* reservation|cancelled<br>* reservation|confirmed<br>* reservation|created<br>* reservation|deleted<br>* reservation|updated<br>* review|created<br>* review|deleted<br>* review|updated<br>* room_type|created<br>* room_type|deleted<br>* room_type|updated<br>* room|created<br>* room|deleted<br>* room|updated<br>* subscription|created<br>* subscription|deleted<br>* subscription|updated<br>* terms|created<br>* terms|deleted<br>* terms|updated|
-|»»» created_at|string(date-time)|false|none|none|
-|»»» updated_at|string(date-time)|false|none|none|
-|»» links|object|false|none|Links|
-|»»» self|string|false|none|Link to self|
-|» meta|object|false|none|none|
-|»» pagination|object|false|none|none|
-|»»» total_records|integer|false|none|none|
-|»»» page|integer|false|none|none|
-|»»» size|integer|false|none|none|
+|— data|[[WebhookEndpoint](#schemawebhookendpoint)]|false|none|none|
+|—— id|string|false|none|ID|
+|—— type|string|false|none|Type|
+|—— attributes|object|false|none|Attributes|
+|——— target_url|string|false|none|none|
+|——— confirm_strategy|string|false|none|One of: wait_for_success, fire_and_forget|
+|——— events|[string]|false|none|One or more of:<br><br>* accommodation_subtype|created<br>* accommodation_subtype|deleted<br>* accommodation_subtype|updated<br>* administration|created<br>* administration|deleted<br>* administration|updated<br>* agenda_period|created<br>* agenda_period|deleted<br>* agenda_period|updated<br>* area_type|created<br>* area_type|deleted<br>* area_type|updated<br>* arrival_checkout_date|created<br>* arrival_checkout_date|deleted<br>* arrival_checkout_date|updated<br>* category_group|created<br>* category_group|deleted<br>* category_group|updated<br>* category|created<br>* category|deleted<br>* category|reindexed<br>* category|updated<br>* channel|created<br>* channel|deleted<br>* channel|updated<br>* city|created<br>* city|deleted<br>* city|updated<br>* cost|created<br>* cost|deleted<br>* cost|updated<br>* currency_conversion|created<br>* currency_conversion|deleted<br>* currency_conversion|updated<br>* discount_action|created<br>* discount_action|deleted<br>* discount_action|updated<br>* extra|created<br>* extra|deleted<br>* extra|updated<br>* invoice|created<br>* invoice|deleted<br>* invoice|updated<br>* organization|created<br>* organization|deleted<br>* organization|updated<br>* package_entry|created<br>* package_entry|deleted<br>* package_entry|updated<br>* package|created<br>* package|deleted<br>* package|updated<br>* payment_method|created<br>* payment_method|deleted<br>* payment_method|updated<br>* payment|created<br>* payment|deleted<br>* payment|updated<br>* period|created<br>* period|deleted<br>* period|updated<br>* region|created<br>* region|deleted<br>* region|updated<br>* rentable_identity|created<br>* rentable_identity|deleted<br>* rentable_identity|updated<br>* rentable|created<br>* rentable|deleted<br>* rentable|updated<br>* reservation|cancelled<br>* reservation|confirmed<br>* reservation|created<br>* reservation|deleted<br>* reservation|updated<br>* review|created<br>* review|deleted<br>* review|updated<br>* room_type|created<br>* room_type|deleted<br>* room_type|updated<br>* room|created<br>* room|deleted<br>* room|updated<br>* subscription|created<br>* subscription|deleted<br>* subscription|updated<br>* terms|created<br>* terms|deleted<br>* terms|updated|
+|——— created_at|string(date-time)|false|none|none|
+|——— updated_at|string(date-time)|false|none|none|
+|—— links|object|false|none|Links|
+|——— self|string|false|none|Link to self|
+|— meta|object|false|none|none|
+|—— pagination|object|false|none|none|
+|——— total_records|integer|false|none|none|
+|——— page|integer|false|none|none|
+|——— size|integer|false|none|none|
 
 Status Code **default**
 
 |Name|Type|Required|Restrictions|Description|
 |---|---|---|---|---|
-|» errors|[object]|false|none|none|
-|»» status|string|false|none|HTTP response code|
-|»» code|string|false|none|Internal error code|
-|»» title|string|false|none|Error title|
-|»» detail|string|false|none|Error details|
-|»» source|object|false|none|none|
-|»»» pointer|string|false|none|Pointer to error in resource|
-
-<aside class="warning">
-To perform this operation, you must be authenticated by means of one of the following methods:
-ApiKeyAuth, OAuth2
-</aside>
+|— errors|[object]|false|none|none|
+|—— status|string|false|none|HTTP response code|
+|—— code|string|false|none|Internal error code|
+|—— title|string|false|none|Error title|
+|—— detail|string|false|none|Error details|
+|—— source|object|false|none|none|
+|——— pointer|string|false|none|Pointer to error in resource|
 
 ## POST webhook endpoint
 
@@ -5257,16 +4994,16 @@ Create a new webhook endpoint. When webhooks are called, the following **JSON** 
 |---|---|---|---|---|
 |Accept-Language|header|string|false|Supported languages. A comma separated list with one or more of the following locales: nl, en, de, fr, da, cs, es, tr, pt, it. Default: 'en'.|
 |body|body|object|true|none|
-|» data|body|object|false|none|
-|»» type|body|string|false|Type|
-|»» attributes|body|object|false|Attributes|
-|»»» target_url|body|string|false|none|
-|»»» confirm_strategy|body|string|false|One of: wait_for_success, fire_and_forget|
-|»»» events|body|[string]|false|One or more of:|
+|— data|body|object|false|none|
+|—— type|body|string|false|Type|
+|—— attributes|body|object|false|Attributes|
+|——— target_url|body|string|false|none|
+|——— confirm_strategy|body|string|false|One of: wait_for_success, fire_and_forget|
+|——— events|body|[string]|false|One or more of:|
 
 #### Detailed descriptions
 
-**»»» events**: One or more of:
+**——— events**: One or more of:
 
 * accommodation_subtype|created
 * accommodation_subtype|deleted
@@ -5376,8 +5113,8 @@ Create a new webhook endpoint. When webhooks are called, the following **JSON** 
         "reservation|updated",
         "reservation|deleted"
       ],
-      "created_at": "2020-06-09T07:58:26Z",
-      "updated_at": "2020-06-09T07:58:26Z"
+      "created_at": "2020-06-09T14:49:30Z",
+      "updated_at": "2020-06-09T14:49:30Z"
     },
     "links": {
       "self": "string"
@@ -5399,34 +5136,29 @@ Status Code **200**
 
 |Name|Type|Required|Restrictions|Description|
 |---|---|---|---|---|
-|» data|[WebhookEndpoint](#schemawebhookendpoint)|false|none|none|
-|»» id|string|false|none|ID|
-|»» type|string|false|none|Type|
-|»» attributes|object|false|none|Attributes|
-|»»» target_url|string|false|none|none|
-|»»» confirm_strategy|string|false|none|One of: wait_for_success, fire_and_forget|
-|»»» events|[string]|false|none|One or more of:<br><br>* accommodation_subtype|created<br>* accommodation_subtype|deleted<br>* accommodation_subtype|updated<br>* administration|created<br>* administration|deleted<br>* administration|updated<br>* agenda_period|created<br>* agenda_period|deleted<br>* agenda_period|updated<br>* area_type|created<br>* area_type|deleted<br>* area_type|updated<br>* arrival_checkout_date|created<br>* arrival_checkout_date|deleted<br>* arrival_checkout_date|updated<br>* category_group|created<br>* category_group|deleted<br>* category_group|updated<br>* category|created<br>* category|deleted<br>* category|reindexed<br>* category|updated<br>* channel|created<br>* channel|deleted<br>* channel|updated<br>* city|created<br>* city|deleted<br>* city|updated<br>* cost|created<br>* cost|deleted<br>* cost|updated<br>* currency_conversion|created<br>* currency_conversion|deleted<br>* currency_conversion|updated<br>* discount_action|created<br>* discount_action|deleted<br>* discount_action|updated<br>* extra|created<br>* extra|deleted<br>* extra|updated<br>* invoice|created<br>* invoice|deleted<br>* invoice|updated<br>* organization|created<br>* organization|deleted<br>* organization|updated<br>* package_entry|created<br>* package_entry|deleted<br>* package_entry|updated<br>* package|created<br>* package|deleted<br>* package|updated<br>* payment_method|created<br>* payment_method|deleted<br>* payment_method|updated<br>* payment|created<br>* payment|deleted<br>* payment|updated<br>* period|created<br>* period|deleted<br>* period|updated<br>* region|created<br>* region|deleted<br>* region|updated<br>* rentable_identity|created<br>* rentable_identity|deleted<br>* rentable_identity|updated<br>* rentable|created<br>* rentable|deleted<br>* rentable|updated<br>* reservation|cancelled<br>* reservation|confirmed<br>* reservation|created<br>* reservation|deleted<br>* reservation|updated<br>* review|created<br>* review|deleted<br>* review|updated<br>* room_type|created<br>* room_type|deleted<br>* room_type|updated<br>* room|created<br>* room|deleted<br>* room|updated<br>* subscription|created<br>* subscription|deleted<br>* subscription|updated<br>* terms|created<br>* terms|deleted<br>* terms|updated|
-|»»» created_at|string(date-time)|false|none|none|
-|»»» updated_at|string(date-time)|false|none|none|
-|»» links|object|false|none|Links|
-|»»» self|string|false|none|Link to self|
+|— data|[WebhookEndpoint](#schemawebhookendpoint)|false|none|none|
+|—— id|string|false|none|ID|
+|—— type|string|false|none|Type|
+|—— attributes|object|false|none|Attributes|
+|——— target_url|string|false|none|none|
+|——— confirm_strategy|string|false|none|One of: wait_for_success, fire_and_forget|
+|——— events|[string]|false|none|One or more of:<br><br>* accommodation_subtype|created<br>* accommodation_subtype|deleted<br>* accommodation_subtype|updated<br>* administration|created<br>* administration|deleted<br>* administration|updated<br>* agenda_period|created<br>* agenda_period|deleted<br>* agenda_period|updated<br>* area_type|created<br>* area_type|deleted<br>* area_type|updated<br>* arrival_checkout_date|created<br>* arrival_checkout_date|deleted<br>* arrival_checkout_date|updated<br>* category_group|created<br>* category_group|deleted<br>* category_group|updated<br>* category|created<br>* category|deleted<br>* category|reindexed<br>* category|updated<br>* channel|created<br>* channel|deleted<br>* channel|updated<br>* city|created<br>* city|deleted<br>* city|updated<br>* cost|created<br>* cost|deleted<br>* cost|updated<br>* currency_conversion|created<br>* currency_conversion|deleted<br>* currency_conversion|updated<br>* discount_action|created<br>* discount_action|deleted<br>* discount_action|updated<br>* extra|created<br>* extra|deleted<br>* extra|updated<br>* invoice|created<br>* invoice|deleted<br>* invoice|updated<br>* organization|created<br>* organization|deleted<br>* organization|updated<br>* package_entry|created<br>* package_entry|deleted<br>* package_entry|updated<br>* package|created<br>* package|deleted<br>* package|updated<br>* payment_method|created<br>* payment_method|deleted<br>* payment_method|updated<br>* payment|created<br>* payment|deleted<br>* payment|updated<br>* period|created<br>* period|deleted<br>* period|updated<br>* region|created<br>* region|deleted<br>* region|updated<br>* rentable_identity|created<br>* rentable_identity|deleted<br>* rentable_identity|updated<br>* rentable|created<br>* rentable|deleted<br>* rentable|updated<br>* reservation|cancelled<br>* reservation|confirmed<br>* reservation|created<br>* reservation|deleted<br>* reservation|updated<br>* review|created<br>* review|deleted<br>* review|updated<br>* room_type|created<br>* room_type|deleted<br>* room_type|updated<br>* room|created<br>* room|deleted<br>* room|updated<br>* subscription|created<br>* subscription|deleted<br>* subscription|updated<br>* terms|created<br>* terms|deleted<br>* terms|updated|
+|——— created_at|string(date-time)|false|none|none|
+|——— updated_at|string(date-time)|false|none|none|
+|—— links|object|false|none|Links|
+|——— self|string|false|none|Link to self|
 
 Status Code **default**
 
 |Name|Type|Required|Restrictions|Description|
 |---|---|---|---|---|
-|» errors|[object]|false|none|none|
-|»» status|string|false|none|HTTP response code|
-|»» code|string|false|none|Internal error code|
-|»» title|string|false|none|Error title|
-|»» detail|string|false|none|Error details|
-|»» source|object|false|none|none|
-|»»» pointer|string|false|none|Pointer to error in resource|
-
-<aside class="warning">
-To perform this operation, you must be authenticated by means of one of the following methods:
-ApiKeyAuth, OAuth2
-</aside>
+|— errors|[object]|false|none|none|
+|—— status|string|false|none|HTTP response code|
+|—— code|string|false|none|Internal error code|
+|—— title|string|false|none|Error title|
+|—— detail|string|false|none|Error details|
+|—— source|object|false|none|none|
+|——— pointer|string|false|none|Pointer to error in resource|
 
 ## GET webhook endpoint
 
@@ -5614,8 +5346,8 @@ Returns the webhook endpoint for the given ID
         "reservation|updated",
         "reservation|deleted"
       ],
-      "created_at": "2020-06-09T07:58:26Z",
-      "updated_at": "2020-06-09T07:58:26Z"
+      "created_at": "2020-06-09T14:49:30Z",
+      "updated_at": "2020-06-09T14:49:30Z"
     },
     "links": {
       "self": "string"
@@ -5637,34 +5369,29 @@ Status Code **200**
 
 |Name|Type|Required|Restrictions|Description|
 |---|---|---|---|---|
-|» data|[WebhookEndpoint](#schemawebhookendpoint)|false|none|none|
-|»» id|string|false|none|ID|
-|»» type|string|false|none|Type|
-|»» attributes|object|false|none|Attributes|
-|»»» target_url|string|false|none|none|
-|»»» confirm_strategy|string|false|none|One of: wait_for_success, fire_and_forget|
-|»»» events|[string]|false|none|One or more of:<br><br>* accommodation_subtype|created<br>* accommodation_subtype|deleted<br>* accommodation_subtype|updated<br>* administration|created<br>* administration|deleted<br>* administration|updated<br>* agenda_period|created<br>* agenda_period|deleted<br>* agenda_period|updated<br>* area_type|created<br>* area_type|deleted<br>* area_type|updated<br>* arrival_checkout_date|created<br>* arrival_checkout_date|deleted<br>* arrival_checkout_date|updated<br>* category_group|created<br>* category_group|deleted<br>* category_group|updated<br>* category|created<br>* category|deleted<br>* category|reindexed<br>* category|updated<br>* channel|created<br>* channel|deleted<br>* channel|updated<br>* city|created<br>* city|deleted<br>* city|updated<br>* cost|created<br>* cost|deleted<br>* cost|updated<br>* currency_conversion|created<br>* currency_conversion|deleted<br>* currency_conversion|updated<br>* discount_action|created<br>* discount_action|deleted<br>* discount_action|updated<br>* extra|created<br>* extra|deleted<br>* extra|updated<br>* invoice|created<br>* invoice|deleted<br>* invoice|updated<br>* organization|created<br>* organization|deleted<br>* organization|updated<br>* package_entry|created<br>* package_entry|deleted<br>* package_entry|updated<br>* package|created<br>* package|deleted<br>* package|updated<br>* payment_method|created<br>* payment_method|deleted<br>* payment_method|updated<br>* payment|created<br>* payment|deleted<br>* payment|updated<br>* period|created<br>* period|deleted<br>* period|updated<br>* region|created<br>* region|deleted<br>* region|updated<br>* rentable_identity|created<br>* rentable_identity|deleted<br>* rentable_identity|updated<br>* rentable|created<br>* rentable|deleted<br>* rentable|updated<br>* reservation|cancelled<br>* reservation|confirmed<br>* reservation|created<br>* reservation|deleted<br>* reservation|updated<br>* review|created<br>* review|deleted<br>* review|updated<br>* room_type|created<br>* room_type|deleted<br>* room_type|updated<br>* room|created<br>* room|deleted<br>* room|updated<br>* subscription|created<br>* subscription|deleted<br>* subscription|updated<br>* terms|created<br>* terms|deleted<br>* terms|updated|
-|»»» created_at|string(date-time)|false|none|none|
-|»»» updated_at|string(date-time)|false|none|none|
-|»» links|object|false|none|Links|
-|»»» self|string|false|none|Link to self|
+|— data|[WebhookEndpoint](#schemawebhookendpoint)|false|none|none|
+|—— id|string|false|none|ID|
+|—— type|string|false|none|Type|
+|—— attributes|object|false|none|Attributes|
+|——— target_url|string|false|none|none|
+|——— confirm_strategy|string|false|none|One of: wait_for_success, fire_and_forget|
+|——— events|[string]|false|none|One or more of:<br><br>* accommodation_subtype|created<br>* accommodation_subtype|deleted<br>* accommodation_subtype|updated<br>* administration|created<br>* administration|deleted<br>* administration|updated<br>* agenda_period|created<br>* agenda_period|deleted<br>* agenda_period|updated<br>* area_type|created<br>* area_type|deleted<br>* area_type|updated<br>* arrival_checkout_date|created<br>* arrival_checkout_date|deleted<br>* arrival_checkout_date|updated<br>* category_group|created<br>* category_group|deleted<br>* category_group|updated<br>* category|created<br>* category|deleted<br>* category|reindexed<br>* category|updated<br>* channel|created<br>* channel|deleted<br>* channel|updated<br>* city|created<br>* city|deleted<br>* city|updated<br>* cost|created<br>* cost|deleted<br>* cost|updated<br>* currency_conversion|created<br>* currency_conversion|deleted<br>* currency_conversion|updated<br>* discount_action|created<br>* discount_action|deleted<br>* discount_action|updated<br>* extra|created<br>* extra|deleted<br>* extra|updated<br>* invoice|created<br>* invoice|deleted<br>* invoice|updated<br>* organization|created<br>* organization|deleted<br>* organization|updated<br>* package_entry|created<br>* package_entry|deleted<br>* package_entry|updated<br>* package|created<br>* package|deleted<br>* package|updated<br>* payment_method|created<br>* payment_method|deleted<br>* payment_method|updated<br>* payment|created<br>* payment|deleted<br>* payment|updated<br>* period|created<br>* period|deleted<br>* period|updated<br>* region|created<br>* region|deleted<br>* region|updated<br>* rentable_identity|created<br>* rentable_identity|deleted<br>* rentable_identity|updated<br>* rentable|created<br>* rentable|deleted<br>* rentable|updated<br>* reservation|cancelled<br>* reservation|confirmed<br>* reservation|created<br>* reservation|deleted<br>* reservation|updated<br>* review|created<br>* review|deleted<br>* review|updated<br>* room_type|created<br>* room_type|deleted<br>* room_type|updated<br>* room|created<br>* room|deleted<br>* room|updated<br>* subscription|created<br>* subscription|deleted<br>* subscription|updated<br>* terms|created<br>* terms|deleted<br>* terms|updated|
+|——— created_at|string(date-time)|false|none|none|
+|——— updated_at|string(date-time)|false|none|none|
+|—— links|object|false|none|Links|
+|——— self|string|false|none|Link to self|
 
 Status Code **default**
 
 |Name|Type|Required|Restrictions|Description|
 |---|---|---|---|---|
-|» errors|[object]|false|none|none|
-|»» status|string|false|none|HTTP response code|
-|»» code|string|false|none|Internal error code|
-|»» title|string|false|none|Error title|
-|»» detail|string|false|none|Error details|
-|»» source|object|false|none|none|
-|»»» pointer|string|false|none|Pointer to error in resource|
-
-<aside class="warning">
-To perform this operation, you must be authenticated by means of one of the following methods:
-ApiKeyAuth, OAuth2
-</aside>
+|— errors|[object]|false|none|none|
+|—— status|string|false|none|HTTP response code|
+|—— code|string|false|none|Internal error code|
+|—— title|string|false|none|Error title|
+|—— detail|string|false|none|Error details|
+|—— source|object|false|none|none|
+|——— pointer|string|false|none|Pointer to error in resource|
 
 ## PATCH webhook endpoint
 
@@ -5868,17 +5595,17 @@ Update a webhook endpoint
 |id|path|string|true|Resource ID|
 |Accept-Language|header|string|false|Supported languages. A comma separated list with one or more of the following locales: nl, en, de, fr, da, cs, es, tr, pt, it. Default: 'en'.|
 |body|body|object|true|none|
-|» data|body|object|false|none|
-|»» id|body|string|false|ID|
-|»» type|body|string|false|Type|
-|»» attributes|body|object|false|Attributes|
-|»»» target_url|body|string|false|none|
-|»»» confirm_strategy|body|string|false|One of: wait_for_success, fire_and_forget|
-|»»» events|body|[string]|false|One or more of:|
+|— data|body|object|false|none|
+|—— id|body|string|false|ID|
+|—— type|body|string|false|Type|
+|—— attributes|body|object|false|Attributes|
+|——— target_url|body|string|false|none|
+|——— confirm_strategy|body|string|false|One of: wait_for_success, fire_and_forget|
+|——— events|body|[string]|false|One or more of:|
 
 #### Detailed descriptions
 
-**»»» events**: One or more of:
+**——— events**: One or more of:
 
 * accommodation_subtype|created
 * accommodation_subtype|deleted
@@ -5988,8 +5715,8 @@ Update a webhook endpoint
         "reservation|updated",
         "reservation|deleted"
       ],
-      "created_at": "2020-06-09T07:58:26Z",
-      "updated_at": "2020-06-09T07:58:26Z"
+      "created_at": "2020-06-09T14:49:30Z",
+      "updated_at": "2020-06-09T14:49:30Z"
     },
     "links": {
       "self": "string"
@@ -6011,34 +5738,29 @@ Status Code **200**
 
 |Name|Type|Required|Restrictions|Description|
 |---|---|---|---|---|
-|» data|[WebhookEndpoint](#schemawebhookendpoint)|false|none|none|
-|»» id|string|false|none|ID|
-|»» type|string|false|none|Type|
-|»» attributes|object|false|none|Attributes|
-|»»» target_url|string|false|none|none|
-|»»» confirm_strategy|string|false|none|One of: wait_for_success, fire_and_forget|
-|»»» events|[string]|false|none|One or more of:<br><br>* accommodation_subtype|created<br>* accommodation_subtype|deleted<br>* accommodation_subtype|updated<br>* administration|created<br>* administration|deleted<br>* administration|updated<br>* agenda_period|created<br>* agenda_period|deleted<br>* agenda_period|updated<br>* area_type|created<br>* area_type|deleted<br>* area_type|updated<br>* arrival_checkout_date|created<br>* arrival_checkout_date|deleted<br>* arrival_checkout_date|updated<br>* category_group|created<br>* category_group|deleted<br>* category_group|updated<br>* category|created<br>* category|deleted<br>* category|reindexed<br>* category|updated<br>* channel|created<br>* channel|deleted<br>* channel|updated<br>* city|created<br>* city|deleted<br>* city|updated<br>* cost|created<br>* cost|deleted<br>* cost|updated<br>* currency_conversion|created<br>* currency_conversion|deleted<br>* currency_conversion|updated<br>* discount_action|created<br>* discount_action|deleted<br>* discount_action|updated<br>* extra|created<br>* extra|deleted<br>* extra|updated<br>* invoice|created<br>* invoice|deleted<br>* invoice|updated<br>* organization|created<br>* organization|deleted<br>* organization|updated<br>* package_entry|created<br>* package_entry|deleted<br>* package_entry|updated<br>* package|created<br>* package|deleted<br>* package|updated<br>* payment_method|created<br>* payment_method|deleted<br>* payment_method|updated<br>* payment|created<br>* payment|deleted<br>* payment|updated<br>* period|created<br>* period|deleted<br>* period|updated<br>* region|created<br>* region|deleted<br>* region|updated<br>* rentable_identity|created<br>* rentable_identity|deleted<br>* rentable_identity|updated<br>* rentable|created<br>* rentable|deleted<br>* rentable|updated<br>* reservation|cancelled<br>* reservation|confirmed<br>* reservation|created<br>* reservation|deleted<br>* reservation|updated<br>* review|created<br>* review|deleted<br>* review|updated<br>* room_type|created<br>* room_type|deleted<br>* room_type|updated<br>* room|created<br>* room|deleted<br>* room|updated<br>* subscription|created<br>* subscription|deleted<br>* subscription|updated<br>* terms|created<br>* terms|deleted<br>* terms|updated|
-|»»» created_at|string(date-time)|false|none|none|
-|»»» updated_at|string(date-time)|false|none|none|
-|»» links|object|false|none|Links|
-|»»» self|string|false|none|Link to self|
+|— data|[WebhookEndpoint](#schemawebhookendpoint)|false|none|none|
+|—— id|string|false|none|ID|
+|—— type|string|false|none|Type|
+|—— attributes|object|false|none|Attributes|
+|——— target_url|string|false|none|none|
+|——— confirm_strategy|string|false|none|One of: wait_for_success, fire_and_forget|
+|——— events|[string]|false|none|One or more of:<br><br>* accommodation_subtype|created<br>* accommodation_subtype|deleted<br>* accommodation_subtype|updated<br>* administration|created<br>* administration|deleted<br>* administration|updated<br>* agenda_period|created<br>* agenda_period|deleted<br>* agenda_period|updated<br>* area_type|created<br>* area_type|deleted<br>* area_type|updated<br>* arrival_checkout_date|created<br>* arrival_checkout_date|deleted<br>* arrival_checkout_date|updated<br>* category_group|created<br>* category_group|deleted<br>* category_group|updated<br>* category|created<br>* category|deleted<br>* category|reindexed<br>* category|updated<br>* channel|created<br>* channel|deleted<br>* channel|updated<br>* city|created<br>* city|deleted<br>* city|updated<br>* cost|created<br>* cost|deleted<br>* cost|updated<br>* currency_conversion|created<br>* currency_conversion|deleted<br>* currency_conversion|updated<br>* discount_action|created<br>* discount_action|deleted<br>* discount_action|updated<br>* extra|created<br>* extra|deleted<br>* extra|updated<br>* invoice|created<br>* invoice|deleted<br>* invoice|updated<br>* organization|created<br>* organization|deleted<br>* organization|updated<br>* package_entry|created<br>* package_entry|deleted<br>* package_entry|updated<br>* package|created<br>* package|deleted<br>* package|updated<br>* payment_method|created<br>* payment_method|deleted<br>* payment_method|updated<br>* payment|created<br>* payment|deleted<br>* payment|updated<br>* period|created<br>* period|deleted<br>* period|updated<br>* region|created<br>* region|deleted<br>* region|updated<br>* rentable_identity|created<br>* rentable_identity|deleted<br>* rentable_identity|updated<br>* rentable|created<br>* rentable|deleted<br>* rentable|updated<br>* reservation|cancelled<br>* reservation|confirmed<br>* reservation|created<br>* reservation|deleted<br>* reservation|updated<br>* review|created<br>* review|deleted<br>* review|updated<br>* room_type|created<br>* room_type|deleted<br>* room_type|updated<br>* room|created<br>* room|deleted<br>* room|updated<br>* subscription|created<br>* subscription|deleted<br>* subscription|updated<br>* terms|created<br>* terms|deleted<br>* terms|updated|
+|——— created_at|string(date-time)|false|none|none|
+|——— updated_at|string(date-time)|false|none|none|
+|—— links|object|false|none|Links|
+|——— self|string|false|none|Link to self|
 
 Status Code **default**
 
 |Name|Type|Required|Restrictions|Description|
 |---|---|---|---|---|
-|» errors|[object]|false|none|none|
-|»» status|string|false|none|HTTP response code|
-|»» code|string|false|none|Internal error code|
-|»» title|string|false|none|Error title|
-|»» detail|string|false|none|Error details|
-|»» source|object|false|none|none|
-|»»» pointer|string|false|none|Pointer to error in resource|
-
-<aside class="warning">
-To perform this operation, you must be authenticated by means of one of the following methods:
-ApiKeyAuth, OAuth2
-</aside>
+|— errors|[object]|false|none|none|
+|—— status|string|false|none|HTTP response code|
+|—— code|string|false|none|Internal error code|
+|—— title|string|false|none|Error title|
+|—— detail|string|false|none|Error details|
+|—— source|object|false|none|none|
+|——— pointer|string|false|none|Pointer to error in resource|
 
 ## DELETE webhook endpoint
 
@@ -6236,18 +5958,13 @@ Status Code **default**
 
 |Name|Type|Required|Restrictions|Description|
 |---|---|---|---|---|
-|» errors|[object]|false|none|none|
-|»» status|string|false|none|HTTP response code|
-|»» code|string|false|none|Internal error code|
-|»» title|string|false|none|Error title|
-|»» detail|string|false|none|Error details|
-|»» source|object|false|none|none|
-|»»» pointer|string|false|none|Pointer to error in resource|
-
-<aside class="warning">
-To perform this operation, you must be authenticated by means of one of the following methods:
-ApiKeyAuth, OAuth2
-</aside>
+|— errors|[object]|false|none|none|
+|—— status|string|false|none|HTTP response code|
+|—— code|string|false|none|Internal error code|
+|—— title|string|false|none|Error title|
+|—— detail|string|false|none|Error details|
+|—— source|object|false|none|none|
+|——— pointer|string|false|none|Pointer to error in resource|
 
 # Schemas
 
@@ -6322,35 +6039,35 @@ links:
 |id|string|false|none|ID|
 |type|string|false|none|Type|
 |attributes|object|false|none|Attributes|
-|» name|string|false|none|none|
-|» phone|string|false|none|none|
-|» website|string|false|none|none|
-|» description|object|false|none|A description of the administration|
-|»» nl|string|false|none|none|
-|»» en|string|false|none|none|
-|»» de|string|false|none|none|
-|»» fr|string|false|none|none|
-|»» da|string|false|none|none|
-|»» cs|string|false|none|none|
-|»» es|string|false|none|none|
-|»» tr|string|false|none|none|
-|»» pt|string|false|none|none|
-|»» it|string|false|none|none|
-|» surroundings_description|object|false|none|A description of the surroundings|
-|»» nl|string|false|none|none|
-|»» en|string|false|none|none|
-|»» de|string|false|none|none|
-|»» fr|string|false|none|none|
-|»» da|string|false|none|none|
-|»» cs|string|false|none|none|
-|»» es|string|false|none|none|
-|»» tr|string|false|none|none|
-|»» pt|string|false|none|none|
-|»» it|string|false|none|none|
-|» available_locales|[string]|false|none|Enabled locales|
-|» utc_offset|string|false|none|The UTC offset of the administration, for example: +01:00|
+|— name|string|false|none|none|
+|— phone|string|false|none|none|
+|— website|string|false|none|none|
+|— description|object|false|none|A description of the administration|
+|—— nl|string|false|none|none|
+|—— en|string|false|none|none|
+|—— de|string|false|none|none|
+|—— fr|string|false|none|none|
+|—— da|string|false|none|none|
+|—— cs|string|false|none|none|
+|—— es|string|false|none|none|
+|—— tr|string|false|none|none|
+|—— pt|string|false|none|none|
+|—— it|string|false|none|none|
+|— surroundings_description|object|false|none|A description of the surroundings|
+|—— nl|string|false|none|none|
+|—— en|string|false|none|none|
+|—— de|string|false|none|none|
+|—— fr|string|false|none|none|
+|—— da|string|false|none|none|
+|—— cs|string|false|none|none|
+|—— es|string|false|none|none|
+|—— tr|string|false|none|none|
+|—— pt|string|false|none|none|
+|—— it|string|false|none|none|
+|— available_locales|[string]|false|none|Enabled locales|
+|— utc_offset|string|false|none|The UTC offset of the administration, for example: +01:00|
 |links|object|false|none|Links|
-|» self|string|false|none|Link to self|
+|— self|string|false|none|Link to self|
 
 <h2 id="tocS_AdministrationSubscription">AdministrationSubscription</h2>
 <!-- backwards compatibility -->
@@ -6381,14 +6098,14 @@ relationships:
 |id|string|false|none|ID|
 |type|string|false|none|Type|
 |relationships|object|false|none|Relationships|
-|» administration|object|false|none|none|
-|»» data|object|false|none|none|
-|»»» id|string|false|none|administration ID|
-|»»» type|string|false|none|none|
-|» channel|object|false|none|none|
-|»» data|object|false|none|none|
-|»»» id|string|false|none|channel ID|
-|»»» type|string|false|none|none|
+|— administration|object|false|none|none|
+|—— data|object|false|none|none|
+|——— id|string|false|none|administration ID|
+|——— type|string|false|none|none|
+|— channel|object|false|none|none|
+|—— data|object|false|none|none|
+|——— id|string|false|none|channel ID|
+|——— type|string|false|none|none|
 
 <h2 id="tocS_AgendaPeriod">AgendaPeriod</h2>
 <!-- backwards compatibility -->
@@ -6432,8 +6149,8 @@ attributes:
   http_method: post
   target_url: https://myapp.lvh.me:3000/gate_cards
   enabled_script: reservation.dig(:data, :attributes, :state) == 'confirmed'
-  created_at: 2020-06-09T07:58:26Z
-  updated_at: 2020-06-09T07:58:26Z
+  created_at: 2020-06-09T14:49:30Z
+  updated_at: 2020-06-09T14:49:30Z
 links:
   self: string
 
@@ -6446,37 +6163,37 @@ links:
 |id|string|false|none|ID|
 |type|string|false|none|Type|
 |attributes|object|false|none|Attributes|
-|» identifier|string|false|none|none|
-|» name|object|false|none|none|
-|»» nl|string|false|none|none|
-|»» en|string|false|none|none|
-|»» de|string|false|none|none|
-|»» fr|string|false|none|none|
-|»» da|string|false|none|none|
-|»» cs|string|false|none|none|
-|»» es|string|false|none|none|
-|»» tr|string|false|none|none|
-|»» pt|string|false|none|none|
-|»» it|string|false|none|none|
-|» description|object|false|none|none|
-|»» nl|string|false|none|none|
-|»» en|string|false|none|none|
-|»» de|string|false|none|none|
-|»» fr|string|false|none|none|
-|»» da|string|false|none|none|
-|»» cs|string|false|none|none|
-|»» es|string|false|none|none|
-|»» tr|string|false|none|none|
-|»» pt|string|false|none|none|
-|»» it|string|false|none|none|
-|» context_model|string|false|none|One of: invoice, reservation, subscription|
-|» http_method|string|false|none|One of: get, post, put, patch, delete|
-|» target_url|string|false|none|This URL will be called by us using the `http_method` specified|
-|» enabled_script|string|false|none|When set, this script will be evaluated to determine whether an action should be available to a user.<br>The last line of your script will be the result of the script. When the result is truthy, the command will be enabled.<br>The following variables will be available to you:<br><br>* The JSON serialized context model as defined in `context_model`. For example: `reservation`. Conforms to the documented schema.<br>* `current_user` - The JSON serialized current user (when present). Conforms to the documented User schema.<br><br>The script language **MUST** be Ruby. The list of method calls you are allowed to make is limited to the following:<br><br>* Allowed methods on any object:<br>`==` `!=` `!` `present?` `blank?`<br>* Allowed methods on hash objects:<br>`[]` `dig`<br>* Allowed calculation methods:<br>`+` `-` `*` `/`|
-|» created_at|string(date-time)|false|none|none|
-|» updated_at|string(date-time)|false|none|none|
+|— identifier|string|false|none|none|
+|— name|object|false|none|none|
+|—— nl|string|false|none|none|
+|—— en|string|false|none|none|
+|—— de|string|false|none|none|
+|—— fr|string|false|none|none|
+|—— da|string|false|none|none|
+|—— cs|string|false|none|none|
+|—— es|string|false|none|none|
+|—— tr|string|false|none|none|
+|—— pt|string|false|none|none|
+|—— it|string|false|none|none|
+|— description|object|false|none|none|
+|—— nl|string|false|none|none|
+|—— en|string|false|none|none|
+|—— de|string|false|none|none|
+|—— fr|string|false|none|none|
+|—— da|string|false|none|none|
+|—— cs|string|false|none|none|
+|—— es|string|false|none|none|
+|—— tr|string|false|none|none|
+|—— pt|string|false|none|none|
+|—— it|string|false|none|none|
+|— context_model|string|false|none|One of: invoice, reservation, subscription|
+|— http_method|string|false|none|One of: get, post, put, patch, delete|
+|— target_url|string|false|none|This URL will be called by us using the `http_method` specified|
+|— enabled_script|string|false|none|When set, this script will be evaluated to determine whether an action should be available to a user.<br>The last line of your script will be the result of the script. When the result is truthy, the command will be enabled.<br>The following variables will be available to you:<br><br>* The JSON serialized context model as defined in `context_model`. For example: `reservation`. Conforms to the documented schema.<br>* `current_user` - The JSON serialized current user (when present). Conforms to the documented User schema.<br><br>The script language **MUST** be Ruby. The list of method calls you are allowed to make is limited to the following:<br><br>* Allowed methods on any object:<br>`==` `!=` `!` `present?` `blank?`<br>* Allowed methods on hash objects:<br>`[]` `dig`<br>* Allowed calculation methods:<br>`+` `-` `*` `/`|
+|— created_at|string(date-time)|false|none|none|
+|— updated_at|string(date-time)|false|none|none|
 |links|object|false|none|Links|
-|» self|string|false|none|Link to self|
+|— self|string|false|none|Link to self|
 
 <h2 id="tocS_AreaType">AreaType</h2>
 <!-- backwards compatibility -->
@@ -6569,36 +6286,36 @@ relationships:
 |id|string|false|none|ID|
 |type|string|false|none|Type|
 |attributes|object|false|none|Attributes|
-|» start_date|string|false|none|none|
-|» los|string|false|none|none|
-|» checkin_time|string|false|none|none|
-|» checkout_time|string|false|none|none|
-|» price|string|false|none|none|
-|» original_price|string|false|none|none|
-|» rent_price|string|false|none|none|
-|» original_rent_price|string|false|none|none|
-|» stock|string|false|none|none|
+|— start_date|string|false|none|none|
+|— los|string|false|none|none|
+|— checkin_time|string|false|none|none|
+|— checkout_time|string|false|none|none|
+|— price|string|false|none|none|
+|— original_price|string|false|none|none|
+|— rent_price|string|false|none|none|
+|— original_rent_price|string|false|none|none|
+|— stock|string|false|none|none|
 |relationships|object|false|none|Relationships|
-|» administration|object|false|none|none|
-|»» data|object|false|none|none|
-|»»» id|string|false|none|administration ID|
-|»»» type|string|false|none|none|
-|» category|object|false|none|none|
-|»» data|object|false|none|none|
-|»»» id|string|false|none|category ID|
-|»»» type|string|false|none|none|
-|» discount_campaign|object|false|none|none|
-|»» data|object|false|none|none|
-|»»» id|string|false|none|discount_campaign ID|
-|»»» type|string|false|none|none|
-|» missing_tags|object|false|none|none|
-|»» data|[object]|false|none|none|
-|»»» id|string|false|none|missing_tags ID|
-|»»» type|string|false|none|none|
-|» rentables|object|false|none|none|
-|»» data|[object]|false|none|none|
-|»»» id|string|false|none|rentables ID|
-|»»» type|string|false|none|none|
+|— administration|object|false|none|none|
+|—— data|object|false|none|none|
+|——— id|string|false|none|administration ID|
+|——— type|string|false|none|none|
+|— category|object|false|none|none|
+|—— data|object|false|none|none|
+|——— id|string|false|none|category ID|
+|——— type|string|false|none|none|
+|— discount_campaign|object|false|none|none|
+|—— data|object|false|none|none|
+|——— id|string|false|none|discount_campaign ID|
+|——— type|string|false|none|none|
+|— missing_tags|object|false|none|none|
+|—— data|[object]|false|none|none|
+|——— id|string|false|none|missing_tags ID|
+|——— type|string|false|none|none|
+|— rentables|object|false|none|none|
+|—— data|[object]|false|none|none|
+|——— id|string|false|none|rentables ID|
+|——— type|string|false|none|none|
 
 <h2 id="tocS_Base">Base</h2>
 <!-- backwards compatibility -->
@@ -6746,31 +6463,31 @@ attributes:
 |id|string|false|none|ID|
 |type|string|false|none|Type|
 |attributes|object|false|none|Attributes|
-|» name|object|false|none|none|
-|»» nl|string|false|none|none|
-|»» en|string|false|none|none|
-|»» de|string|false|none|none|
-|»» fr|string|false|none|none|
-|»» da|string|false|none|none|
-|»» cs|string|false|none|none|
-|»» es|string|false|none|none|
-|»» tr|string|false|none|none|
-|»» pt|string|false|none|none|
-|»» it|string|false|none|none|
-|» description|object|false|none|none|
-|»» nl|string|false|none|none|
-|»» en|string|false|none|none|
-|»» de|string|false|none|none|
-|»» fr|string|false|none|none|
-|»» da|string|false|none|none|
-|»» cs|string|false|none|none|
-|»» es|string|false|none|none|
-|»» tr|string|false|none|none|
-|»» pt|string|false|none|none|
-|»» it|string|false|none|none|
-|» invoiced_as|string|false|none|none|
-|» cost_type|string|false|none|none|
-|» if_stay_overlaps|string|false|none|none|
+|— name|object|false|none|none|
+|—— nl|string|false|none|none|
+|—— en|string|false|none|none|
+|—— de|string|false|none|none|
+|—— fr|string|false|none|none|
+|—— da|string|false|none|none|
+|—— cs|string|false|none|none|
+|—— es|string|false|none|none|
+|—— tr|string|false|none|none|
+|—— pt|string|false|none|none|
+|—— it|string|false|none|none|
+|— description|object|false|none|none|
+|—— nl|string|false|none|none|
+|—— en|string|false|none|none|
+|—— de|string|false|none|none|
+|—— fr|string|false|none|none|
+|—— da|string|false|none|none|
+|—— cs|string|false|none|none|
+|—— es|string|false|none|none|
+|—— tr|string|false|none|none|
+|—— pt|string|false|none|none|
+|—— it|string|false|none|none|
+|— invoiced_as|string|false|none|none|
+|— cost_type|string|false|none|none|
+|— if_stay_overlaps|string|false|none|none|
 
 <h2 id="tocS_Coupon">Coupon</h2>
 <!-- backwards compatibility -->
@@ -6893,46 +6610,46 @@ attributes:
 |id|string|false|none|ID|
 |type|string|false|none|Type|
 |attributes|object|false|none|Attributes|
-|» name|object|false|none|none|
-|»» nl|string|false|none|none|
-|»» en|string|false|none|none|
-|»» de|string|false|none|none|
-|»» fr|string|false|none|none|
-|»» da|string|false|none|none|
-|»» cs|string|false|none|none|
-|»» es|string|false|none|none|
-|»» tr|string|false|none|none|
-|»» pt|string|false|none|none|
-|»» it|string|false|none|none|
-|» description|object|false|none|none|
-|»» nl|string|false|none|none|
-|»» en|string|false|none|none|
-|»» de|string|false|none|none|
-|»» fr|string|false|none|none|
-|»» da|string|false|none|none|
-|»» cs|string|false|none|none|
-|»» es|string|false|none|none|
-|»» tr|string|false|none|none|
-|»» pt|string|false|none|none|
-|»» it|string|false|none|none|
-|» memo_description|object|false|none|none|
-|»» nl|string|false|none|none|
-|»» en|string|false|none|none|
-|»» de|string|false|none|none|
-|»» fr|string|false|none|none|
-|»» da|string|false|none|none|
-|»» cs|string|false|none|none|
-|»» es|string|false|none|none|
-|»» tr|string|false|none|none|
-|»» pt|string|false|none|none|
-|»» it|string|false|none|none|
-|» invoiced_as|string|false|none|none|
-|» selectable|string|false|none|none|
-|» confirm_by_guest|string|false|none|none|
-|» extra_type|string|false|none|none|
-|» quantity_required|string|false|none|none|
-|» memo_required|string|false|none|none|
-|» maximum_quantity|string|false|none|none|
+|— name|object|false|none|none|
+|—— nl|string|false|none|none|
+|—— en|string|false|none|none|
+|—— de|string|false|none|none|
+|—— fr|string|false|none|none|
+|—— da|string|false|none|none|
+|—— cs|string|false|none|none|
+|—— es|string|false|none|none|
+|—— tr|string|false|none|none|
+|—— pt|string|false|none|none|
+|—— it|string|false|none|none|
+|— description|object|false|none|none|
+|—— nl|string|false|none|none|
+|—— en|string|false|none|none|
+|—— de|string|false|none|none|
+|—— fr|string|false|none|none|
+|—— da|string|false|none|none|
+|—— cs|string|false|none|none|
+|—— es|string|false|none|none|
+|—— tr|string|false|none|none|
+|—— pt|string|false|none|none|
+|—— it|string|false|none|none|
+|— memo_description|object|false|none|none|
+|—— nl|string|false|none|none|
+|—— en|string|false|none|none|
+|—— de|string|false|none|none|
+|—— fr|string|false|none|none|
+|—— da|string|false|none|none|
+|—— cs|string|false|none|none|
+|—— es|string|false|none|none|
+|—— tr|string|false|none|none|
+|—— pt|string|false|none|none|
+|—— it|string|false|none|none|
+|— invoiced_as|string|false|none|none|
+|— selectable|string|false|none|none|
+|— confirm_by_guest|string|false|none|none|
+|— extra_type|string|false|none|none|
+|— quantity_required|string|false|none|none|
+|— memo_required|string|false|none|none|
+|— maximum_quantity|string|false|none|none|
 
 <h2 id="tocS_Invoice">Invoice</h2>
 <!-- backwards compatibility -->
@@ -6974,25 +6691,25 @@ relationships:
 |id|string|false|none|ID|
 |type|string|false|none|Type|
 |attributes|object|false|none|Attributes|
-|» invoice_nr|string|false|none|none|
-|» foreign_total|number(float)|false|none|none|
-|» foreign_total_open|number(float)|false|none|none|
-|» foreign_currency|string|false|none|An ISO 4217 currency code|
+|— invoice_nr|string|false|none|none|
+|— foreign_total|number(float)|false|none|none|
+|— foreign_total_open|number(float)|false|none|none|
+|— foreign_currency|string|false|none|An ISO 4217 currency code|
 |links|object|false|none|Links|
-|» self|string|false|none|Link to self|
+|— self|string|false|none|Link to self|
 |relationships|object|false|none|Relationships|
-|» administration|object|false|none|none|
-|»» data|object|false|none|none|
-|»»» id|string|false|none|administration ID|
-|»»» type|string|false|none|none|
-|»» links|object|false|none|none|
-|»»» related|string|false|none|none|
-|» reservation|object|false|none|none|
-|»» data|object|false|none|none|
-|»»» id|string|false|none|reservation ID|
-|»»» type|string|false|none|none|
-|»» links|object|false|none|none|
-|»»» related|string|false|none|none|
+|— administration|object|false|none|none|
+|—— data|object|false|none|none|
+|——— id|string|false|none|administration ID|
+|——— type|string|false|none|none|
+|—— links|object|false|none|none|
+|——— related|string|false|none|none|
+|— reservation|object|false|none|none|
+|—— data|object|false|none|none|
+|——— id|string|false|none|reservation ID|
+|——— type|string|false|none|none|
+|—— links|object|false|none|none|
+|——— related|string|false|none|none|
 
 <h2 id="tocS_Order">Order</h2>
 <!-- backwards compatibility -->
@@ -7036,27 +6753,27 @@ relationships:
 |id|string|false|none|ID|
 |type|string|false|none|Type|
 |attributes|object|false|none|Attributes|
-|» reservation_days|string|false|none|none|
-|» packaged_date_range|string|false|none|none|
-|» primary_package_id|string|false|none|none|
-|» extra_package_ids|string|false|none|none|
-|» currency|string|false|none|none|
-|» total|string|false|none|none|
+|— reservation_days|string|false|none|none|
+|— packaged_date_range|string|false|none|none|
+|— primary_package_id|string|false|none|none|
+|— extra_package_ids|string|false|none|none|
+|— currency|string|false|none|none|
+|— total|string|false|none|none|
 |links|object|false|none|Links|
-|» self|string|false|none|Link to self|
+|— self|string|false|none|Link to self|
 |relationships|object|false|none|Relationships|
-|» administration|object|false|none|none|
-|»» data|object|false|none|none|
-|»»» id|string|false|none|administration ID|
-|»»» type|string|false|none|none|
-|» main_order_items|object|false|none|none|
-|»» data|[object]|false|none|none|
-|»»» id|string|false|none|main_order_items ID|
-|»»» type|string|false|none|none|
-|» extra_order_items|object|false|none|none|
-|»» data|[object]|false|none|none|
-|»»» id|string|false|none|extra_order_items ID|
-|»»» type|string|false|none|none|
+|— administration|object|false|none|none|
+|—— data|object|false|none|none|
+|——— id|string|false|none|administration ID|
+|——— type|string|false|none|none|
+|— main_order_items|object|false|none|none|
+|—— data|[object]|false|none|none|
+|——— id|string|false|none|main_order_items ID|
+|——— type|string|false|none|none|
+|— extra_order_items|object|false|none|none|
+|—— data|[object]|false|none|none|
+|——— id|string|false|none|extra_order_items ID|
+|——— type|string|false|none|none|
 
 <h2 id="tocS_Organization">Organization</h2>
 <!-- backwards compatibility -->
@@ -7091,18 +6808,18 @@ links:
 |id|string|false|none|ID|
 |type|string|false|none|Type|
 |attributes|object|false|none|Attributes|
-|» name|string|false|none|none|
-|» website|string|false|none|none|
-|» country_code|string|false|none|none|
-|» phone|string|false|none|none|
-|» email|string|false|none|none|
-|» weekend_behavior|string|false|none|none|
-|» max_baby_age|integer|false|none|none|
-|» max_child_age|integer|false|none|none|
-|» max_adolescent_age|integer|false|none|none|
-|» min_senior_age|integer|false|none|none|
+|— name|string|false|none|none|
+|— website|string|false|none|none|
+|— country_code|string|false|none|none|
+|— phone|string|false|none|none|
+|— email|string|false|none|none|
+|— weekend_behavior|string|false|none|none|
+|— max_baby_age|integer|false|none|none|
+|— max_child_age|integer|false|none|none|
+|— max_adolescent_age|integer|false|none|none|
+|— min_senior_age|integer|false|none|none|
 |links|object|false|none|Links|
-|» self|string|false|none|Link to self|
+|— self|string|false|none|Link to self|
 
 <h2 id="tocS_PackageEntry">PackageEntry</h2>
 <!-- backwards compatibility -->
@@ -7195,16 +6912,16 @@ relationships:
 |id|string|false|none|ID|
 |type|string|false|none|Type|
 |attributes|object|false|none|Attributes|
-|» paid_at|string(date)|false|none|Local payment date|
-|» foreign_price|number(float)|false|none|Paid price in the same currency as the invoice currency|
-|» memo|string|false|none|An optional note|
+|— paid_at|string(date)|false|none|Local payment date|
+|— foreign_price|number(float)|false|none|Paid price in the same currency as the invoice currency|
+|— memo|string|false|none|An optional note|
 |relationships|object|false|none|Relationships|
-|» invoice|object|false|none|none|
-|»» data|object|false|none|none|
-|»»» id|string|false|none|invoice ID|
-|»»» type|string|false|none|none|
-|»» links|object|false|none|none|
-|»»» related|string|false|none|none|
+|— invoice|object|false|none|none|
+|—— data|object|false|none|none|
+|——— id|string|false|none|invoice ID|
+|——— type|string|false|none|none|
+|—— links|object|false|none|none|
+|——— related|string|false|none|none|
 
 <h2 id="tocS_Period">Period</h2>
 <!-- backwards compatibility -->
@@ -7303,8 +7020,8 @@ attributes:
   end_date: string
   state: string
   rentable: string
-  created_at: 2020-06-09T07:58:26Z
-  updated_at: 2020-06-09T07:58:26Z
+  created_at: 2020-06-09T14:49:30Z
+  updated_at: 2020-06-09T14:49:30Z
 links:
   self: string
 relationships:
@@ -7330,29 +7047,29 @@ relationships:
 |id|string|false|none|ID|
 |type|string|false|none|Type|
 |attributes|object|false|none|Attributes|
-|» booking_nr|string|false|none|none|
-|» last_name|string|false|none|none|
-|» start_date|string|false|none|none|
-|» end_date|string|false|none|none|
-|» state|string|false|none|none|
-|» rentable|string|false|none|none|
-|» created_at|string(date-time)|false|none|none|
-|» updated_at|string(date-time)|false|none|none|
+|— booking_nr|string|false|none|none|
+|— last_name|string|false|none|none|
+|— start_date|string|false|none|none|
+|— end_date|string|false|none|none|
+|— state|string|false|none|none|
+|— rentable|string|false|none|none|
+|— created_at|string(date-time)|false|none|none|
+|— updated_at|string(date-time)|false|none|none|
 |links|object|false|none|Links|
-|» self|string|false|none|Link to self|
+|— self|string|false|none|Link to self|
 |relationships|object|false|none|Relationships|
-|» administration|object|false|none|none|
-|»» data|object|false|none|none|
-|»»» id|string|false|none|administration ID|
-|»»» type|string|false|none|none|
-|»» links|object|false|none|none|
-|»»» related|string|false|none|none|
-|» order|object|false|none|none|
-|»» data|object|false|none|none|
-|»»» id|string|false|none|order ID|
-|»»» type|string|false|none|none|
-|»» links|object|false|none|none|
-|»»» related|string|false|none|none|
+|— administration|object|false|none|none|
+|—— data|object|false|none|none|
+|——— id|string|false|none|administration ID|
+|——— type|string|false|none|none|
+|—— links|object|false|none|none|
+|——— related|string|false|none|none|
+|— order|object|false|none|none|
+|—— data|object|false|none|none|
+|——— id|string|false|none|order ID|
+|——— type|string|false|none|none|
+|—— links|object|false|none|none|
+|——— related|string|false|none|none|
 
 <h2 id="tocS_Review">Review</h2>
 <!-- backwards compatibility -->
@@ -7427,8 +7144,8 @@ type: subscription
 attributes:
   authorized: string
   user_locale: string
-  created_at: 2020-06-09T07:58:26Z
-  updated_at: 2020-06-09T07:58:26Z
+  created_at: 2020-06-09T14:49:30Z
+  updated_at: 2020-06-09T14:49:30Z
 links:
   self: string
   url: string
@@ -7453,24 +7170,24 @@ relationships:
 |id|string|false|none|ID|
 |type|string|false|none|Type|
 |attributes|object|false|none|Attributes|
-|» authorized|string|false|none|Returns whether a user has authorized this subscription|
-|» user_locale|string|false|none|The locale of the user that created this subscription|
-|» created_at|string(date-time)|false|none|none|
-|» updated_at|string(date-time)|false|none|none|
+|— authorized|string|false|none|Returns whether a user has authorized this subscription|
+|— user_locale|string|false|none|The locale of the user that created this subscription|
+|— created_at|string(date-time)|false|none|none|
+|— updated_at|string(date-time)|false|none|none|
 |links|object|false|none|Links|
-|» self|string|false|none|Link to self|
-|» url|string|false|none|Link to url|
+|— self|string|false|none|Link to self|
+|— url|string|false|none|Link to url|
 |relationships|object|false|none|Relationships|
-|» organization|object|false|none|none|
-|»» data|object|false|none|none|
-|»»» id|string|false|none|organization ID|
-|»»» type|string|false|none|none|
-|»» links|object|false|none|none|
-|»»» related|string|false|none|none|
-|» administration_subscriptions|object|false|none|none|
-|»» data|[object]|false|none|none|
-|»»» id|string|false|none|administration_subscriptions ID|
-|»»» type|string|false|none|none|
+|— organization|object|false|none|none|
+|—— data|object|false|none|none|
+|——— id|string|false|none|organization ID|
+|——— type|string|false|none|none|
+|—— links|object|false|none|none|
+|——— related|string|false|none|none|
+|— administration_subscriptions|object|false|none|none|
+|—— data|[object]|false|none|none|
+|——— id|string|false|none|administration_subscriptions ID|
+|——— type|string|false|none|none|
 
 <h2 id="tocS_Terms">Terms</h2>
 <!-- backwards compatibility -->
@@ -7517,10 +7234,10 @@ attributes:
 |id|string|false|none|ID|
 |type|string|false|none|Type|
 |attributes|object|false|none|Attributes|
-|» email|string|false|none|none|
-|» name|string|false|none|none|
-|» locale|string|false|none|none|
-|» timezone|string|false|none|none|
+|— email|string|false|none|none|
+|— name|string|false|none|none|
+|— locale|string|false|none|none|
+|— timezone|string|false|none|none|
 
 <h2 id="tocS_WebhookEndpoint">WebhookEndpoint</h2>
 <!-- backwards compatibility -->
@@ -7539,8 +7256,8 @@ attributes:
     - reservation|created
     - reservation|updated
     - reservation|deleted
-  created_at: 2020-06-09T07:58:26Z
-  updated_at: 2020-06-09T07:58:26Z
+  created_at: 2020-06-09T14:49:30Z
+  updated_at: 2020-06-09T14:49:30Z
 links:
   self: string
 
@@ -7553,11 +7270,11 @@ links:
 |id|string|false|none|ID|
 |type|string|false|none|Type|
 |attributes|object|false|none|Attributes|
-|» target_url|string|false|none|none|
-|» confirm_strategy|string|false|none|One of: wait_for_success, fire_and_forget|
-|» events|[string]|false|none|One or more of:<br><br>* accommodation_subtype|created<br>* accommodation_subtype|deleted<br>* accommodation_subtype|updated<br>* administration|created<br>* administration|deleted<br>* administration|updated<br>* agenda_period|created<br>* agenda_period|deleted<br>* agenda_period|updated<br>* area_type|created<br>* area_type|deleted<br>* area_type|updated<br>* arrival_checkout_date|created<br>* arrival_checkout_date|deleted<br>* arrival_checkout_date|updated<br>* category_group|created<br>* category_group|deleted<br>* category_group|updated<br>* category|created<br>* category|deleted<br>* category|reindexed<br>* category|updated<br>* channel|created<br>* channel|deleted<br>* channel|updated<br>* city|created<br>* city|deleted<br>* city|updated<br>* cost|created<br>* cost|deleted<br>* cost|updated<br>* currency_conversion|created<br>* currency_conversion|deleted<br>* currency_conversion|updated<br>* discount_action|created<br>* discount_action|deleted<br>* discount_action|updated<br>* extra|created<br>* extra|deleted<br>* extra|updated<br>* invoice|created<br>* invoice|deleted<br>* invoice|updated<br>* organization|created<br>* organization|deleted<br>* organization|updated<br>* package_entry|created<br>* package_entry|deleted<br>* package_entry|updated<br>* package|created<br>* package|deleted<br>* package|updated<br>* payment_method|created<br>* payment_method|deleted<br>* payment_method|updated<br>* payment|created<br>* payment|deleted<br>* payment|updated<br>* period|created<br>* period|deleted<br>* period|updated<br>* region|created<br>* region|deleted<br>* region|updated<br>* rentable_identity|created<br>* rentable_identity|deleted<br>* rentable_identity|updated<br>* rentable|created<br>* rentable|deleted<br>* rentable|updated<br>* reservation|cancelled<br>* reservation|confirmed<br>* reservation|created<br>* reservation|deleted<br>* reservation|updated<br>* review|created<br>* review|deleted<br>* review|updated<br>* room_type|created<br>* room_type|deleted<br>* room_type|updated<br>* room|created<br>* room|deleted<br>* room|updated<br>* subscription|created<br>* subscription|deleted<br>* subscription|updated<br>* terms|created<br>* terms|deleted<br>* terms|updated|
-|» created_at|string(date-time)|false|none|none|
-|» updated_at|string(date-time)|false|none|none|
+|— target_url|string|false|none|none|
+|— confirm_strategy|string|false|none|One of: wait_for_success, fire_and_forget|
+|— events|[string]|false|none|One or more of:<br><br>* accommodation_subtype|created<br>* accommodation_subtype|deleted<br>* accommodation_subtype|updated<br>* administration|created<br>* administration|deleted<br>* administration|updated<br>* agenda_period|created<br>* agenda_period|deleted<br>* agenda_period|updated<br>* area_type|created<br>* area_type|deleted<br>* area_type|updated<br>* arrival_checkout_date|created<br>* arrival_checkout_date|deleted<br>* arrival_checkout_date|updated<br>* category_group|created<br>* category_group|deleted<br>* category_group|updated<br>* category|created<br>* category|deleted<br>* category|reindexed<br>* category|updated<br>* channel|created<br>* channel|deleted<br>* channel|updated<br>* city|created<br>* city|deleted<br>* city|updated<br>* cost|created<br>* cost|deleted<br>* cost|updated<br>* currency_conversion|created<br>* currency_conversion|deleted<br>* currency_conversion|updated<br>* discount_action|created<br>* discount_action|deleted<br>* discount_action|updated<br>* extra|created<br>* extra|deleted<br>* extra|updated<br>* invoice|created<br>* invoice|deleted<br>* invoice|updated<br>* organization|created<br>* organization|deleted<br>* organization|updated<br>* package_entry|created<br>* package_entry|deleted<br>* package_entry|updated<br>* package|created<br>* package|deleted<br>* package|updated<br>* payment_method|created<br>* payment_method|deleted<br>* payment_method|updated<br>* payment|created<br>* payment|deleted<br>* payment|updated<br>* period|created<br>* period|deleted<br>* period|updated<br>* region|created<br>* region|deleted<br>* region|updated<br>* rentable_identity|created<br>* rentable_identity|deleted<br>* rentable_identity|updated<br>* rentable|created<br>* rentable|deleted<br>* rentable|updated<br>* reservation|cancelled<br>* reservation|confirmed<br>* reservation|created<br>* reservation|deleted<br>* reservation|updated<br>* review|created<br>* review|deleted<br>* review|updated<br>* room_type|created<br>* room_type|deleted<br>* room_type|updated<br>* room|created<br>* room|deleted<br>* room|updated<br>* subscription|created<br>* subscription|deleted<br>* subscription|updated<br>* terms|created<br>* terms|deleted<br>* terms|updated|
+|— created_at|string(date-time)|false|none|none|
+|— updated_at|string(date-time)|false|none|none|
 |links|object|false|none|Links|
-|» self|string|false|none|Link to self|
+|— self|string|false|none|Link to self|
 

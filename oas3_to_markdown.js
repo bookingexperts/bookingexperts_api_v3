@@ -20,9 +20,10 @@ const options = {
   //experimental: true,
   sample: true,
   user_templates: './widdershins_templates/openapi3/',
-  includes: [
-    'release_notes'
-  ],
+  includes: {
+    before: ['overview'],
+    after: ['release_notes']
+  },
   toc_footers: [
     {
       url: 'https://www.bookingexperts.nl',
