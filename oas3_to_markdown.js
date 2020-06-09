@@ -11,7 +11,7 @@ const options = {
   tocSummary: true,
   //expandBody: false,
   //useBodyName: true,
-  //httpsnippet: true,
+  httpsnippet: true,
   //verbose: false,
   search: false,
   //omitBody: false,

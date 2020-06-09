@@ -25,7 +25,7 @@ headingLevel: 2
 
 > Scroll down for code samples, example requests and responses. Select a language for code samples from the tabs above or the mobile navigation menu.
 
-## Introducton
+## Introduction
 
 **DRAFT: this is a draft version and should not be used because this specification will change a lot.**
 
@@ -109,7 +109,7 @@ To verify a request, your code should like something like this:
 
 ```ruby
 def verify_signature(payload_body)
-  signature = 'sha1=' + OpenSSL::HMAC.hexdigest(OpenSSL::Digest.new('sha1'), ENV['OAUTH@_CLIENT_SECRET'], payload_body)
+  signature = 'sha1=' + OpenSSL::HMAC.hexdigest(OpenSSL::Digest.new('sha1'), ENV['OAUTH_CLIENT_SECRET'], payload_body)
   return halt 500, "Signatures didn't match!" unless Rack::Utils.secure_compare(signature, request.env['HTTP_X_BE_SIGNATURE'])
 end
 ```
@@ -206,16 +206,37 @@ Email: <a href="mailto:connectivity@bookingexperts.nl">Connectivity team</a> Web
 
 |Scope|Scope Description|
 |---|---|
+|accommodation_subtype|read|Read accommodation subtypes|
 |administration|read|Read administrations|
-|content|delete|Delete content|
-|content|read|Read content|
-|content|write|Update content|
+|agenda_period|read|Read blocked periods|
+|area_type|read|Read floors|
+|arrival_checkout_date|read|Read arrival / checkout dates|
+|category_group|read|Read type groups|
+|category|read|Read types|
+|channel|read|Read channels|
+|city|read|Read cities|
+|cost|read|Read costs|
+|currency_conversion|read|Read currency conversions|
+|discount_action|read|Read discount actions|
+|extra|read|Read extras|
 |invoice|read|Read invoices|
 |order|read|Read orders|
 |organization|read|Read organizations|
+|package_entry|read|Read costs|
+|package|read|Read packages|
+|payment_method|read|Read payment methods|
 |payment|read|Read payments|
 |payment|write|Update payments|
+|period|read|Read period groups|
+|region|read|Read regions|
+|rentable_identity|read|Read accommodations|
+|rentable|read|Read accommodations|
 |reservation|read|Read reservations|
+|review|read|Read reviews|
+|room_type|read|Read room types|
+|room|read|Read rooms|
+|subscription|read|Read subscriptions|
+|terms|read|Read terms  and conditions|
 
 <h1 id="booking-experts-contentapi-administrations">Administrations</h1>
 
@@ -226,151 +247,149 @@ Email: <a href="mailto:connectivity@bookingexperts.nl">Connectivity team</a> Web
 > Code samples
 
 ```shell
-# You can also use wget
-curl -X GET https://api.bookingexperts.nl/v3/administrations \
-  -H 'Accept: application/vnd.api+json' \
-  -H 'Accept-Language: en,nl' \
-  -H 'X-API-KEY: API_KEY'
-
+curl --request GET \
+  --url https://api.bookingexperts.nl/v3/administrations \
+  --header 'accept: application/vnd.api+json' \
+  --header 'accept-language: en,nl' \
+  --header 'x-api-key: API_KEY'
 ```
 
 ```http
-GET https://api.bookingexperts.nl/v3/administrations HTTP/1.1
-Host: api.bookingexperts.nl
+GET /v3/administrations HTTP/1.1
 Accept: application/vnd.api+json
 Accept-Language: en,nl
+X-Api-Key: API_KEY
+Host: api.bookingexperts.nl
 
 ```
 
 ```javascript
+var data = null;
 
-const headers = {
-  'Accept':'application/vnd.api+json',
-  'Accept-Language':'en,nl',
-  'X-API-KEY':'API_KEY'
-};
+var xhr = new XMLHttpRequest();
+xhr.withCredentials = true;
 
-fetch('https://api.bookingexperts.nl/v3/administrations',
-{
-  method: 'GET',
-
-  headers: headers
-})
-.then(function(res) {
-    return res.json();
-}).then(function(body) {
-    console.log(body);
+xhr.addEventListener("readystatechange", function () {
+  if (this.readyState === this.DONE) {
+    console.log(this.responseText);
+  }
 });
 
+xhr.open("GET", "https://api.bookingexperts.nl/v3/administrations");
+xhr.setRequestHeader("accept", "application/vnd.api+json");
+xhr.setRequestHeader("accept-language", "en,nl");
+xhr.setRequestHeader("x-api-key", "API_KEY");
+
+xhr.send(data);
 ```
 
 ```ruby
-require 'rest-client'
-require 'json'
+require 'uri'
+require 'net/http'
+require 'openssl'
 
-headers = {
-  'Accept' => 'application/vnd.api+json',
-  'Accept-Language' => 'en,nl',
-  'X-API-KEY' => 'API_KEY'
-}
+url = URI("https://api.bookingexperts.nl/v3/administrations")
 
-result = RestClient.get 'https://api.bookingexperts.nl/v3/administrations',
-  params: {
-  }, headers: headers
+http = Net::HTTP.new(url.host, url.port)
+http.use_ssl = true
+http.verify_mode = OpenSSL::SSL::VERIFY_NONE
 
-p JSON.parse(result)
+request = Net::HTTP::Get.new(url)
+request["accept"] = 'application/vnd.api+json'
+request["accept-language"] = 'en,nl'
+request["x-api-key"] = 'API_KEY'
 
+response = http.request(request)
+puts response.read_body
 ```
 
 ```python
-import requests
+import http.client
+
+conn = http.client.HTTPSConnection("api.bookingexperts.nl")
+
 headers = {
-  'Accept': 'application/vnd.api+json',
-  'Accept-Language': 'en,nl',
-  'X-API-KEY': 'API_KEY'
-}
+    'accept': "application/vnd.api+json",
+    'accept-language': "en,nl",
+    'x-api-key': "API_KEY"
+    }
 
-r = requests.get('https://api.bookingexperts.nl/v3/administrations', headers = headers)
+conn.request("GET", "/v3/administrations", headers=headers)
 
-print(r.json())
+res = conn.getresponse()
+data = res.read()
 
+print(data.decode("utf-8"))
 ```
 
 ```php
 <?php
 
-require 'vendor/autoload.php';
+$curl = curl_init();
 
-$headers = array(
-    'Accept' => 'application/vnd.api+json',
-    'Accept-Language' => 'en,nl',
-    'X-API-KEY' => 'API_KEY',
-);
+curl_setopt_array($curl, array(
+  CURLOPT_URL => "https://api.bookingexperts.nl/v3/administrations",
+  CURLOPT_RETURNTRANSFER => true,
+  CURLOPT_ENCODING => "",
+  CURLOPT_MAXREDIRS => 10,
+  CURLOPT_TIMEOUT => 30,
+  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+  CURLOPT_CUSTOMREQUEST => "GET",
+  CURLOPT_HTTPHEADER => array(
+    "accept: application/vnd.api+json",
+    "accept-language: en,nl",
+    "x-api-key: API_KEY"
+  ),
+));
 
-$client = new \GuzzleHttp\Client();
+$response = curl_exec($curl);
+$err = curl_error($curl);
 
-// Define array of request body.
-$request_body = array();
+curl_close($curl);
 
-try {
-    $response = $client->request('GET','https://api.bookingexperts.nl/v3/administrations', array(
-        'headers' => $headers,
-        'json' => $request_body,
-       )
-    );
-    print_r($response->getBody()->getContents());
- }
- catch (\GuzzleHttp\Exception\BadResponseException $e) {
-    // handle exception or api errors.
-    print_r($e->getMessage());
- }
-
- // ...
-
+if ($err) {
+  echo "cURL Error #:" . $err;
+} else {
+  echo $response;
+}
 ```
 
 ```java
-URL obj = new URL("https://api.bookingexperts.nl/v3/administrations");
-HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-con.setRequestMethod("GET");
-int responseCode = con.getResponseCode();
-BufferedReader in = new BufferedReader(
-    new InputStreamReader(con.getInputStream()));
-String inputLine;
-StringBuffer response = new StringBuffer();
-while ((inputLine = in.readLine()) != null) {
-    response.append(inputLine);
-}
-in.close();
-System.out.println(response.toString());
-
+HttpResponse<String> response = Unirest.get("https://api.bookingexperts.nl/v3/administrations")
+  .header("accept", "application/vnd.api+json")
+  .header("accept-language", "en,nl")
+  .header("x-api-key", "API_KEY")
+  .asString();
 ```
 
 ```go
 package main
 
 import (
-       "bytes"
-       "net/http"
+	"fmt"
+	"net/http"
+	"io/ioutil"
 )
 
 func main() {
 
-    headers := map[string][]string{
-        "Accept": []string{"application/vnd.api+json"},
-        "Accept-Language": []string{"en,nl"},
-        "X-API-KEY": []string{"API_KEY"},
-    }
+	url := "https://api.bookingexperts.nl/v3/administrations"
 
-    data := bytes.NewBuffer([]byte{jsonReq})
-    req, err := http.NewRequest("GET", "https://api.bookingexperts.nl/v3/administrations", data)
-    req.Header = headers
+	req, _ := http.NewRequest("GET", url, nil)
 
-    client := &http.Client{}
-    resp, err := client.Do(req)
-    // ...
+	req.Header.Add("accept", "application/vnd.api+json")
+	req.Header.Add("accept-language", "en,nl")
+	req.Header.Add("x-api-key", "API_KEY")
+
+	res, _ := http.DefaultClient.Do(req)
+
+	defer res.Body.Close()
+	body, _ := ioutil.ReadAll(res.Body)
+
+	fmt.Println(res)
+	fmt.Println(string(body))
+
 }
-
 ```
 
 `GET /v3/administrations`
@@ -392,7 +411,7 @@ Returns all administrations accessible for the current subscription
 |filter[surroundings_description]|query|string|false|Filter on surroundings_description|
 |filter[available_locales]|query|string|false|Filter on available_locales|
 |filter[utc_offset]|query|string|false|Filter on utc_offset|
-|Accept-Language|header|string|false|Supported languages. A comma separated list with one or more of the following locales: nl, en, de, fr, da, cs, es, tr, pt. Default: 'en'.|
+|Accept-Language|header|string|false|Supported languages. A comma separated list with one or more of the following locales: nl, en, de, fr, da, cs, es, tr, pt, it. Default: 'en'.|
 
 > Example responses
 
@@ -417,7 +436,8 @@ Returns all administrations accessible for the current subscription
           "cs": "string",
           "es": "string",
           "tr": "string",
-          "pt": "string"
+          "pt": "string",
+          "it": "string"
         },
         "surroundings_description": {
           "nl": "string",
@@ -428,7 +448,8 @@ Returns all administrations accessible for the current subscription
           "cs": "string",
           "es": "string",
           "tr": "string",
-          "pt": "string"
+          "pt": "string",
+          "it": "string"
         },
         "available_locales": [
           "string"
@@ -480,6 +501,7 @@ Status Code **200**
 |»»»» es|string|false|none|none|
 |»»»» tr|string|false|none|none|
 |»»»» pt|string|false|none|none|
+|»»»» it|string|false|none|none|
 |»»» surroundings_description|object|false|none|A description of the surroundings|
 |»»»» nl|string|false|none|none|
 |»»»» en|string|false|none|none|
@@ -490,6 +512,7 @@ Status Code **200**
 |»»»» es|string|false|none|none|
 |»»»» tr|string|false|none|none|
 |»»»» pt|string|false|none|none|
+|»»»» it|string|false|none|none|
 |»»» available_locales|[string]|false|none|Enabled locales|
 |»»» utc_offset|string|false|none|The UTC offset of the administration, for example: +01:00|
 |»» links|object|false|none|Links|
@@ -524,151 +547,149 @@ ApiKeyAuth, OAuth2
 > Code samples
 
 ```shell
-# You can also use wget
-curl -X GET https://api.bookingexperts.nl/v3/administrations/{id} \
-  -H 'Accept: application/vnd.api+json' \
-  -H 'Accept-Language: en,nl' \
-  -H 'X-API-KEY: API_KEY'
-
+curl --request GET \
+  --url https://api.bookingexperts.nl/v3/administrations/string \
+  --header 'accept: application/vnd.api+json' \
+  --header 'accept-language: en,nl' \
+  --header 'x-api-key: API_KEY'
 ```
 
 ```http
-GET https://api.bookingexperts.nl/v3/administrations/{id} HTTP/1.1
-Host: api.bookingexperts.nl
+GET /v3/administrations/string HTTP/1.1
 Accept: application/vnd.api+json
 Accept-Language: en,nl
+X-Api-Key: API_KEY
+Host: api.bookingexperts.nl
 
 ```
 
 ```javascript
+var data = null;
 
-const headers = {
-  'Accept':'application/vnd.api+json',
-  'Accept-Language':'en,nl',
-  'X-API-KEY':'API_KEY'
-};
+var xhr = new XMLHttpRequest();
+xhr.withCredentials = true;
 
-fetch('https://api.bookingexperts.nl/v3/administrations/{id}',
-{
-  method: 'GET',
-
-  headers: headers
-})
-.then(function(res) {
-    return res.json();
-}).then(function(body) {
-    console.log(body);
+xhr.addEventListener("readystatechange", function () {
+  if (this.readyState === this.DONE) {
+    console.log(this.responseText);
+  }
 });
 
+xhr.open("GET", "https://api.bookingexperts.nl/v3/administrations/string");
+xhr.setRequestHeader("accept", "application/vnd.api+json");
+xhr.setRequestHeader("accept-language", "en,nl");
+xhr.setRequestHeader("x-api-key", "API_KEY");
+
+xhr.send(data);
 ```
 
 ```ruby
-require 'rest-client'
-require 'json'
+require 'uri'
+require 'net/http'
+require 'openssl'
 
-headers = {
-  'Accept' => 'application/vnd.api+json',
-  'Accept-Language' => 'en,nl',
-  'X-API-KEY' => 'API_KEY'
-}
+url = URI("https://api.bookingexperts.nl/v3/administrations/string")
 
-result = RestClient.get 'https://api.bookingexperts.nl/v3/administrations/{id}',
-  params: {
-  }, headers: headers
+http = Net::HTTP.new(url.host, url.port)
+http.use_ssl = true
+http.verify_mode = OpenSSL::SSL::VERIFY_NONE
 
-p JSON.parse(result)
+request = Net::HTTP::Get.new(url)
+request["accept"] = 'application/vnd.api+json'
+request["accept-language"] = 'en,nl'
+request["x-api-key"] = 'API_KEY'
 
+response = http.request(request)
+puts response.read_body
 ```
 
 ```python
-import requests
+import http.client
+
+conn = http.client.HTTPSConnection("api.bookingexperts.nl")
+
 headers = {
-  'Accept': 'application/vnd.api+json',
-  'Accept-Language': 'en,nl',
-  'X-API-KEY': 'API_KEY'
-}
+    'accept': "application/vnd.api+json",
+    'accept-language': "en,nl",
+    'x-api-key': "API_KEY"
+    }
 
-r = requests.get('https://api.bookingexperts.nl/v3/administrations/{id}', headers = headers)
+conn.request("GET", "/v3/administrations/string", headers=headers)
 
-print(r.json())
+res = conn.getresponse()
+data = res.read()
 
+print(data.decode("utf-8"))
 ```
 
 ```php
 <?php
 
-require 'vendor/autoload.php';
+$curl = curl_init();
 
-$headers = array(
-    'Accept' => 'application/vnd.api+json',
-    'Accept-Language' => 'en,nl',
-    'X-API-KEY' => 'API_KEY',
-);
+curl_setopt_array($curl, array(
+  CURLOPT_URL => "https://api.bookingexperts.nl/v3/administrations/string",
+  CURLOPT_RETURNTRANSFER => true,
+  CURLOPT_ENCODING => "",
+  CURLOPT_MAXREDIRS => 10,
+  CURLOPT_TIMEOUT => 30,
+  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+  CURLOPT_CUSTOMREQUEST => "GET",
+  CURLOPT_HTTPHEADER => array(
+    "accept: application/vnd.api+json",
+    "accept-language: en,nl",
+    "x-api-key: API_KEY"
+  ),
+));
 
-$client = new \GuzzleHttp\Client();
+$response = curl_exec($curl);
+$err = curl_error($curl);
 
-// Define array of request body.
-$request_body = array();
+curl_close($curl);
 
-try {
-    $response = $client->request('GET','https://api.bookingexperts.nl/v3/administrations/{id}', array(
-        'headers' => $headers,
-        'json' => $request_body,
-       )
-    );
-    print_r($response->getBody()->getContents());
- }
- catch (\GuzzleHttp\Exception\BadResponseException $e) {
-    // handle exception or api errors.
-    print_r($e->getMessage());
- }
-
- // ...
-
+if ($err) {
+  echo "cURL Error #:" . $err;
+} else {
+  echo $response;
+}
 ```
 
 ```java
-URL obj = new URL("https://api.bookingexperts.nl/v3/administrations/{id}");
-HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-con.setRequestMethod("GET");
-int responseCode = con.getResponseCode();
-BufferedReader in = new BufferedReader(
-    new InputStreamReader(con.getInputStream()));
-String inputLine;
-StringBuffer response = new StringBuffer();
-while ((inputLine = in.readLine()) != null) {
-    response.append(inputLine);
-}
-in.close();
-System.out.println(response.toString());
-
+HttpResponse<String> response = Unirest.get("https://api.bookingexperts.nl/v3/administrations/string")
+  .header("accept", "application/vnd.api+json")
+  .header("accept-language", "en,nl")
+  .header("x-api-key", "API_KEY")
+  .asString();
 ```
 
 ```go
 package main
 
 import (
-       "bytes"
-       "net/http"
+	"fmt"
+	"net/http"
+	"io/ioutil"
 )
 
 func main() {
 
-    headers := map[string][]string{
-        "Accept": []string{"application/vnd.api+json"},
-        "Accept-Language": []string{"en,nl"},
-        "X-API-KEY": []string{"API_KEY"},
-    }
+	url := "https://api.bookingexperts.nl/v3/administrations/string"
 
-    data := bytes.NewBuffer([]byte{jsonReq})
-    req, err := http.NewRequest("GET", "https://api.bookingexperts.nl/v3/administrations/{id}", data)
-    req.Header = headers
+	req, _ := http.NewRequest("GET", url, nil)
 
-    client := &http.Client{}
-    resp, err := client.Do(req)
-    // ...
+	req.Header.Add("accept", "application/vnd.api+json")
+	req.Header.Add("accept-language", "en,nl")
+	req.Header.Add("x-api-key", "API_KEY")
+
+	res, _ := http.DefaultClient.Do(req)
+
+	defer res.Body.Close()
+	body, _ := ioutil.ReadAll(res.Body)
+
+	fmt.Println(res)
+	fmt.Println(string(body))
+
 }
-
 ```
 
 `GET /v3/administrations/{id}`
@@ -688,7 +709,7 @@ Returns an administration of the current organization
 |filter[surroundings_description]|query|string|false|Filter on surroundings_description|
 |filter[available_locales]|query|string|false|Filter on available_locales|
 |filter[utc_offset]|query|string|false|Filter on utc_offset|
-|Accept-Language|header|string|false|Supported languages. A comma separated list with one or more of the following locales: nl, en, de, fr, da, cs, es, tr, pt. Default: 'en'.|
+|Accept-Language|header|string|false|Supported languages. A comma separated list with one or more of the following locales: nl, en, de, fr, da, cs, es, tr, pt, it. Default: 'en'.|
 
 > Example responses
 
@@ -712,7 +733,8 @@ Returns an administration of the current organization
         "cs": "string",
         "es": "string",
         "tr": "string",
-        "pt": "string"
+        "pt": "string",
+        "it": "string"
       },
       "surroundings_description": {
         "nl": "string",
@@ -723,7 +745,8 @@ Returns an administration of the current organization
         "cs": "string",
         "es": "string",
         "tr": "string",
-        "pt": "string"
+        "pt": "string",
+        "it": "string"
       },
       "available_locales": [
         "string"
@@ -767,6 +790,7 @@ Status Code **200**
 |»»»» es|string|false|none|none|
 |»»»» tr|string|false|none|none|
 |»»»» pt|string|false|none|none|
+|»»»» it|string|false|none|none|
 |»»» surroundings_description|object|false|none|A description of the surroundings|
 |»»»» nl|string|false|none|none|
 |»»»» en|string|false|none|none|
@@ -777,6 +801,7 @@ Status Code **200**
 |»»»» es|string|false|none|none|
 |»»»» tr|string|false|none|none|
 |»»»» pt|string|false|none|none|
+|»»»» it|string|false|none|none|
 |»»» available_locales|[string]|false|none|Enabled locales|
 |»»» utc_offset|string|false|none|The UTC offset of the administration, for example: +01:00|
 |»» links|object|false|none|Links|
@@ -817,151 +842,149 @@ Example use cases:
 > Code samples
 
 ```shell
-# You can also use wget
-curl -X GET https://api.bookingexperts.nl/v3/application_commands \
-  -H 'Accept: application/vnd.api+json' \
-  -H 'Accept-Language: en,nl' \
-  -H 'X-API-KEY: API_KEY'
-
+curl --request GET \
+  --url https://api.bookingexperts.nl/v3/application_commands \
+  --header 'accept: application/vnd.api+json' \
+  --header 'accept-language: en,nl' \
+  --header 'x-api-key: API_KEY'
 ```
 
 ```http
-GET https://api.bookingexperts.nl/v3/application_commands HTTP/1.1
-Host: api.bookingexperts.nl
+GET /v3/application_commands HTTP/1.1
 Accept: application/vnd.api+json
 Accept-Language: en,nl
+X-Api-Key: API_KEY
+Host: api.bookingexperts.nl
 
 ```
 
 ```javascript
+var data = null;
 
-const headers = {
-  'Accept':'application/vnd.api+json',
-  'Accept-Language':'en,nl',
-  'X-API-KEY':'API_KEY'
-};
+var xhr = new XMLHttpRequest();
+xhr.withCredentials = true;
 
-fetch('https://api.bookingexperts.nl/v3/application_commands',
-{
-  method: 'GET',
-
-  headers: headers
-})
-.then(function(res) {
-    return res.json();
-}).then(function(body) {
-    console.log(body);
+xhr.addEventListener("readystatechange", function () {
+  if (this.readyState === this.DONE) {
+    console.log(this.responseText);
+  }
 });
 
+xhr.open("GET", "https://api.bookingexperts.nl/v3/application_commands");
+xhr.setRequestHeader("accept", "application/vnd.api+json");
+xhr.setRequestHeader("accept-language", "en,nl");
+xhr.setRequestHeader("x-api-key", "API_KEY");
+
+xhr.send(data);
 ```
 
 ```ruby
-require 'rest-client'
-require 'json'
+require 'uri'
+require 'net/http'
+require 'openssl'
 
-headers = {
-  'Accept' => 'application/vnd.api+json',
-  'Accept-Language' => 'en,nl',
-  'X-API-KEY' => 'API_KEY'
-}
+url = URI("https://api.bookingexperts.nl/v3/application_commands")
 
-result = RestClient.get 'https://api.bookingexperts.nl/v3/application_commands',
-  params: {
-  }, headers: headers
+http = Net::HTTP.new(url.host, url.port)
+http.use_ssl = true
+http.verify_mode = OpenSSL::SSL::VERIFY_NONE
 
-p JSON.parse(result)
+request = Net::HTTP::Get.new(url)
+request["accept"] = 'application/vnd.api+json'
+request["accept-language"] = 'en,nl'
+request["x-api-key"] = 'API_KEY'
 
+response = http.request(request)
+puts response.read_body
 ```
 
 ```python
-import requests
+import http.client
+
+conn = http.client.HTTPSConnection("api.bookingexperts.nl")
+
 headers = {
-  'Accept': 'application/vnd.api+json',
-  'Accept-Language': 'en,nl',
-  'X-API-KEY': 'API_KEY'
-}
+    'accept': "application/vnd.api+json",
+    'accept-language': "en,nl",
+    'x-api-key': "API_KEY"
+    }
 
-r = requests.get('https://api.bookingexperts.nl/v3/application_commands', headers = headers)
+conn.request("GET", "/v3/application_commands", headers=headers)
 
-print(r.json())
+res = conn.getresponse()
+data = res.read()
 
+print(data.decode("utf-8"))
 ```
 
 ```php
 <?php
 
-require 'vendor/autoload.php';
+$curl = curl_init();
 
-$headers = array(
-    'Accept' => 'application/vnd.api+json',
-    'Accept-Language' => 'en,nl',
-    'X-API-KEY' => 'API_KEY',
-);
+curl_setopt_array($curl, array(
+  CURLOPT_URL => "https://api.bookingexperts.nl/v3/application_commands",
+  CURLOPT_RETURNTRANSFER => true,
+  CURLOPT_ENCODING => "",
+  CURLOPT_MAXREDIRS => 10,
+  CURLOPT_TIMEOUT => 30,
+  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+  CURLOPT_CUSTOMREQUEST => "GET",
+  CURLOPT_HTTPHEADER => array(
+    "accept: application/vnd.api+json",
+    "accept-language: en,nl",
+    "x-api-key: API_KEY"
+  ),
+));
 
-$client = new \GuzzleHttp\Client();
+$response = curl_exec($curl);
+$err = curl_error($curl);
 
-// Define array of request body.
-$request_body = array();
+curl_close($curl);
 
-try {
-    $response = $client->request('GET','https://api.bookingexperts.nl/v3/application_commands', array(
-        'headers' => $headers,
-        'json' => $request_body,
-       )
-    );
-    print_r($response->getBody()->getContents());
- }
- catch (\GuzzleHttp\Exception\BadResponseException $e) {
-    // handle exception or api errors.
-    print_r($e->getMessage());
- }
-
- // ...
-
+if ($err) {
+  echo "cURL Error #:" . $err;
+} else {
+  echo $response;
+}
 ```
 
 ```java
-URL obj = new URL("https://api.bookingexperts.nl/v3/application_commands");
-HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-con.setRequestMethod("GET");
-int responseCode = con.getResponseCode();
-BufferedReader in = new BufferedReader(
-    new InputStreamReader(con.getInputStream()));
-String inputLine;
-StringBuffer response = new StringBuffer();
-while ((inputLine = in.readLine()) != null) {
-    response.append(inputLine);
-}
-in.close();
-System.out.println(response.toString());
-
+HttpResponse<String> response = Unirest.get("https://api.bookingexperts.nl/v3/application_commands")
+  .header("accept", "application/vnd.api+json")
+  .header("accept-language", "en,nl")
+  .header("x-api-key", "API_KEY")
+  .asString();
 ```
 
 ```go
 package main
 
 import (
-       "bytes"
-       "net/http"
+	"fmt"
+	"net/http"
+	"io/ioutil"
 )
 
 func main() {
 
-    headers := map[string][]string{
-        "Accept": []string{"application/vnd.api+json"},
-        "Accept-Language": []string{"en,nl"},
-        "X-API-KEY": []string{"API_KEY"},
-    }
+	url := "https://api.bookingexperts.nl/v3/application_commands"
 
-    data := bytes.NewBuffer([]byte{jsonReq})
-    req, err := http.NewRequest("GET", "https://api.bookingexperts.nl/v3/application_commands", data)
-    req.Header = headers
+	req, _ := http.NewRequest("GET", url, nil)
 
-    client := &http.Client{}
-    resp, err := client.Do(req)
-    // ...
+	req.Header.Add("accept", "application/vnd.api+json")
+	req.Header.Add("accept-language", "en,nl")
+	req.Header.Add("x-api-key", "API_KEY")
+
+	res, _ := http.DefaultClient.Do(req)
+
+	defer res.Body.Close()
+	body, _ := ioutil.ReadAll(res.Body)
+
+	fmt.Println(res)
+	fmt.Println(string(body))
+
 }
-
 ```
 
 `GET /v3/application_commands`
@@ -985,7 +1008,7 @@ Returns application commands you have registered
 |filter[enabled_script]|query|string|false|Filter on enabled_script|
 |filter[created_at]|query|string|false|Filter on created_at|
 |filter[updated_at]|query|string|false|Filter on updated_at|
-|Accept-Language|header|string|false|Supported languages. A comma separated list with one or more of the following locales: nl, en, de, fr, da, cs, es, tr, pt. Default: 'en'.|
+|Accept-Language|header|string|false|Supported languages. A comma separated list with one or more of the following locales: nl, en, de, fr, da, cs, es, tr, pt, it. Default: 'en'.|
 
 > Example responses
 
@@ -1011,8 +1034,8 @@ Returns application commands you have registered
         "http_method": "post",
         "target_url": "https://myapp.lvh.me:3000/gate_cards",
         "enabled_script": "reservation.dig(:data, :attributes, :state) == 'confirmed'",
-        "created_at": "2020-05-20T13:12:31Z",
-        "updated_at": "2020-05-20T13:12:31Z"
+        "created_at": "2020-06-09T07:58:26Z",
+        "updated_at": "2020-06-09T07:58:26Z"
       },
       "links": {
         "self": "string"
@@ -1057,6 +1080,7 @@ Status Code **200**
 |»»»» es|string|false|none|none|
 |»»»» tr|string|false|none|none|
 |»»»» pt|string|false|none|none|
+|»»»» it|string|false|none|none|
 |»»» description|object|false|none|none|
 |»»»» nl|string|false|none|none|
 |»»»» en|string|false|none|none|
@@ -1067,6 +1091,7 @@ Status Code **200**
 |»»»» es|string|false|none|none|
 |»»»» tr|string|false|none|none|
 |»»»» pt|string|false|none|none|
+|»»»» it|string|false|none|none|
 |»»» context_model|string|false|none|One of: invoice, reservation, subscription|
 |»»» http_method|string|false|none|One of: get, post, put, patch, delete|
 |»»» target_url|string|false|none|This URL will be called by us using the `http_method` specified|
@@ -1105,177 +1130,168 @@ ApiKeyAuth, OAuth2
 > Code samples
 
 ```shell
-# You can also use wget
-curl -X POST https://api.bookingexperts.nl/v3/application_commands \
-  -H 'Content-Type: application/vnd.api+json' \
-  -H 'Accept: application/vnd.api+json' \
-  -H 'Accept-Language: en,nl' \
-  -H 'X-API-KEY: API_KEY'
-
+curl --request POST \
+  --url https://api.bookingexperts.nl/v3/application_commands \
+  --header 'accept: application/vnd.api+json' \
+  --header 'accept-language: en,nl' \
+  --header 'content-type: application/vnd.api+json' \
+  --header 'x-api-key: API_KEY' \
+  --data '{"data":{"type":"application_command","attributes":{"identifier":"create_cards","name":{"en":"Create gate cards","nl":"Toegangskaarten maken"},"description":{"en":"Create gate cards for this gate system","nl":"Toegangskaarten maken voor dit toegangssysteem"},"context_model":"reservation","http_method":"post","target_url":"https://myapp.lvh.me:3000/gate_cards","enabled_script":"reservation.dig(:data, :attributes, :state) == '\''confirmed'\''"}}}'
 ```
 
 ```http
-POST https://api.bookingexperts.nl/v3/application_commands HTTP/1.1
-Host: api.bookingexperts.nl
+POST /v3/application_commands HTTP/1.1
 Content-Type: application/vnd.api+json
 Accept: application/vnd.api+json
 Accept-Language: en,nl
+X-Api-Key: API_KEY
+Host: api.bookingexperts.nl
+Content-Length: 442
 
+{"data":{"type":"application_command","attributes":{"identifier":"create_cards","name":{"en":"Create gate cards","nl":"Toegangskaarten maken"},"description":{"en":"Create gate cards for this gate system","nl":"Toegangskaarten maken voor dit toegangssysteem"},"context_model":"reservation","http_method":"post","target_url":"https://myapp.lvh.me:3000/gate_cards","enabled_script":"reservation.dig(:data, :attributes, :state) == 'confirmed'"}}}
 ```
 
 ```javascript
-const inputBody = '{
-  "data": {
-    "type": "application_command",
-    "attributes": {
-      "identifier": "create_cards",
-      "name": {
-        "en": "Create gate cards",
-        "nl": "Toegangskaarten maken"
-      },
-      "description": {
-        "en": "Create gate cards for this gate system",
-        "nl": "Toegangskaarten maken voor dit toegangssysteem"
-      },
-      "context_model": "reservation",
-      "http_method": "post",
-      "target_url": "https://myapp.lvh.me:3000/gate_cards",
-      "enabled_script": "reservation.dig(:data, :attributes, :state) == 'confirmed'"
-    }
-  }
-}';
-const headers = {
-  'Content-Type':'application/vnd.api+json',
-  'Accept':'application/vnd.api+json',
-  'Accept-Language':'en,nl',
-  'X-API-KEY':'API_KEY'
-};
+var data = "{\"data\":{\"type\":\"application_command\",\"attributes\":{\"identifier\":\"create_cards\",\"name\":{\"en\":\"Create gate cards\",\"nl\":\"Toegangskaarten maken\"},\"description\":{\"en\":\"Create gate cards for this gate system\",\"nl\":\"Toegangskaarten maken voor dit toegangssysteem\"},\"context_model\":\"reservation\",\"http_method\":\"post\",\"target_url\":\"https://myapp.lvh.me:3000/gate_cards\",\"enabled_script\":\"reservation.dig(:data, :attributes, :state) == 'confirmed'\"}}}";
 
-fetch('https://api.bookingexperts.nl/v3/application_commands',
-{
-  method: 'POST',
-  body: inputBody,
-  headers: headers
-})
-.then(function(res) {
-    return res.json();
-}).then(function(body) {
-    console.log(body);
+var xhr = new XMLHttpRequest();
+xhr.withCredentials = true;
+
+xhr.addEventListener("readystatechange", function () {
+  if (this.readyState === this.DONE) {
+    console.log(this.responseText);
+  }
 });
 
+xhr.open("POST", "https://api.bookingexperts.nl/v3/application_commands");
+xhr.setRequestHeader("content-type", "application/vnd.api+json");
+xhr.setRequestHeader("accept", "application/vnd.api+json");
+xhr.setRequestHeader("accept-language", "en,nl");
+xhr.setRequestHeader("x-api-key", "API_KEY");
+
+xhr.send(data);
 ```
 
 ```ruby
-require 'rest-client'
-require 'json'
+require 'uri'
+require 'net/http'
+require 'openssl'
 
-headers = {
-  'Content-Type' => 'application/vnd.api+json',
-  'Accept' => 'application/vnd.api+json',
-  'Accept-Language' => 'en,nl',
-  'X-API-KEY' => 'API_KEY'
-}
+url = URI("https://api.bookingexperts.nl/v3/application_commands")
 
-result = RestClient.post 'https://api.bookingexperts.nl/v3/application_commands',
-  params: {
-  }, headers: headers
+http = Net::HTTP.new(url.host, url.port)
+http.use_ssl = true
+http.verify_mode = OpenSSL::SSL::VERIFY_NONE
 
-p JSON.parse(result)
+request = Net::HTTP::Post.new(url)
+request["content-type"] = 'application/vnd.api+json'
+request["accept"] = 'application/vnd.api+json'
+request["accept-language"] = 'en,nl'
+request["x-api-key"] = 'API_KEY'
+request.body = "{\"data\":{\"type\":\"application_command\",\"attributes\":{\"identifier\":\"create_cards\",\"name\":{\"en\":\"Create gate cards\",\"nl\":\"Toegangskaarten maken\"},\"description\":{\"en\":\"Create gate cards for this gate system\",\"nl\":\"Toegangskaarten maken voor dit toegangssysteem\"},\"context_model\":\"reservation\",\"http_method\":\"post\",\"target_url\":\"https://myapp.lvh.me:3000/gate_cards\",\"enabled_script\":\"reservation.dig(:data, :attributes, :state) == 'confirmed'\"}}}"
 
+response = http.request(request)
+puts response.read_body
 ```
 
 ```python
-import requests
+import http.client
+
+conn = http.client.HTTPSConnection("api.bookingexperts.nl")
+
+payload = "{\"data\":{\"type\":\"application_command\",\"attributes\":{\"identifier\":\"create_cards\",\"name\":{\"en\":\"Create gate cards\",\"nl\":\"Toegangskaarten maken\"},\"description\":{\"en\":\"Create gate cards for this gate system\",\"nl\":\"Toegangskaarten maken voor dit toegangssysteem\"},\"context_model\":\"reservation\",\"http_method\":\"post\",\"target_url\":\"https://myapp.lvh.me:3000/gate_cards\",\"enabled_script\":\"reservation.dig(:data, :attributes, :state) == 'confirmed'\"}}}"
+
 headers = {
-  'Content-Type': 'application/vnd.api+json',
-  'Accept': 'application/vnd.api+json',
-  'Accept-Language': 'en,nl',
-  'X-API-KEY': 'API_KEY'
-}
+    'content-type': "application/vnd.api+json",
+    'accept': "application/vnd.api+json",
+    'accept-language': "en,nl",
+    'x-api-key': "API_KEY"
+    }
 
-r = requests.post('https://api.bookingexperts.nl/v3/application_commands', headers = headers)
+conn.request("POST", "/v3/application_commands", payload, headers)
 
-print(r.json())
+res = conn.getresponse()
+data = res.read()
 
+print(data.decode("utf-8"))
 ```
 
 ```php
 <?php
 
-require 'vendor/autoload.php';
+$curl = curl_init();
 
-$headers = array(
-    'Content-Type' => 'application/vnd.api+json',
-    'Accept' => 'application/vnd.api+json',
-    'Accept-Language' => 'en,nl',
-    'X-API-KEY' => 'API_KEY',
-);
+curl_setopt_array($curl, array(
+  CURLOPT_URL => "https://api.bookingexperts.nl/v3/application_commands",
+  CURLOPT_RETURNTRANSFER => true,
+  CURLOPT_ENCODING => "",
+  CURLOPT_MAXREDIRS => 10,
+  CURLOPT_TIMEOUT => 30,
+  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+  CURLOPT_CUSTOMREQUEST => "POST",
+  CURLOPT_POSTFIELDS => "{\"data\":{\"type\":\"application_command\",\"attributes\":{\"identifier\":\"create_cards\",\"name\":{\"en\":\"Create gate cards\",\"nl\":\"Toegangskaarten maken\"},\"description\":{\"en\":\"Create gate cards for this gate system\",\"nl\":\"Toegangskaarten maken voor dit toegangssysteem\"},\"context_model\":\"reservation\",\"http_method\":\"post\",\"target_url\":\"https://myapp.lvh.me:3000/gate_cards\",\"enabled_script\":\"reservation.dig(:data, :attributes, :state) == 'confirmed'\"}}}",
+  CURLOPT_HTTPHEADER => array(
+    "accept: application/vnd.api+json",
+    "accept-language: en,nl",
+    "content-type: application/vnd.api+json",
+    "x-api-key: API_KEY"
+  ),
+));
 
-$client = new \GuzzleHttp\Client();
+$response = curl_exec($curl);
+$err = curl_error($curl);
 
-// Define array of request body.
-$request_body = array();
+curl_close($curl);
 
-try {
-    $response = $client->request('POST','https://api.bookingexperts.nl/v3/application_commands', array(
-        'headers' => $headers,
-        'json' => $request_body,
-       )
-    );
-    print_r($response->getBody()->getContents());
- }
- catch (\GuzzleHttp\Exception\BadResponseException $e) {
-    // handle exception or api errors.
-    print_r($e->getMessage());
- }
-
- // ...
-
+if ($err) {
+  echo "cURL Error #:" . $err;
+} else {
+  echo $response;
+}
 ```
 
 ```java
-URL obj = new URL("https://api.bookingexperts.nl/v3/application_commands");
-HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-con.setRequestMethod("POST");
-int responseCode = con.getResponseCode();
-BufferedReader in = new BufferedReader(
-    new InputStreamReader(con.getInputStream()));
-String inputLine;
-StringBuffer response = new StringBuffer();
-while ((inputLine = in.readLine()) != null) {
-    response.append(inputLine);
-}
-in.close();
-System.out.println(response.toString());
-
+HttpResponse<String> response = Unirest.post("https://api.bookingexperts.nl/v3/application_commands")
+  .header("content-type", "application/vnd.api+json")
+  .header("accept", "application/vnd.api+json")
+  .header("accept-language", "en,nl")
+  .header("x-api-key", "API_KEY")
+  .body("{\"data\":{\"type\":\"application_command\",\"attributes\":{\"identifier\":\"create_cards\",\"name\":{\"en\":\"Create gate cards\",\"nl\":\"Toegangskaarten maken\"},\"description\":{\"en\":\"Create gate cards for this gate system\",\"nl\":\"Toegangskaarten maken voor dit toegangssysteem\"},\"context_model\":\"reservation\",\"http_method\":\"post\",\"target_url\":\"https://myapp.lvh.me:3000/gate_cards\",\"enabled_script\":\"reservation.dig(:data, :attributes, :state) == 'confirmed'\"}}}")
+  .asString();
 ```
 
 ```go
 package main
 
 import (
-       "bytes"
-       "net/http"
+	"fmt"
+	"strings"
+	"net/http"
+	"io/ioutil"
 )
 
 func main() {
 
-    headers := map[string][]string{
-        "Content-Type": []string{"application/vnd.api+json"},
-        "Accept": []string{"application/vnd.api+json"},
-        "Accept-Language": []string{"en,nl"},
-        "X-API-KEY": []string{"API_KEY"},
-    }
+	url := "https://api.bookingexperts.nl/v3/application_commands"
 
-    data := bytes.NewBuffer([]byte{jsonReq})
-    req, err := http.NewRequest("POST", "https://api.bookingexperts.nl/v3/application_commands", data)
-    req.Header = headers
+	payload := strings.NewReader("{\"data\":{\"type\":\"application_command\",\"attributes\":{\"identifier\":\"create_cards\",\"name\":{\"en\":\"Create gate cards\",\"nl\":\"Toegangskaarten maken\"},\"description\":{\"en\":\"Create gate cards for this gate system\",\"nl\":\"Toegangskaarten maken voor dit toegangssysteem\"},\"context_model\":\"reservation\",\"http_method\":\"post\",\"target_url\":\"https://myapp.lvh.me:3000/gate_cards\",\"enabled_script\":\"reservation.dig(:data, :attributes, :state) == 'confirmed'\"}}}")
 
-    client := &http.Client{}
-    resp, err := client.Do(req)
-    // ...
+	req, _ := http.NewRequest("POST", url, payload)
+
+	req.Header.Add("content-type", "application/vnd.api+json")
+	req.Header.Add("accept", "application/vnd.api+json")
+	req.Header.Add("accept-language", "en,nl")
+	req.Header.Add("x-api-key", "API_KEY")
+
+	res, _ := http.DefaultClient.Do(req)
+
+	defer res.Body.Close()
+	body, _ := ioutil.ReadAll(res.Body)
+
+	fmt.Println(res)
+	fmt.Println(string(body))
+
 }
-
 ```
 
 `POST /v3/application_commands`
@@ -1322,7 +1338,7 @@ Application commands **MUST** respond with one of the following **JSON** respons
 
 |Name|In|Type|Required|Description|
 |---|---|---|---|---|
-|Accept-Language|header|string|false|Supported languages. A comma separated list with one or more of the following locales: nl, en, de, fr, da, cs, es, tr, pt. Default: 'en'.|
+|Accept-Language|header|string|false|Supported languages. A comma separated list with one or more of the following locales: nl, en, de, fr, da, cs, es, tr, pt, it. Default: 'en'.|
 |body|body|object|true|none|
 |» data|body|object|false|none|
 |»» type|body|string|false|Type|
@@ -1338,6 +1354,7 @@ Application commands **MUST** respond with one of the following **JSON** respons
 |»»»» es|body|string|false|none|
 |»»»» tr|body|string|false|none|
 |»»»» pt|body|string|false|none|
+|»»»» it|body|string|false|none|
 |»»» description|body|object|false|none|
 |»»»» nl|body|string|false|none|
 |»»»» en|body|string|false|none|
@@ -1348,6 +1365,7 @@ Application commands **MUST** respond with one of the following **JSON** respons
 |»»»» es|body|string|false|none|
 |»»»» tr|body|string|false|none|
 |»»»» pt|body|string|false|none|
+|»»»» it|body|string|false|none|
 |»»» context_model|body|string|false|One of: invoice, reservation, subscription|
 |»»» http_method|body|string|false|One of: get, post, put, patch, delete|
 |»»» target_url|body|string|false|This URL will be called by us using the `http_method` specified|
@@ -1394,8 +1412,8 @@ The script language **MUST** be Ruby. The list of method calls you are allowed t
       "http_method": "post",
       "target_url": "https://myapp.lvh.me:3000/gate_cards",
       "enabled_script": "reservation.dig(:data, :attributes, :state) == 'confirmed'",
-      "created_at": "2020-05-20T13:12:31Z",
-      "updated_at": "2020-05-20T13:12:31Z"
+      "created_at": "2020-06-09T07:58:26Z",
+      "updated_at": "2020-06-09T07:58:26Z"
     },
     "links": {
       "self": "string"
@@ -1432,6 +1450,7 @@ Status Code **200**
 |»»»» es|string|false|none|none|
 |»»»» tr|string|false|none|none|
 |»»»» pt|string|false|none|none|
+|»»»» it|string|false|none|none|
 |»»» description|object|false|none|none|
 |»»»» nl|string|false|none|none|
 |»»»» en|string|false|none|none|
@@ -1442,6 +1461,7 @@ Status Code **200**
 |»»»» es|string|false|none|none|
 |»»»» tr|string|false|none|none|
 |»»»» pt|string|false|none|none|
+|»»»» it|string|false|none|none|
 |»»» context_model|string|false|none|One of: invoice, reservation, subscription|
 |»»» http_method|string|false|none|One of: get, post, put, patch, delete|
 |»»» target_url|string|false|none|This URL will be called by us using the `http_method` specified|
@@ -1475,151 +1495,149 @@ ApiKeyAuth, OAuth2
 > Code samples
 
 ```shell
-# You can also use wget
-curl -X GET https://api.bookingexperts.nl/v3/application_commands/{id} \
-  -H 'Accept: application/vnd.api+json' \
-  -H 'Accept-Language: en,nl' \
-  -H 'X-API-KEY: API_KEY'
-
+curl --request GET \
+  --url https://api.bookingexperts.nl/v3/application_commands/string \
+  --header 'accept: application/vnd.api+json' \
+  --header 'accept-language: en,nl' \
+  --header 'x-api-key: API_KEY'
 ```
 
 ```http
-GET https://api.bookingexperts.nl/v3/application_commands/{id} HTTP/1.1
-Host: api.bookingexperts.nl
+GET /v3/application_commands/string HTTP/1.1
 Accept: application/vnd.api+json
 Accept-Language: en,nl
+X-Api-Key: API_KEY
+Host: api.bookingexperts.nl
 
 ```
 
 ```javascript
+var data = null;
 
-const headers = {
-  'Accept':'application/vnd.api+json',
-  'Accept-Language':'en,nl',
-  'X-API-KEY':'API_KEY'
-};
+var xhr = new XMLHttpRequest();
+xhr.withCredentials = true;
 
-fetch('https://api.bookingexperts.nl/v3/application_commands/{id}',
-{
-  method: 'GET',
-
-  headers: headers
-})
-.then(function(res) {
-    return res.json();
-}).then(function(body) {
-    console.log(body);
+xhr.addEventListener("readystatechange", function () {
+  if (this.readyState === this.DONE) {
+    console.log(this.responseText);
+  }
 });
 
+xhr.open("GET", "https://api.bookingexperts.nl/v3/application_commands/string");
+xhr.setRequestHeader("accept", "application/vnd.api+json");
+xhr.setRequestHeader("accept-language", "en,nl");
+xhr.setRequestHeader("x-api-key", "API_KEY");
+
+xhr.send(data);
 ```
 
 ```ruby
-require 'rest-client'
-require 'json'
+require 'uri'
+require 'net/http'
+require 'openssl'
 
-headers = {
-  'Accept' => 'application/vnd.api+json',
-  'Accept-Language' => 'en,nl',
-  'X-API-KEY' => 'API_KEY'
-}
+url = URI("https://api.bookingexperts.nl/v3/application_commands/string")
 
-result = RestClient.get 'https://api.bookingexperts.nl/v3/application_commands/{id}',
-  params: {
-  }, headers: headers
+http = Net::HTTP.new(url.host, url.port)
+http.use_ssl = true
+http.verify_mode = OpenSSL::SSL::VERIFY_NONE
 
-p JSON.parse(result)
+request = Net::HTTP::Get.new(url)
+request["accept"] = 'application/vnd.api+json'
+request["accept-language"] = 'en,nl'
+request["x-api-key"] = 'API_KEY'
 
+response = http.request(request)
+puts response.read_body
 ```
 
 ```python
-import requests
+import http.client
+
+conn = http.client.HTTPSConnection("api.bookingexperts.nl")
+
 headers = {
-  'Accept': 'application/vnd.api+json',
-  'Accept-Language': 'en,nl',
-  'X-API-KEY': 'API_KEY'
-}
+    'accept': "application/vnd.api+json",
+    'accept-language': "en,nl",
+    'x-api-key': "API_KEY"
+    }
 
-r = requests.get('https://api.bookingexperts.nl/v3/application_commands/{id}', headers = headers)
+conn.request("GET", "/v3/application_commands/string", headers=headers)
 
-print(r.json())
+res = conn.getresponse()
+data = res.read()
 
+print(data.decode("utf-8"))
 ```
 
 ```php
 <?php
 
-require 'vendor/autoload.php';
+$curl = curl_init();
 
-$headers = array(
-    'Accept' => 'application/vnd.api+json',
-    'Accept-Language' => 'en,nl',
-    'X-API-KEY' => 'API_KEY',
-);
+curl_setopt_array($curl, array(
+  CURLOPT_URL => "https://api.bookingexperts.nl/v3/application_commands/string",
+  CURLOPT_RETURNTRANSFER => true,
+  CURLOPT_ENCODING => "",
+  CURLOPT_MAXREDIRS => 10,
+  CURLOPT_TIMEOUT => 30,
+  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+  CURLOPT_CUSTOMREQUEST => "GET",
+  CURLOPT_HTTPHEADER => array(
+    "accept: application/vnd.api+json",
+    "accept-language: en,nl",
+    "x-api-key: API_KEY"
+  ),
+));
 
-$client = new \GuzzleHttp\Client();
+$response = curl_exec($curl);
+$err = curl_error($curl);
 
-// Define array of request body.
-$request_body = array();
+curl_close($curl);
 
-try {
-    $response = $client->request('GET','https://api.bookingexperts.nl/v3/application_commands/{id}', array(
-        'headers' => $headers,
-        'json' => $request_body,
-       )
-    );
-    print_r($response->getBody()->getContents());
- }
- catch (\GuzzleHttp\Exception\BadResponseException $e) {
-    // handle exception or api errors.
-    print_r($e->getMessage());
- }
-
- // ...
-
+if ($err) {
+  echo "cURL Error #:" . $err;
+} else {
+  echo $response;
+}
 ```
 
 ```java
-URL obj = new URL("https://api.bookingexperts.nl/v3/application_commands/{id}");
-HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-con.setRequestMethod("GET");
-int responseCode = con.getResponseCode();
-BufferedReader in = new BufferedReader(
-    new InputStreamReader(con.getInputStream()));
-String inputLine;
-StringBuffer response = new StringBuffer();
-while ((inputLine = in.readLine()) != null) {
-    response.append(inputLine);
-}
-in.close();
-System.out.println(response.toString());
-
+HttpResponse<String> response = Unirest.get("https://api.bookingexperts.nl/v3/application_commands/string")
+  .header("accept", "application/vnd.api+json")
+  .header("accept-language", "en,nl")
+  .header("x-api-key", "API_KEY")
+  .asString();
 ```
 
 ```go
 package main
 
 import (
-       "bytes"
-       "net/http"
+	"fmt"
+	"net/http"
+	"io/ioutil"
 )
 
 func main() {
 
-    headers := map[string][]string{
-        "Accept": []string{"application/vnd.api+json"},
-        "Accept-Language": []string{"en,nl"},
-        "X-API-KEY": []string{"API_KEY"},
-    }
+	url := "https://api.bookingexperts.nl/v3/application_commands/string"
 
-    data := bytes.NewBuffer([]byte{jsonReq})
-    req, err := http.NewRequest("GET", "https://api.bookingexperts.nl/v3/application_commands/{id}", data)
-    req.Header = headers
+	req, _ := http.NewRequest("GET", url, nil)
 
-    client := &http.Client{}
-    resp, err := client.Do(req)
-    // ...
+	req.Header.Add("accept", "application/vnd.api+json")
+	req.Header.Add("accept-language", "en,nl")
+	req.Header.Add("x-api-key", "API_KEY")
+
+	res, _ := http.DefaultClient.Do(req)
+
+	defer res.Body.Close()
+	body, _ := ioutil.ReadAll(res.Body)
+
+	fmt.Println(res)
+	fmt.Println(string(body))
+
 }
-
 ```
 
 `GET /v3/application_commands/{id}`
@@ -1641,7 +1659,7 @@ Returns the application command for the given ID
 |filter[enabled_script]|query|string|false|Filter on enabled_script|
 |filter[created_at]|query|string|false|Filter on created_at|
 |filter[updated_at]|query|string|false|Filter on updated_at|
-|Accept-Language|header|string|false|Supported languages. A comma separated list with one or more of the following locales: nl, en, de, fr, da, cs, es, tr, pt. Default: 'en'.|
+|Accept-Language|header|string|false|Supported languages. A comma separated list with one or more of the following locales: nl, en, de, fr, da, cs, es, tr, pt, it. Default: 'en'.|
 
 > Example responses
 
@@ -1666,8 +1684,8 @@ Returns the application command for the given ID
       "http_method": "post",
       "target_url": "https://myapp.lvh.me:3000/gate_cards",
       "enabled_script": "reservation.dig(:data, :attributes, :state) == 'confirmed'",
-      "created_at": "2020-05-20T13:12:31Z",
-      "updated_at": "2020-05-20T13:12:31Z"
+      "created_at": "2020-06-09T07:58:26Z",
+      "updated_at": "2020-06-09T07:58:26Z"
     },
     "links": {
       "self": "string"
@@ -1704,6 +1722,7 @@ Status Code **200**
 |»»»» es|string|false|none|none|
 |»»»» tr|string|false|none|none|
 |»»»» pt|string|false|none|none|
+|»»»» it|string|false|none|none|
 |»»» description|object|false|none|none|
 |»»»» nl|string|false|none|none|
 |»»»» en|string|false|none|none|
@@ -1714,6 +1733,7 @@ Status Code **200**
 |»»»» es|string|false|none|none|
 |»»»» tr|string|false|none|none|
 |»»»» pt|string|false|none|none|
+|»»»» it|string|false|none|none|
 |»»» context_model|string|false|none|One of: invoice, reservation, subscription|
 |»»» http_method|string|false|none|One of: get, post, put, patch, delete|
 |»»» target_url|string|false|none|This URL will be called by us using the `http_method` specified|
@@ -1747,178 +1767,168 @@ ApiKeyAuth, OAuth2
 > Code samples
 
 ```shell
-# You can also use wget
-curl -X PATCH https://api.bookingexperts.nl/v3/application_commands/{id} \
-  -H 'Content-Type: application/vnd.api+json' \
-  -H 'Accept: application/vnd.api+json' \
-  -H 'Accept-Language: en,nl' \
-  -H 'X-API-KEY: API_KEY'
-
+curl --request PATCH \
+  --url https://api.bookingexperts.nl/v3/application_commands/string \
+  --header 'accept: application/vnd.api+json' \
+  --header 'accept-language: en,nl' \
+  --header 'content-type: application/vnd.api+json' \
+  --header 'x-api-key: API_KEY' \
+  --data '{"data":{"id":"1","type":"application_command","attributes":{"identifier":"create_cards","name":{"en":"Create gate cards","nl":"Toegangskaarten maken"},"description":{"en":"Create gate cards for this gate system","nl":"Toegangskaarten maken voor dit toegangssysteem"},"context_model":"reservation","http_method":"post","target_url":"https://myapp.lvh.me:3000/gate_cards","enabled_script":"reservation.dig(:data, :attributes, :state) == '\''confirmed'\''"}}}'
 ```
 
 ```http
-PATCH https://api.bookingexperts.nl/v3/application_commands/{id} HTTP/1.1
-Host: api.bookingexperts.nl
+PATCH /v3/application_commands/string HTTP/1.1
 Content-Type: application/vnd.api+json
 Accept: application/vnd.api+json
 Accept-Language: en,nl
+X-Api-Key: API_KEY
+Host: api.bookingexperts.nl
+Content-Length: 451
 
+{"data":{"id":"1","type":"application_command","attributes":{"identifier":"create_cards","name":{"en":"Create gate cards","nl":"Toegangskaarten maken"},"description":{"en":"Create gate cards for this gate system","nl":"Toegangskaarten maken voor dit toegangssysteem"},"context_model":"reservation","http_method":"post","target_url":"https://myapp.lvh.me:3000/gate_cards","enabled_script":"reservation.dig(:data, :attributes, :state) == 'confirmed'"}}}
 ```
 
 ```javascript
-const inputBody = '{
-  "data": {
-    "id": "1",
-    "type": "application_command",
-    "attributes": {
-      "identifier": "create_cards",
-      "name": {
-        "en": "Create gate cards",
-        "nl": "Toegangskaarten maken"
-      },
-      "description": {
-        "en": "Create gate cards for this gate system",
-        "nl": "Toegangskaarten maken voor dit toegangssysteem"
-      },
-      "context_model": "reservation",
-      "http_method": "post",
-      "target_url": "https://myapp.lvh.me:3000/gate_cards",
-      "enabled_script": "reservation.dig(:data, :attributes, :state) == 'confirmed'"
-    }
-  }
-}';
-const headers = {
-  'Content-Type':'application/vnd.api+json',
-  'Accept':'application/vnd.api+json',
-  'Accept-Language':'en,nl',
-  'X-API-KEY':'API_KEY'
-};
+var data = "{\"data\":{\"id\":\"1\",\"type\":\"application_command\",\"attributes\":{\"identifier\":\"create_cards\",\"name\":{\"en\":\"Create gate cards\",\"nl\":\"Toegangskaarten maken\"},\"description\":{\"en\":\"Create gate cards for this gate system\",\"nl\":\"Toegangskaarten maken voor dit toegangssysteem\"},\"context_model\":\"reservation\",\"http_method\":\"post\",\"target_url\":\"https://myapp.lvh.me:3000/gate_cards\",\"enabled_script\":\"reservation.dig(:data, :attributes, :state) == 'confirmed'\"}}}";
 
-fetch('https://api.bookingexperts.nl/v3/application_commands/{id}',
-{
-  method: 'PATCH',
-  body: inputBody,
-  headers: headers
-})
-.then(function(res) {
-    return res.json();
-}).then(function(body) {
-    console.log(body);
+var xhr = new XMLHttpRequest();
+xhr.withCredentials = true;
+
+xhr.addEventListener("readystatechange", function () {
+  if (this.readyState === this.DONE) {
+    console.log(this.responseText);
+  }
 });
 
+xhr.open("PATCH", "https://api.bookingexperts.nl/v3/application_commands/string");
+xhr.setRequestHeader("content-type", "application/vnd.api+json");
+xhr.setRequestHeader("accept", "application/vnd.api+json");
+xhr.setRequestHeader("accept-language", "en,nl");
+xhr.setRequestHeader("x-api-key", "API_KEY");
+
+xhr.send(data);
 ```
 
 ```ruby
-require 'rest-client'
-require 'json'
+require 'uri'
+require 'net/http'
+require 'openssl'
 
-headers = {
-  'Content-Type' => 'application/vnd.api+json',
-  'Accept' => 'application/vnd.api+json',
-  'Accept-Language' => 'en,nl',
-  'X-API-KEY' => 'API_KEY'
-}
+url = URI("https://api.bookingexperts.nl/v3/application_commands/string")
 
-result = RestClient.patch 'https://api.bookingexperts.nl/v3/application_commands/{id}',
-  params: {
-  }, headers: headers
+http = Net::HTTP.new(url.host, url.port)
+http.use_ssl = true
+http.verify_mode = OpenSSL::SSL::VERIFY_NONE
 
-p JSON.parse(result)
+request = Net::HTTP::Patch.new(url)
+request["content-type"] = 'application/vnd.api+json'
+request["accept"] = 'application/vnd.api+json'
+request["accept-language"] = 'en,nl'
+request["x-api-key"] = 'API_KEY'
+request.body = "{\"data\":{\"id\":\"1\",\"type\":\"application_command\",\"attributes\":{\"identifier\":\"create_cards\",\"name\":{\"en\":\"Create gate cards\",\"nl\":\"Toegangskaarten maken\"},\"description\":{\"en\":\"Create gate cards for this gate system\",\"nl\":\"Toegangskaarten maken voor dit toegangssysteem\"},\"context_model\":\"reservation\",\"http_method\":\"post\",\"target_url\":\"https://myapp.lvh.me:3000/gate_cards\",\"enabled_script\":\"reservation.dig(:data, :attributes, :state) == 'confirmed'\"}}}"
 
+response = http.request(request)
+puts response.read_body
 ```
 
 ```python
-import requests
+import http.client
+
+conn = http.client.HTTPSConnection("api.bookingexperts.nl")
+
+payload = "{\"data\":{\"id\":\"1\",\"type\":\"application_command\",\"attributes\":{\"identifier\":\"create_cards\",\"name\":{\"en\":\"Create gate cards\",\"nl\":\"Toegangskaarten maken\"},\"description\":{\"en\":\"Create gate cards for this gate system\",\"nl\":\"Toegangskaarten maken voor dit toegangssysteem\"},\"context_model\":\"reservation\",\"http_method\":\"post\",\"target_url\":\"https://myapp.lvh.me:3000/gate_cards\",\"enabled_script\":\"reservation.dig(:data, :attributes, :state) == 'confirmed'\"}}}"
+
 headers = {
-  'Content-Type': 'application/vnd.api+json',
-  'Accept': 'application/vnd.api+json',
-  'Accept-Language': 'en,nl',
-  'X-API-KEY': 'API_KEY'
-}
+    'content-type': "application/vnd.api+json",
+    'accept': "application/vnd.api+json",
+    'accept-language': "en,nl",
+    'x-api-key': "API_KEY"
+    }
 
-r = requests.patch('https://api.bookingexperts.nl/v3/application_commands/{id}', headers = headers)
+conn.request("PATCH", "/v3/application_commands/string", payload, headers)
 
-print(r.json())
+res = conn.getresponse()
+data = res.read()
 
+print(data.decode("utf-8"))
 ```
 
 ```php
 <?php
 
-require 'vendor/autoload.php';
+$curl = curl_init();
 
-$headers = array(
-    'Content-Type' => 'application/vnd.api+json',
-    'Accept' => 'application/vnd.api+json',
-    'Accept-Language' => 'en,nl',
-    'X-API-KEY' => 'API_KEY',
-);
+curl_setopt_array($curl, array(
+  CURLOPT_URL => "https://api.bookingexperts.nl/v3/application_commands/string",
+  CURLOPT_RETURNTRANSFER => true,
+  CURLOPT_ENCODING => "",
+  CURLOPT_MAXREDIRS => 10,
+  CURLOPT_TIMEOUT => 30,
+  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+  CURLOPT_CUSTOMREQUEST => "PATCH",
+  CURLOPT_POSTFIELDS => "{\"data\":{\"id\":\"1\",\"type\":\"application_command\",\"attributes\":{\"identifier\":\"create_cards\",\"name\":{\"en\":\"Create gate cards\",\"nl\":\"Toegangskaarten maken\"},\"description\":{\"en\":\"Create gate cards for this gate system\",\"nl\":\"Toegangskaarten maken voor dit toegangssysteem\"},\"context_model\":\"reservation\",\"http_method\":\"post\",\"target_url\":\"https://myapp.lvh.me:3000/gate_cards\",\"enabled_script\":\"reservation.dig(:data, :attributes, :state) == 'confirmed'\"}}}",
+  CURLOPT_HTTPHEADER => array(
+    "accept: application/vnd.api+json",
+    "accept-language: en,nl",
+    "content-type: application/vnd.api+json",
+    "x-api-key: API_KEY"
+  ),
+));
 
-$client = new \GuzzleHttp\Client();
+$response = curl_exec($curl);
+$err = curl_error($curl);
 
-// Define array of request body.
-$request_body = array();
+curl_close($curl);
 
-try {
-    $response = $client->request('PATCH','https://api.bookingexperts.nl/v3/application_commands/{id}', array(
-        'headers' => $headers,
-        'json' => $request_body,
-       )
-    );
-    print_r($response->getBody()->getContents());
- }
- catch (\GuzzleHttp\Exception\BadResponseException $e) {
-    // handle exception or api errors.
-    print_r($e->getMessage());
- }
-
- // ...
-
+if ($err) {
+  echo "cURL Error #:" . $err;
+} else {
+  echo $response;
+}
 ```
 
 ```java
-URL obj = new URL("https://api.bookingexperts.nl/v3/application_commands/{id}");
-HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-con.setRequestMethod("PATCH");
-int responseCode = con.getResponseCode();
-BufferedReader in = new BufferedReader(
-    new InputStreamReader(con.getInputStream()));
-String inputLine;
-StringBuffer response = new StringBuffer();
-while ((inputLine = in.readLine()) != null) {
-    response.append(inputLine);
-}
-in.close();
-System.out.println(response.toString());
-
+HttpResponse<String> response = Unirest.patch("https://api.bookingexperts.nl/v3/application_commands/string")
+  .header("content-type", "application/vnd.api+json")
+  .header("accept", "application/vnd.api+json")
+  .header("accept-language", "en,nl")
+  .header("x-api-key", "API_KEY")
+  .body("{\"data\":{\"id\":\"1\",\"type\":\"application_command\",\"attributes\":{\"identifier\":\"create_cards\",\"name\":{\"en\":\"Create gate cards\",\"nl\":\"Toegangskaarten maken\"},\"description\":{\"en\":\"Create gate cards for this gate system\",\"nl\":\"Toegangskaarten maken voor dit toegangssysteem\"},\"context_model\":\"reservation\",\"http_method\":\"post\",\"target_url\":\"https://myapp.lvh.me:3000/gate_cards\",\"enabled_script\":\"reservation.dig(:data, :attributes, :state) == 'confirmed'\"}}}")
+  .asString();
 ```
 
 ```go
 package main
 
 import (
-       "bytes"
-       "net/http"
+	"fmt"
+	"strings"
+	"net/http"
+	"io/ioutil"
 )
 
 func main() {
 
-    headers := map[string][]string{
-        "Content-Type": []string{"application/vnd.api+json"},
-        "Accept": []string{"application/vnd.api+json"},
-        "Accept-Language": []string{"en,nl"},
-        "X-API-KEY": []string{"API_KEY"},
-    }
+	url := "https://api.bookingexperts.nl/v3/application_commands/string"
 
-    data := bytes.NewBuffer([]byte{jsonReq})
-    req, err := http.NewRequest("PATCH", "https://api.bookingexperts.nl/v3/application_commands/{id}", data)
-    req.Header = headers
+	payload := strings.NewReader("{\"data\":{\"id\":\"1\",\"type\":\"application_command\",\"attributes\":{\"identifier\":\"create_cards\",\"name\":{\"en\":\"Create gate cards\",\"nl\":\"Toegangskaarten maken\"},\"description\":{\"en\":\"Create gate cards for this gate system\",\"nl\":\"Toegangskaarten maken voor dit toegangssysteem\"},\"context_model\":\"reservation\",\"http_method\":\"post\",\"target_url\":\"https://myapp.lvh.me:3000/gate_cards\",\"enabled_script\":\"reservation.dig(:data, :attributes, :state) == 'confirmed'\"}}}")
 
-    client := &http.Client{}
-    resp, err := client.Do(req)
-    // ...
+	req, _ := http.NewRequest("PATCH", url, payload)
+
+	req.Header.Add("content-type", "application/vnd.api+json")
+	req.Header.Add("accept", "application/vnd.api+json")
+	req.Header.Add("accept-language", "en,nl")
+	req.Header.Add("x-api-key", "API_KEY")
+
+	res, _ := http.DefaultClient.Do(req)
+
+	defer res.Body.Close()
+	body, _ := ioutil.ReadAll(res.Body)
+
+	fmt.Println(res)
+	fmt.Println(string(body))
+
 }
-
 ```
 
 `PATCH /v3/application_commands/{id}`
@@ -1956,7 +1966,7 @@ Update an application command
 |Name|In|Type|Required|Description|
 |---|---|---|---|---|
 |id|path|string|true|Resource ID|
-|Accept-Language|header|string|false|Supported languages. A comma separated list with one or more of the following locales: nl, en, de, fr, da, cs, es, tr, pt. Default: 'en'.|
+|Accept-Language|header|string|false|Supported languages. A comma separated list with one or more of the following locales: nl, en, de, fr, da, cs, es, tr, pt, it. Default: 'en'.|
 |body|body|object|true|none|
 |» data|body|object|false|none|
 |»» id|body|string|false|ID|
@@ -1973,6 +1983,7 @@ Update an application command
 |»»»» es|body|string|false|none|
 |»»»» tr|body|string|false|none|
 |»»»» pt|body|string|false|none|
+|»»»» it|body|string|false|none|
 |»»» description|body|object|false|none|
 |»»»» nl|body|string|false|none|
 |»»»» en|body|string|false|none|
@@ -1983,6 +1994,7 @@ Update an application command
 |»»»» es|body|string|false|none|
 |»»»» tr|body|string|false|none|
 |»»»» pt|body|string|false|none|
+|»»»» it|body|string|false|none|
 |»»» context_model|body|string|false|One of: invoice, reservation, subscription|
 |»»» http_method|body|string|false|One of: get, post, put, patch, delete|
 |»»» target_url|body|string|false|This URL will be called by us using the `http_method` specified|
@@ -2029,8 +2041,8 @@ The script language **MUST** be Ruby. The list of method calls you are allowed t
       "http_method": "post",
       "target_url": "https://myapp.lvh.me:3000/gate_cards",
       "enabled_script": "reservation.dig(:data, :attributes, :state) == 'confirmed'",
-      "created_at": "2020-05-20T13:12:31Z",
-      "updated_at": "2020-05-20T13:12:31Z"
+      "created_at": "2020-06-09T07:58:26Z",
+      "updated_at": "2020-06-09T07:58:26Z"
     },
     "links": {
       "self": "string"
@@ -2067,6 +2079,7 @@ Status Code **200**
 |»»»» es|string|false|none|none|
 |»»»» tr|string|false|none|none|
 |»»»» pt|string|false|none|none|
+|»»»» it|string|false|none|none|
 |»»» description|object|false|none|none|
 |»»»» nl|string|false|none|none|
 |»»»» en|string|false|none|none|
@@ -2077,6 +2090,7 @@ Status Code **200**
 |»»»» es|string|false|none|none|
 |»»»» tr|string|false|none|none|
 |»»»» pt|string|false|none|none|
+|»»»» it|string|false|none|none|
 |»»» context_model|string|false|none|One of: invoice, reservation, subscription|
 |»»» http_method|string|false|none|One of: get, post, put, patch, delete|
 |»»» target_url|string|false|none|This URL will be called by us using the `http_method` specified|
@@ -2110,151 +2124,149 @@ ApiKeyAuth, OAuth2
 > Code samples
 
 ```shell
-# You can also use wget
-curl -X DELETE https://api.bookingexperts.nl/v3/application_commands/{id} \
-  -H 'Accept: application/vnd.api+json' \
-  -H 'Accept-Language: en,nl' \
-  -H 'X-API-KEY: API_KEY'
-
+curl --request DELETE \
+  --url https://api.bookingexperts.nl/v3/application_commands/string \
+  --header 'accept: application/vnd.api+json' \
+  --header 'accept-language: en,nl' \
+  --header 'x-api-key: API_KEY'
 ```
 
 ```http
-DELETE https://api.bookingexperts.nl/v3/application_commands/{id} HTTP/1.1
-Host: api.bookingexperts.nl
+DELETE /v3/application_commands/string HTTP/1.1
 Accept: application/vnd.api+json
 Accept-Language: en,nl
+X-Api-Key: API_KEY
+Host: api.bookingexperts.nl
 
 ```
 
 ```javascript
+var data = null;
 
-const headers = {
-  'Accept':'application/vnd.api+json',
-  'Accept-Language':'en,nl',
-  'X-API-KEY':'API_KEY'
-};
+var xhr = new XMLHttpRequest();
+xhr.withCredentials = true;
 
-fetch('https://api.bookingexperts.nl/v3/application_commands/{id}',
-{
-  method: 'DELETE',
-
-  headers: headers
-})
-.then(function(res) {
-    return res.json();
-}).then(function(body) {
-    console.log(body);
+xhr.addEventListener("readystatechange", function () {
+  if (this.readyState === this.DONE) {
+    console.log(this.responseText);
+  }
 });
 
+xhr.open("DELETE", "https://api.bookingexperts.nl/v3/application_commands/string");
+xhr.setRequestHeader("accept", "application/vnd.api+json");
+xhr.setRequestHeader("accept-language", "en,nl");
+xhr.setRequestHeader("x-api-key", "API_KEY");
+
+xhr.send(data);
 ```
 
 ```ruby
-require 'rest-client'
-require 'json'
+require 'uri'
+require 'net/http'
+require 'openssl'
 
-headers = {
-  'Accept' => 'application/vnd.api+json',
-  'Accept-Language' => 'en,nl',
-  'X-API-KEY' => 'API_KEY'
-}
+url = URI("https://api.bookingexperts.nl/v3/application_commands/string")
 
-result = RestClient.delete 'https://api.bookingexperts.nl/v3/application_commands/{id}',
-  params: {
-  }, headers: headers
+http = Net::HTTP.new(url.host, url.port)
+http.use_ssl = true
+http.verify_mode = OpenSSL::SSL::VERIFY_NONE
 
-p JSON.parse(result)
+request = Net::HTTP::Delete.new(url)
+request["accept"] = 'application/vnd.api+json'
+request["accept-language"] = 'en,nl'
+request["x-api-key"] = 'API_KEY'
 
+response = http.request(request)
+puts response.read_body
 ```
 
 ```python
-import requests
+import http.client
+
+conn = http.client.HTTPSConnection("api.bookingexperts.nl")
+
 headers = {
-  'Accept': 'application/vnd.api+json',
-  'Accept-Language': 'en,nl',
-  'X-API-KEY': 'API_KEY'
-}
+    'accept': "application/vnd.api+json",
+    'accept-language': "en,nl",
+    'x-api-key': "API_KEY"
+    }
 
-r = requests.delete('https://api.bookingexperts.nl/v3/application_commands/{id}', headers = headers)
+conn.request("DELETE", "/v3/application_commands/string", headers=headers)
 
-print(r.json())
+res = conn.getresponse()
+data = res.read()
 
+print(data.decode("utf-8"))
 ```
 
 ```php
 <?php
 
-require 'vendor/autoload.php';
+$curl = curl_init();
 
-$headers = array(
-    'Accept' => 'application/vnd.api+json',
-    'Accept-Language' => 'en,nl',
-    'X-API-KEY' => 'API_KEY',
-);
+curl_setopt_array($curl, array(
+  CURLOPT_URL => "https://api.bookingexperts.nl/v3/application_commands/string",
+  CURLOPT_RETURNTRANSFER => true,
+  CURLOPT_ENCODING => "",
+  CURLOPT_MAXREDIRS => 10,
+  CURLOPT_TIMEOUT => 30,
+  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+  CURLOPT_CUSTOMREQUEST => "DELETE",
+  CURLOPT_HTTPHEADER => array(
+    "accept: application/vnd.api+json",
+    "accept-language: en,nl",
+    "x-api-key: API_KEY"
+  ),
+));
 
-$client = new \GuzzleHttp\Client();
+$response = curl_exec($curl);
+$err = curl_error($curl);
 
-// Define array of request body.
-$request_body = array();
+curl_close($curl);
 
-try {
-    $response = $client->request('DELETE','https://api.bookingexperts.nl/v3/application_commands/{id}', array(
-        'headers' => $headers,
-        'json' => $request_body,
-       )
-    );
-    print_r($response->getBody()->getContents());
- }
- catch (\GuzzleHttp\Exception\BadResponseException $e) {
-    // handle exception or api errors.
-    print_r($e->getMessage());
- }
-
- // ...
-
+if ($err) {
+  echo "cURL Error #:" . $err;
+} else {
+  echo $response;
+}
 ```
 
 ```java
-URL obj = new URL("https://api.bookingexperts.nl/v3/application_commands/{id}");
-HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-con.setRequestMethod("DELETE");
-int responseCode = con.getResponseCode();
-BufferedReader in = new BufferedReader(
-    new InputStreamReader(con.getInputStream()));
-String inputLine;
-StringBuffer response = new StringBuffer();
-while ((inputLine = in.readLine()) != null) {
-    response.append(inputLine);
-}
-in.close();
-System.out.println(response.toString());
-
+HttpResponse<String> response = Unirest.delete("https://api.bookingexperts.nl/v3/application_commands/string")
+  .header("accept", "application/vnd.api+json")
+  .header("accept-language", "en,nl")
+  .header("x-api-key", "API_KEY")
+  .asString();
 ```
 
 ```go
 package main
 
 import (
-       "bytes"
-       "net/http"
+	"fmt"
+	"net/http"
+	"io/ioutil"
 )
 
 func main() {
 
-    headers := map[string][]string{
-        "Accept": []string{"application/vnd.api+json"},
-        "Accept-Language": []string{"en,nl"},
-        "X-API-KEY": []string{"API_KEY"},
-    }
+	url := "https://api.bookingexperts.nl/v3/application_commands/string"
 
-    data := bytes.NewBuffer([]byte{jsonReq})
-    req, err := http.NewRequest("DELETE", "https://api.bookingexperts.nl/v3/application_commands/{id}", data)
-    req.Header = headers
+	req, _ := http.NewRequest("DELETE", url, nil)
 
-    client := &http.Client{}
-    resp, err := client.Do(req)
-    // ...
+	req.Header.Add("accept", "application/vnd.api+json")
+	req.Header.Add("accept-language", "en,nl")
+	req.Header.Add("x-api-key", "API_KEY")
+
+	res, _ := http.DefaultClient.Do(req)
+
+	defer res.Body.Close()
+	body, _ := ioutil.ReadAll(res.Body)
+
+	fmt.Println(res)
+	fmt.Println(string(body))
+
 }
-
 ```
 
 `DELETE /v3/application_commands/{id}`
@@ -2266,7 +2278,7 @@ Delete an application command
 |Name|In|Type|Required|Description|
 |---|---|---|---|---|
 |id|path|string|true|Resource ID|
-|Accept-Language|header|string|false|Supported languages. A comma separated list with one or more of the following locales: nl, en, de, fr, da, cs, es, tr, pt. Default: 'en'.|
+|Accept-Language|header|string|false|Supported languages. A comma separated list with one or more of the following locales: nl, en, de, fr, da, cs, es, tr, pt, it. Default: 'en'.|
 
 > Example responses
 
@@ -2323,151 +2335,149 @@ ApiKeyAuth, OAuth2
 > Code samples
 
 ```shell
-# You can also use wget
-curl -X GET https://api.bookingexperts.nl/v3/administrations/{administration_id}/invoices/{id} \
-  -H 'Accept: application/vnd.api+json' \
-  -H 'Accept-Language: en,nl' \
-  -H 'X-API-KEY: API_KEY'
-
+curl --request GET \
+  --url https://api.bookingexperts.nl/v3/administrations/string/invoices/string \
+  --header 'accept: application/vnd.api+json' \
+  --header 'accept-language: en,nl' \
+  --header 'x-api-key: API_KEY'
 ```
 
 ```http
-GET https://api.bookingexperts.nl/v3/administrations/{administration_id}/invoices/{id} HTTP/1.1
-Host: api.bookingexperts.nl
+GET /v3/administrations/string/invoices/string HTTP/1.1
 Accept: application/vnd.api+json
 Accept-Language: en,nl
+X-Api-Key: API_KEY
+Host: api.bookingexperts.nl
 
 ```
 
 ```javascript
+var data = null;
 
-const headers = {
-  'Accept':'application/vnd.api+json',
-  'Accept-Language':'en,nl',
-  'X-API-KEY':'API_KEY'
-};
+var xhr = new XMLHttpRequest();
+xhr.withCredentials = true;
 
-fetch('https://api.bookingexperts.nl/v3/administrations/{administration_id}/invoices/{id}',
-{
-  method: 'GET',
-
-  headers: headers
-})
-.then(function(res) {
-    return res.json();
-}).then(function(body) {
-    console.log(body);
+xhr.addEventListener("readystatechange", function () {
+  if (this.readyState === this.DONE) {
+    console.log(this.responseText);
+  }
 });
 
+xhr.open("GET", "https://api.bookingexperts.nl/v3/administrations/string/invoices/string");
+xhr.setRequestHeader("accept", "application/vnd.api+json");
+xhr.setRequestHeader("accept-language", "en,nl");
+xhr.setRequestHeader("x-api-key", "API_KEY");
+
+xhr.send(data);
 ```
 
 ```ruby
-require 'rest-client'
-require 'json'
+require 'uri'
+require 'net/http'
+require 'openssl'
 
-headers = {
-  'Accept' => 'application/vnd.api+json',
-  'Accept-Language' => 'en,nl',
-  'X-API-KEY' => 'API_KEY'
-}
+url = URI("https://api.bookingexperts.nl/v3/administrations/string/invoices/string")
 
-result = RestClient.get 'https://api.bookingexperts.nl/v3/administrations/{administration_id}/invoices/{id}',
-  params: {
-  }, headers: headers
+http = Net::HTTP.new(url.host, url.port)
+http.use_ssl = true
+http.verify_mode = OpenSSL::SSL::VERIFY_NONE
 
-p JSON.parse(result)
+request = Net::HTTP::Get.new(url)
+request["accept"] = 'application/vnd.api+json'
+request["accept-language"] = 'en,nl'
+request["x-api-key"] = 'API_KEY'
 
+response = http.request(request)
+puts response.read_body
 ```
 
 ```python
-import requests
+import http.client
+
+conn = http.client.HTTPSConnection("api.bookingexperts.nl")
+
 headers = {
-  'Accept': 'application/vnd.api+json',
-  'Accept-Language': 'en,nl',
-  'X-API-KEY': 'API_KEY'
-}
+    'accept': "application/vnd.api+json",
+    'accept-language': "en,nl",
+    'x-api-key': "API_KEY"
+    }
 
-r = requests.get('https://api.bookingexperts.nl/v3/administrations/{administration_id}/invoices/{id}', headers = headers)
+conn.request("GET", "/v3/administrations/string/invoices/string", headers=headers)
 
-print(r.json())
+res = conn.getresponse()
+data = res.read()
 
+print(data.decode("utf-8"))
 ```
 
 ```php
 <?php
 
-require 'vendor/autoload.php';
+$curl = curl_init();
 
-$headers = array(
-    'Accept' => 'application/vnd.api+json',
-    'Accept-Language' => 'en,nl',
-    'X-API-KEY' => 'API_KEY',
-);
+curl_setopt_array($curl, array(
+  CURLOPT_URL => "https://api.bookingexperts.nl/v3/administrations/string/invoices/string",
+  CURLOPT_RETURNTRANSFER => true,
+  CURLOPT_ENCODING => "",
+  CURLOPT_MAXREDIRS => 10,
+  CURLOPT_TIMEOUT => 30,
+  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+  CURLOPT_CUSTOMREQUEST => "GET",
+  CURLOPT_HTTPHEADER => array(
+    "accept: application/vnd.api+json",
+    "accept-language: en,nl",
+    "x-api-key: API_KEY"
+  ),
+));
 
-$client = new \GuzzleHttp\Client();
+$response = curl_exec($curl);
+$err = curl_error($curl);
 
-// Define array of request body.
-$request_body = array();
+curl_close($curl);
 
-try {
-    $response = $client->request('GET','https://api.bookingexperts.nl/v3/administrations/{administration_id}/invoices/{id}', array(
-        'headers' => $headers,
-        'json' => $request_body,
-       )
-    );
-    print_r($response->getBody()->getContents());
- }
- catch (\GuzzleHttp\Exception\BadResponseException $e) {
-    // handle exception or api errors.
-    print_r($e->getMessage());
- }
-
- // ...
-
+if ($err) {
+  echo "cURL Error #:" . $err;
+} else {
+  echo $response;
+}
 ```
 
 ```java
-URL obj = new URL("https://api.bookingexperts.nl/v3/administrations/{administration_id}/invoices/{id}");
-HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-con.setRequestMethod("GET");
-int responseCode = con.getResponseCode();
-BufferedReader in = new BufferedReader(
-    new InputStreamReader(con.getInputStream()));
-String inputLine;
-StringBuffer response = new StringBuffer();
-while ((inputLine = in.readLine()) != null) {
-    response.append(inputLine);
-}
-in.close();
-System.out.println(response.toString());
-
+HttpResponse<String> response = Unirest.get("https://api.bookingexperts.nl/v3/administrations/string/invoices/string")
+  .header("accept", "application/vnd.api+json")
+  .header("accept-language", "en,nl")
+  .header("x-api-key", "API_KEY")
+  .asString();
 ```
 
 ```go
 package main
 
 import (
-       "bytes"
-       "net/http"
+	"fmt"
+	"net/http"
+	"io/ioutil"
 )
 
 func main() {
 
-    headers := map[string][]string{
-        "Accept": []string{"application/vnd.api+json"},
-        "Accept-Language": []string{"en,nl"},
-        "X-API-KEY": []string{"API_KEY"},
-    }
+	url := "https://api.bookingexperts.nl/v3/administrations/string/invoices/string"
 
-    data := bytes.NewBuffer([]byte{jsonReq})
-    req, err := http.NewRequest("GET", "https://api.bookingexperts.nl/v3/administrations/{administration_id}/invoices/{id}", data)
-    req.Header = headers
+	req, _ := http.NewRequest("GET", url, nil)
 
-    client := &http.Client{}
-    resp, err := client.Do(req)
-    // ...
+	req.Header.Add("accept", "application/vnd.api+json")
+	req.Header.Add("accept-language", "en,nl")
+	req.Header.Add("x-api-key", "API_KEY")
+
+	res, _ := http.DefaultClient.Do(req)
+
+	defer res.Body.Close()
+	body, _ := ioutil.ReadAll(res.Body)
+
+	fmt.Println(res)
+	fmt.Println(string(body))
+
 }
-
 ```
 
 `GET /v3/administrations/{administration_id}/invoices/{id}`
@@ -2488,7 +2498,7 @@ Returns an invoice
 |filter[administration]|query|string|false|Filter on administration. Specify a comma separated list of IDs to filter on.|
 |filter[reservation]|query|string|false|Filter on reservation. Specify a comma separated list of IDs to filter on.|
 |include|query|string|false|Includes list. Specify a comma separated list of resources to include.|
-|Accept-Language|header|string|false|Supported languages. A comma separated list with one or more of the following locales: nl, en, de, fr, da, cs, es, tr, pt. Default: 'en'.|
+|Accept-Language|header|string|false|Supported languages. A comma separated list with one or more of the following locales: nl, en, de, fr, da, cs, es, tr, pt, it. Default: 'en'.|
 
 > Example responses
 
@@ -2595,151 +2605,149 @@ ApiKeyAuth, OAuth2
 > Code samples
 
 ```shell
-# You can also use wget
-curl -X GET https://api.bookingexperts.nl/v3/administrations/{administration_id}/orders/{id} \
-  -H 'Accept: application/vnd.api+json' \
-  -H 'Accept-Language: en,nl' \
-  -H 'X-API-KEY: API_KEY'
-
+curl --request GET \
+  --url https://api.bookingexperts.nl/v3/administrations/string/orders/string \
+  --header 'accept: application/vnd.api+json' \
+  --header 'accept-language: en,nl' \
+  --header 'x-api-key: API_KEY'
 ```
 
 ```http
-GET https://api.bookingexperts.nl/v3/administrations/{administration_id}/orders/{id} HTTP/1.1
-Host: api.bookingexperts.nl
+GET /v3/administrations/string/orders/string HTTP/1.1
 Accept: application/vnd.api+json
 Accept-Language: en,nl
+X-Api-Key: API_KEY
+Host: api.bookingexperts.nl
 
 ```
 
 ```javascript
+var data = null;
 
-const headers = {
-  'Accept':'application/vnd.api+json',
-  'Accept-Language':'en,nl',
-  'X-API-KEY':'API_KEY'
-};
+var xhr = new XMLHttpRequest();
+xhr.withCredentials = true;
 
-fetch('https://api.bookingexperts.nl/v3/administrations/{administration_id}/orders/{id}',
-{
-  method: 'GET',
-
-  headers: headers
-})
-.then(function(res) {
-    return res.json();
-}).then(function(body) {
-    console.log(body);
+xhr.addEventListener("readystatechange", function () {
+  if (this.readyState === this.DONE) {
+    console.log(this.responseText);
+  }
 });
 
+xhr.open("GET", "https://api.bookingexperts.nl/v3/administrations/string/orders/string");
+xhr.setRequestHeader("accept", "application/vnd.api+json");
+xhr.setRequestHeader("accept-language", "en,nl");
+xhr.setRequestHeader("x-api-key", "API_KEY");
+
+xhr.send(data);
 ```
 
 ```ruby
-require 'rest-client'
-require 'json'
+require 'uri'
+require 'net/http'
+require 'openssl'
 
-headers = {
-  'Accept' => 'application/vnd.api+json',
-  'Accept-Language' => 'en,nl',
-  'X-API-KEY' => 'API_KEY'
-}
+url = URI("https://api.bookingexperts.nl/v3/administrations/string/orders/string")
 
-result = RestClient.get 'https://api.bookingexperts.nl/v3/administrations/{administration_id}/orders/{id}',
-  params: {
-  }, headers: headers
+http = Net::HTTP.new(url.host, url.port)
+http.use_ssl = true
+http.verify_mode = OpenSSL::SSL::VERIFY_NONE
 
-p JSON.parse(result)
+request = Net::HTTP::Get.new(url)
+request["accept"] = 'application/vnd.api+json'
+request["accept-language"] = 'en,nl'
+request["x-api-key"] = 'API_KEY'
 
+response = http.request(request)
+puts response.read_body
 ```
 
 ```python
-import requests
+import http.client
+
+conn = http.client.HTTPSConnection("api.bookingexperts.nl")
+
 headers = {
-  'Accept': 'application/vnd.api+json',
-  'Accept-Language': 'en,nl',
-  'X-API-KEY': 'API_KEY'
-}
+    'accept': "application/vnd.api+json",
+    'accept-language': "en,nl",
+    'x-api-key': "API_KEY"
+    }
 
-r = requests.get('https://api.bookingexperts.nl/v3/administrations/{administration_id}/orders/{id}', headers = headers)
+conn.request("GET", "/v3/administrations/string/orders/string", headers=headers)
 
-print(r.json())
+res = conn.getresponse()
+data = res.read()
 
+print(data.decode("utf-8"))
 ```
 
 ```php
 <?php
 
-require 'vendor/autoload.php';
+$curl = curl_init();
 
-$headers = array(
-    'Accept' => 'application/vnd.api+json',
-    'Accept-Language' => 'en,nl',
-    'X-API-KEY' => 'API_KEY',
-);
+curl_setopt_array($curl, array(
+  CURLOPT_URL => "https://api.bookingexperts.nl/v3/administrations/string/orders/string",
+  CURLOPT_RETURNTRANSFER => true,
+  CURLOPT_ENCODING => "",
+  CURLOPT_MAXREDIRS => 10,
+  CURLOPT_TIMEOUT => 30,
+  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+  CURLOPT_CUSTOMREQUEST => "GET",
+  CURLOPT_HTTPHEADER => array(
+    "accept: application/vnd.api+json",
+    "accept-language: en,nl",
+    "x-api-key: API_KEY"
+  ),
+));
 
-$client = new \GuzzleHttp\Client();
+$response = curl_exec($curl);
+$err = curl_error($curl);
 
-// Define array of request body.
-$request_body = array();
+curl_close($curl);
 
-try {
-    $response = $client->request('GET','https://api.bookingexperts.nl/v3/administrations/{administration_id}/orders/{id}', array(
-        'headers' => $headers,
-        'json' => $request_body,
-       )
-    );
-    print_r($response->getBody()->getContents());
- }
- catch (\GuzzleHttp\Exception\BadResponseException $e) {
-    // handle exception or api errors.
-    print_r($e->getMessage());
- }
-
- // ...
-
+if ($err) {
+  echo "cURL Error #:" . $err;
+} else {
+  echo $response;
+}
 ```
 
 ```java
-URL obj = new URL("https://api.bookingexperts.nl/v3/administrations/{administration_id}/orders/{id}");
-HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-con.setRequestMethod("GET");
-int responseCode = con.getResponseCode();
-BufferedReader in = new BufferedReader(
-    new InputStreamReader(con.getInputStream()));
-String inputLine;
-StringBuffer response = new StringBuffer();
-while ((inputLine = in.readLine()) != null) {
-    response.append(inputLine);
-}
-in.close();
-System.out.println(response.toString());
-
+HttpResponse<String> response = Unirest.get("https://api.bookingexperts.nl/v3/administrations/string/orders/string")
+  .header("accept", "application/vnd.api+json")
+  .header("accept-language", "en,nl")
+  .header("x-api-key", "API_KEY")
+  .asString();
 ```
 
 ```go
 package main
 
 import (
-       "bytes"
-       "net/http"
+	"fmt"
+	"net/http"
+	"io/ioutil"
 )
 
 func main() {
 
-    headers := map[string][]string{
-        "Accept": []string{"application/vnd.api+json"},
-        "Accept-Language": []string{"en,nl"},
-        "X-API-KEY": []string{"API_KEY"},
-    }
+	url := "https://api.bookingexperts.nl/v3/administrations/string/orders/string"
 
-    data := bytes.NewBuffer([]byte{jsonReq})
-    req, err := http.NewRequest("GET", "https://api.bookingexperts.nl/v3/administrations/{administration_id}/orders/{id}", data)
-    req.Header = headers
+	req, _ := http.NewRequest("GET", url, nil)
 
-    client := &http.Client{}
-    resp, err := client.Do(req)
-    // ...
+	req.Header.Add("accept", "application/vnd.api+json")
+	req.Header.Add("accept-language", "en,nl")
+	req.Header.Add("x-api-key", "API_KEY")
+
+	res, _ := http.DefaultClient.Do(req)
+
+	defer res.Body.Close()
+	body, _ := ioutil.ReadAll(res.Body)
+
+	fmt.Println(res)
+	fmt.Println(string(body))
+
 }
-
 ```
 
 `GET /v3/administrations/{administration_id}/orders/{id}`
@@ -2763,7 +2771,7 @@ Returns an order of a reservation
 |filter[main_order_items]|query|string|false|Filter on main_order_items. Specify a comma separated list of IDs to filter on.|
 |filter[extra_order_items]|query|string|false|Filter on extra_order_items. Specify a comma separated list of IDs to filter on.|
 |include|query|string|false|Includes list. Specify a comma separated list of resources to include.|
-|Accept-Language|header|string|false|Supported languages. A comma separated list with one or more of the following locales: nl, en, de, fr, da, cs, es, tr, pt. Default: 'en'.|
+|Accept-Language|header|string|false|Supported languages. A comma separated list with one or more of the following locales: nl, en, de, fr, da, cs, es, tr, pt, it. Default: 'en'.|
 
 > Example responses
 
@@ -2787,7 +2795,8 @@ Returns an order of a reservation
         "cs": "string",
         "es": "string",
         "tr": "string",
-        "pt": "string"
+        "pt": "string",
+        "it": "string"
       },
       "surroundings_description": {
         "nl": "string",
@@ -2798,7 +2807,8 @@ Returns an order of a reservation
         "cs": "string",
         "es": "string",
         "tr": "string",
-        "pt": "string"
+        "pt": "string",
+        "it": "string"
       },
       "available_locales": [
         "string"
@@ -2842,6 +2852,7 @@ Status Code **200**
 |»»»» es|string|false|none|none|
 |»»»» tr|string|false|none|none|
 |»»»» pt|string|false|none|none|
+|»»»» it|string|false|none|none|
 |»»» surroundings_description|object|false|none|A description of the surroundings|
 |»»»» nl|string|false|none|none|
 |»»»» en|string|false|none|none|
@@ -2852,6 +2863,7 @@ Status Code **200**
 |»»»» es|string|false|none|none|
 |»»»» tr|string|false|none|none|
 |»»»» pt|string|false|none|none|
+|»»»» it|string|false|none|none|
 |»»» available_locales|[string]|false|none|Enabled locales|
 |»»» utc_offset|string|false|none|The UTC offset of the administration, for example: +01:00|
 |»» links|object|false|none|Links|
@@ -2883,151 +2895,149 @@ ApiKeyAuth, OAuth2
 > Code samples
 
 ```shell
-# You can also use wget
-curl -X GET https://api.bookingexperts.nl/v3/organization \
-  -H 'Accept: application/vnd.api+json' \
-  -H 'Accept-Language: en,nl' \
-  -H 'X-API-KEY: API_KEY'
-
+curl --request GET \
+  --url https://api.bookingexperts.nl/v3/organization \
+  --header 'accept: application/vnd.api+json' \
+  --header 'accept-language: en,nl' \
+  --header 'x-api-key: API_KEY'
 ```
 
 ```http
-GET https://api.bookingexperts.nl/v3/organization HTTP/1.1
-Host: api.bookingexperts.nl
+GET /v3/organization HTTP/1.1
 Accept: application/vnd.api+json
 Accept-Language: en,nl
+X-Api-Key: API_KEY
+Host: api.bookingexperts.nl
 
 ```
 
 ```javascript
+var data = null;
 
-const headers = {
-  'Accept':'application/vnd.api+json',
-  'Accept-Language':'en,nl',
-  'X-API-KEY':'API_KEY'
-};
+var xhr = new XMLHttpRequest();
+xhr.withCredentials = true;
 
-fetch('https://api.bookingexperts.nl/v3/organization',
-{
-  method: 'GET',
-
-  headers: headers
-})
-.then(function(res) {
-    return res.json();
-}).then(function(body) {
-    console.log(body);
+xhr.addEventListener("readystatechange", function () {
+  if (this.readyState === this.DONE) {
+    console.log(this.responseText);
+  }
 });
 
+xhr.open("GET", "https://api.bookingexperts.nl/v3/organization");
+xhr.setRequestHeader("accept", "application/vnd.api+json");
+xhr.setRequestHeader("accept-language", "en,nl");
+xhr.setRequestHeader("x-api-key", "API_KEY");
+
+xhr.send(data);
 ```
 
 ```ruby
-require 'rest-client'
-require 'json'
+require 'uri'
+require 'net/http'
+require 'openssl'
 
-headers = {
-  'Accept' => 'application/vnd.api+json',
-  'Accept-Language' => 'en,nl',
-  'X-API-KEY' => 'API_KEY'
-}
+url = URI("https://api.bookingexperts.nl/v3/organization")
 
-result = RestClient.get 'https://api.bookingexperts.nl/v3/organization',
-  params: {
-  }, headers: headers
+http = Net::HTTP.new(url.host, url.port)
+http.use_ssl = true
+http.verify_mode = OpenSSL::SSL::VERIFY_NONE
 
-p JSON.parse(result)
+request = Net::HTTP::Get.new(url)
+request["accept"] = 'application/vnd.api+json'
+request["accept-language"] = 'en,nl'
+request["x-api-key"] = 'API_KEY'
 
+response = http.request(request)
+puts response.read_body
 ```
 
 ```python
-import requests
+import http.client
+
+conn = http.client.HTTPSConnection("api.bookingexperts.nl")
+
 headers = {
-  'Accept': 'application/vnd.api+json',
-  'Accept-Language': 'en,nl',
-  'X-API-KEY': 'API_KEY'
-}
+    'accept': "application/vnd.api+json",
+    'accept-language': "en,nl",
+    'x-api-key': "API_KEY"
+    }
 
-r = requests.get('https://api.bookingexperts.nl/v3/organization', headers = headers)
+conn.request("GET", "/v3/organization", headers=headers)
 
-print(r.json())
+res = conn.getresponse()
+data = res.read()
 
+print(data.decode("utf-8"))
 ```
 
 ```php
 <?php
 
-require 'vendor/autoload.php';
+$curl = curl_init();
 
-$headers = array(
-    'Accept' => 'application/vnd.api+json',
-    'Accept-Language' => 'en,nl',
-    'X-API-KEY' => 'API_KEY',
-);
+curl_setopt_array($curl, array(
+  CURLOPT_URL => "https://api.bookingexperts.nl/v3/organization",
+  CURLOPT_RETURNTRANSFER => true,
+  CURLOPT_ENCODING => "",
+  CURLOPT_MAXREDIRS => 10,
+  CURLOPT_TIMEOUT => 30,
+  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+  CURLOPT_CUSTOMREQUEST => "GET",
+  CURLOPT_HTTPHEADER => array(
+    "accept: application/vnd.api+json",
+    "accept-language: en,nl",
+    "x-api-key: API_KEY"
+  ),
+));
 
-$client = new \GuzzleHttp\Client();
+$response = curl_exec($curl);
+$err = curl_error($curl);
 
-// Define array of request body.
-$request_body = array();
+curl_close($curl);
 
-try {
-    $response = $client->request('GET','https://api.bookingexperts.nl/v3/organization', array(
-        'headers' => $headers,
-        'json' => $request_body,
-       )
-    );
-    print_r($response->getBody()->getContents());
- }
- catch (\GuzzleHttp\Exception\BadResponseException $e) {
-    // handle exception or api errors.
-    print_r($e->getMessage());
- }
-
- // ...
-
+if ($err) {
+  echo "cURL Error #:" . $err;
+} else {
+  echo $response;
+}
 ```
 
 ```java
-URL obj = new URL("https://api.bookingexperts.nl/v3/organization");
-HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-con.setRequestMethod("GET");
-int responseCode = con.getResponseCode();
-BufferedReader in = new BufferedReader(
-    new InputStreamReader(con.getInputStream()));
-String inputLine;
-StringBuffer response = new StringBuffer();
-while ((inputLine = in.readLine()) != null) {
-    response.append(inputLine);
-}
-in.close();
-System.out.println(response.toString());
-
+HttpResponse<String> response = Unirest.get("https://api.bookingexperts.nl/v3/organization")
+  .header("accept", "application/vnd.api+json")
+  .header("accept-language", "en,nl")
+  .header("x-api-key", "API_KEY")
+  .asString();
 ```
 
 ```go
 package main
 
 import (
-       "bytes"
-       "net/http"
+	"fmt"
+	"net/http"
+	"io/ioutil"
 )
 
 func main() {
 
-    headers := map[string][]string{
-        "Accept": []string{"application/vnd.api+json"},
-        "Accept-Language": []string{"en,nl"},
-        "X-API-KEY": []string{"API_KEY"},
-    }
+	url := "https://api.bookingexperts.nl/v3/organization"
 
-    data := bytes.NewBuffer([]byte{jsonReq})
-    req, err := http.NewRequest("GET", "https://api.bookingexperts.nl/v3/organization", data)
-    req.Header = headers
+	req, _ := http.NewRequest("GET", url, nil)
 
-    client := &http.Client{}
-    resp, err := client.Do(req)
-    // ...
+	req.Header.Add("accept", "application/vnd.api+json")
+	req.Header.Add("accept-language", "en,nl")
+	req.Header.Add("x-api-key", "API_KEY")
+
+	res, _ := http.DefaultClient.Do(req)
+
+	defer res.Body.Close()
+	body, _ := ioutil.ReadAll(res.Body)
+
+	fmt.Println(res)
+	fmt.Println(string(body))
+
 }
-
 ```
 
 `GET /v3/organization`
@@ -3049,7 +3059,7 @@ Returns the current organization
 |filter[max_child_age]|query|string|false|Filter on max_child_age|
 |filter[max_adolescent_age]|query|string|false|Filter on max_adolescent_age|
 |filter[min_senior_age]|query|string|false|Filter on min_senior_age|
-|Accept-Language|header|string|false|Supported languages. A comma separated list with one or more of the following locales: nl, en, de, fr, da, cs, es, tr, pt. Default: 'en'.|
+|Accept-Language|header|string|false|Supported languages. A comma separated list with one or more of the following locales: nl, en, de, fr, da, cs, es, tr, pt, it. Default: 'en'.|
 
 > Example responses
 
@@ -3135,151 +3145,149 @@ ApiKeyAuth, OAuth2
 > Code samples
 
 ```shell
-# You can also use wget
-curl -X GET https://api.bookingexperts.nl/v3/administrations/{administration_id}/payments \
-  -H 'Accept: application/vnd.api+json' \
-  -H 'Accept-Language: en,nl' \
-  -H 'X-API-KEY: API_KEY'
-
+curl --request GET \
+  --url https://api.bookingexperts.nl/v3/administrations/string/payments \
+  --header 'accept: application/vnd.api+json' \
+  --header 'accept-language: en,nl' \
+  --header 'x-api-key: API_KEY'
 ```
 
 ```http
-GET https://api.bookingexperts.nl/v3/administrations/{administration_id}/payments HTTP/1.1
-Host: api.bookingexperts.nl
+GET /v3/administrations/string/payments HTTP/1.1
 Accept: application/vnd.api+json
 Accept-Language: en,nl
+X-Api-Key: API_KEY
+Host: api.bookingexperts.nl
 
 ```
 
 ```javascript
+var data = null;
 
-const headers = {
-  'Accept':'application/vnd.api+json',
-  'Accept-Language':'en,nl',
-  'X-API-KEY':'API_KEY'
-};
+var xhr = new XMLHttpRequest();
+xhr.withCredentials = true;
 
-fetch('https://api.bookingexperts.nl/v3/administrations/{administration_id}/payments',
-{
-  method: 'GET',
-
-  headers: headers
-})
-.then(function(res) {
-    return res.json();
-}).then(function(body) {
-    console.log(body);
+xhr.addEventListener("readystatechange", function () {
+  if (this.readyState === this.DONE) {
+    console.log(this.responseText);
+  }
 });
 
+xhr.open("GET", "https://api.bookingexperts.nl/v3/administrations/string/payments");
+xhr.setRequestHeader("accept", "application/vnd.api+json");
+xhr.setRequestHeader("accept-language", "en,nl");
+xhr.setRequestHeader("x-api-key", "API_KEY");
+
+xhr.send(data);
 ```
 
 ```ruby
-require 'rest-client'
-require 'json'
+require 'uri'
+require 'net/http'
+require 'openssl'
 
-headers = {
-  'Accept' => 'application/vnd.api+json',
-  'Accept-Language' => 'en,nl',
-  'X-API-KEY' => 'API_KEY'
-}
+url = URI("https://api.bookingexperts.nl/v3/administrations/string/payments")
 
-result = RestClient.get 'https://api.bookingexperts.nl/v3/administrations/{administration_id}/payments',
-  params: {
-  }, headers: headers
+http = Net::HTTP.new(url.host, url.port)
+http.use_ssl = true
+http.verify_mode = OpenSSL::SSL::VERIFY_NONE
 
-p JSON.parse(result)
+request = Net::HTTP::Get.new(url)
+request["accept"] = 'application/vnd.api+json'
+request["accept-language"] = 'en,nl'
+request["x-api-key"] = 'API_KEY'
 
+response = http.request(request)
+puts response.read_body
 ```
 
 ```python
-import requests
+import http.client
+
+conn = http.client.HTTPSConnection("api.bookingexperts.nl")
+
 headers = {
-  'Accept': 'application/vnd.api+json',
-  'Accept-Language': 'en,nl',
-  'X-API-KEY': 'API_KEY'
-}
+    'accept': "application/vnd.api+json",
+    'accept-language': "en,nl",
+    'x-api-key': "API_KEY"
+    }
 
-r = requests.get('https://api.bookingexperts.nl/v3/administrations/{administration_id}/payments', headers = headers)
+conn.request("GET", "/v3/administrations/string/payments", headers=headers)
 
-print(r.json())
+res = conn.getresponse()
+data = res.read()
 
+print(data.decode("utf-8"))
 ```
 
 ```php
 <?php
 
-require 'vendor/autoload.php';
+$curl = curl_init();
 
-$headers = array(
-    'Accept' => 'application/vnd.api+json',
-    'Accept-Language' => 'en,nl',
-    'X-API-KEY' => 'API_KEY',
-);
+curl_setopt_array($curl, array(
+  CURLOPT_URL => "https://api.bookingexperts.nl/v3/administrations/string/payments",
+  CURLOPT_RETURNTRANSFER => true,
+  CURLOPT_ENCODING => "",
+  CURLOPT_MAXREDIRS => 10,
+  CURLOPT_TIMEOUT => 30,
+  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+  CURLOPT_CUSTOMREQUEST => "GET",
+  CURLOPT_HTTPHEADER => array(
+    "accept: application/vnd.api+json",
+    "accept-language: en,nl",
+    "x-api-key: API_KEY"
+  ),
+));
 
-$client = new \GuzzleHttp\Client();
+$response = curl_exec($curl);
+$err = curl_error($curl);
 
-// Define array of request body.
-$request_body = array();
+curl_close($curl);
 
-try {
-    $response = $client->request('GET','https://api.bookingexperts.nl/v3/administrations/{administration_id}/payments', array(
-        'headers' => $headers,
-        'json' => $request_body,
-       )
-    );
-    print_r($response->getBody()->getContents());
- }
- catch (\GuzzleHttp\Exception\BadResponseException $e) {
-    // handle exception or api errors.
-    print_r($e->getMessage());
- }
-
- // ...
-
+if ($err) {
+  echo "cURL Error #:" . $err;
+} else {
+  echo $response;
+}
 ```
 
 ```java
-URL obj = new URL("https://api.bookingexperts.nl/v3/administrations/{administration_id}/payments");
-HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-con.setRequestMethod("GET");
-int responseCode = con.getResponseCode();
-BufferedReader in = new BufferedReader(
-    new InputStreamReader(con.getInputStream()));
-String inputLine;
-StringBuffer response = new StringBuffer();
-while ((inputLine = in.readLine()) != null) {
-    response.append(inputLine);
-}
-in.close();
-System.out.println(response.toString());
-
+HttpResponse<String> response = Unirest.get("https://api.bookingexperts.nl/v3/administrations/string/payments")
+  .header("accept", "application/vnd.api+json")
+  .header("accept-language", "en,nl")
+  .header("x-api-key", "API_KEY")
+  .asString();
 ```
 
 ```go
 package main
 
 import (
-       "bytes"
-       "net/http"
+	"fmt"
+	"net/http"
+	"io/ioutil"
 )
 
 func main() {
 
-    headers := map[string][]string{
-        "Accept": []string{"application/vnd.api+json"},
-        "Accept-Language": []string{"en,nl"},
-        "X-API-KEY": []string{"API_KEY"},
-    }
+	url := "https://api.bookingexperts.nl/v3/administrations/string/payments"
 
-    data := bytes.NewBuffer([]byte{jsonReq})
-    req, err := http.NewRequest("GET", "https://api.bookingexperts.nl/v3/administrations/{administration_id}/payments", data)
-    req.Header = headers
+	req, _ := http.NewRequest("GET", url, nil)
 
-    client := &http.Client{}
-    resp, err := client.Do(req)
-    // ...
+	req.Header.Add("accept", "application/vnd.api+json")
+	req.Header.Add("accept-language", "en,nl")
+	req.Header.Add("x-api-key", "API_KEY")
+
+	res, _ := http.DefaultClient.Do(req)
+
+	defer res.Body.Close()
+	body, _ := ioutil.ReadAll(res.Body)
+
+	fmt.Println(res)
+	fmt.Println(string(body))
+
 }
-
 ```
 
 `GET /v3/administrations/{administration_id}/payments`
@@ -3300,7 +3308,7 @@ Returns the payments you have registered
 |filter[memo]|query|string|false|Filter on memo|
 |filter[invoice]|query|string|false|Filter on invoice. Specify a comma separated list of IDs to filter on.|
 |include|query|string|false|Includes list. Specify a comma separated list of resources to include.|
-|Accept-Language|header|string|false|Supported languages. A comma separated list with one or more of the following locales: nl, en, de, fr, da, cs, es, tr, pt. Default: 'en'.|
+|Accept-Language|header|string|false|Supported languages. A comma separated list with one or more of the following locales: nl, en, de, fr, da, cs, es, tr, pt, it. Default: 'en'.|
 
 > Example responses
 
@@ -3313,7 +3321,7 @@ Returns the payments you have registered
       "id": "1",
       "type": "payment",
       "attributes": {
-        "paid_at": "2020-05-20",
+        "paid_at": "2020-06-09",
         "foreign_price": 0,
         "memo": "string"
       },
@@ -3397,178 +3405,168 @@ ApiKeyAuth, OAuth2
 > Code samples
 
 ```shell
-# You can also use wget
-curl -X POST https://api.bookingexperts.nl/v3/administrations/{administration_id}/payments \
-  -H 'Content-Type: application/vnd.api+json' \
-  -H 'Accept: application/vnd.api+json' \
-  -H 'Accept-Language: en,nl' \
-  -H 'X-API-KEY: API_KEY'
-
+curl --request POST \
+  --url https://api.bookingexperts.nl/v3/administrations/string/payments \
+  --header 'accept: application/vnd.api+json' \
+  --header 'accept-language: en,nl' \
+  --header 'content-type: application/vnd.api+json' \
+  --header 'x-api-key: API_KEY' \
+  --data '{"data":{"type":"payment","attributes":{"paid_at":"2020-06-09","foreign_price":0,"memo":"string"},"relationships":{"invoice":{"data":{"id":"string","type":"invoice"},"links":{"related":"string"}}}}}'
 ```
 
 ```http
-POST https://api.bookingexperts.nl/v3/administrations/{administration_id}/payments HTTP/1.1
-Host: api.bookingexperts.nl
+POST /v3/administrations/string/payments HTTP/1.1
 Content-Type: application/vnd.api+json
 Accept: application/vnd.api+json
 Accept-Language: en,nl
+X-Api-Key: API_KEY
+Host: api.bookingexperts.nl
+Content-Length: 198
 
+{"data":{"type":"payment","attributes":{"paid_at":"2020-06-09","foreign_price":0,"memo":"string"},"relationships":{"invoice":{"data":{"id":"string","type":"invoice"},"links":{"related":"string"}}}}}
 ```
 
 ```javascript
-const inputBody = '{
-  "data": {
-    "type": "payment",
-    "attributes": {
-      "paid_at": "2020-05-20",
-      "foreign_price": 0,
-      "memo": "string"
-    },
-    "relationships": {
-      "invoice": {
-        "data": {
-          "id": "string",
-          "type": "invoice"
-        },
-        "links": {
-          "related": "string"
-        }
-      }
-    }
-  }
-}';
-const headers = {
-  'Content-Type':'application/vnd.api+json',
-  'Accept':'application/vnd.api+json',
-  'Accept-Language':'en,nl',
-  'X-API-KEY':'API_KEY'
-};
+var data = "{\"data\":{\"type\":\"payment\",\"attributes\":{\"paid_at\":\"2020-06-09\",\"foreign_price\":0,\"memo\":\"string\"},\"relationships\":{\"invoice\":{\"data\":{\"id\":\"string\",\"type\":\"invoice\"},\"links\":{\"related\":\"string\"}}}}}";
 
-fetch('https://api.bookingexperts.nl/v3/administrations/{administration_id}/payments',
-{
-  method: 'POST',
-  body: inputBody,
-  headers: headers
-})
-.then(function(res) {
-    return res.json();
-}).then(function(body) {
-    console.log(body);
+var xhr = new XMLHttpRequest();
+xhr.withCredentials = true;
+
+xhr.addEventListener("readystatechange", function () {
+  if (this.readyState === this.DONE) {
+    console.log(this.responseText);
+  }
 });
 
+xhr.open("POST", "https://api.bookingexperts.nl/v3/administrations/string/payments");
+xhr.setRequestHeader("content-type", "application/vnd.api+json");
+xhr.setRequestHeader("accept", "application/vnd.api+json");
+xhr.setRequestHeader("accept-language", "en,nl");
+xhr.setRequestHeader("x-api-key", "API_KEY");
+
+xhr.send(data);
 ```
 
 ```ruby
-require 'rest-client'
-require 'json'
+require 'uri'
+require 'net/http'
+require 'openssl'
 
-headers = {
-  'Content-Type' => 'application/vnd.api+json',
-  'Accept' => 'application/vnd.api+json',
-  'Accept-Language' => 'en,nl',
-  'X-API-KEY' => 'API_KEY'
-}
+url = URI("https://api.bookingexperts.nl/v3/administrations/string/payments")
 
-result = RestClient.post 'https://api.bookingexperts.nl/v3/administrations/{administration_id}/payments',
-  params: {
-  }, headers: headers
+http = Net::HTTP.new(url.host, url.port)
+http.use_ssl = true
+http.verify_mode = OpenSSL::SSL::VERIFY_NONE
 
-p JSON.parse(result)
+request = Net::HTTP::Post.new(url)
+request["content-type"] = 'application/vnd.api+json'
+request["accept"] = 'application/vnd.api+json'
+request["accept-language"] = 'en,nl'
+request["x-api-key"] = 'API_KEY'
+request.body = "{\"data\":{\"type\":\"payment\",\"attributes\":{\"paid_at\":\"2020-06-09\",\"foreign_price\":0,\"memo\":\"string\"},\"relationships\":{\"invoice\":{\"data\":{\"id\":\"string\",\"type\":\"invoice\"},\"links\":{\"related\":\"string\"}}}}}"
 
+response = http.request(request)
+puts response.read_body
 ```
 
 ```python
-import requests
+import http.client
+
+conn = http.client.HTTPSConnection("api.bookingexperts.nl")
+
+payload = "{\"data\":{\"type\":\"payment\",\"attributes\":{\"paid_at\":\"2020-06-09\",\"foreign_price\":0,\"memo\":\"string\"},\"relationships\":{\"invoice\":{\"data\":{\"id\":\"string\",\"type\":\"invoice\"},\"links\":{\"related\":\"string\"}}}}}"
+
 headers = {
-  'Content-Type': 'application/vnd.api+json',
-  'Accept': 'application/vnd.api+json',
-  'Accept-Language': 'en,nl',
-  'X-API-KEY': 'API_KEY'
-}
+    'content-type': "application/vnd.api+json",
+    'accept': "application/vnd.api+json",
+    'accept-language': "en,nl",
+    'x-api-key': "API_KEY"
+    }
 
-r = requests.post('https://api.bookingexperts.nl/v3/administrations/{administration_id}/payments', headers = headers)
+conn.request("POST", "/v3/administrations/string/payments", payload, headers)
 
-print(r.json())
+res = conn.getresponse()
+data = res.read()
 
+print(data.decode("utf-8"))
 ```
 
 ```php
 <?php
 
-require 'vendor/autoload.php';
+$curl = curl_init();
 
-$headers = array(
-    'Content-Type' => 'application/vnd.api+json',
-    'Accept' => 'application/vnd.api+json',
-    'Accept-Language' => 'en,nl',
-    'X-API-KEY' => 'API_KEY',
-);
+curl_setopt_array($curl, array(
+  CURLOPT_URL => "https://api.bookingexperts.nl/v3/administrations/string/payments",
+  CURLOPT_RETURNTRANSFER => true,
+  CURLOPT_ENCODING => "",
+  CURLOPT_MAXREDIRS => 10,
+  CURLOPT_TIMEOUT => 30,
+  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+  CURLOPT_CUSTOMREQUEST => "POST",
+  CURLOPT_POSTFIELDS => "{\"data\":{\"type\":\"payment\",\"attributes\":{\"paid_at\":\"2020-06-09\",\"foreign_price\":0,\"memo\":\"string\"},\"relationships\":{\"invoice\":{\"data\":{\"id\":\"string\",\"type\":\"invoice\"},\"links\":{\"related\":\"string\"}}}}}",
+  CURLOPT_HTTPHEADER => array(
+    "accept: application/vnd.api+json",
+    "accept-language: en,nl",
+    "content-type: application/vnd.api+json",
+    "x-api-key: API_KEY"
+  ),
+));
 
-$client = new \GuzzleHttp\Client();
+$response = curl_exec($curl);
+$err = curl_error($curl);
 
-// Define array of request body.
-$request_body = array();
+curl_close($curl);
 
-try {
-    $response = $client->request('POST','https://api.bookingexperts.nl/v3/administrations/{administration_id}/payments', array(
-        'headers' => $headers,
-        'json' => $request_body,
-       )
-    );
-    print_r($response->getBody()->getContents());
- }
- catch (\GuzzleHttp\Exception\BadResponseException $e) {
-    // handle exception or api errors.
-    print_r($e->getMessage());
- }
-
- // ...
-
+if ($err) {
+  echo "cURL Error #:" . $err;
+} else {
+  echo $response;
+}
 ```
 
 ```java
-URL obj = new URL("https://api.bookingexperts.nl/v3/administrations/{administration_id}/payments");
-HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-con.setRequestMethod("POST");
-int responseCode = con.getResponseCode();
-BufferedReader in = new BufferedReader(
-    new InputStreamReader(con.getInputStream()));
-String inputLine;
-StringBuffer response = new StringBuffer();
-while ((inputLine = in.readLine()) != null) {
-    response.append(inputLine);
-}
-in.close();
-System.out.println(response.toString());
-
+HttpResponse<String> response = Unirest.post("https://api.bookingexperts.nl/v3/administrations/string/payments")
+  .header("content-type", "application/vnd.api+json")
+  .header("accept", "application/vnd.api+json")
+  .header("accept-language", "en,nl")
+  .header("x-api-key", "API_KEY")
+  .body("{\"data\":{\"type\":\"payment\",\"attributes\":{\"paid_at\":\"2020-06-09\",\"foreign_price\":0,\"memo\":\"string\"},\"relationships\":{\"invoice\":{\"data\":{\"id\":\"string\",\"type\":\"invoice\"},\"links\":{\"related\":\"string\"}}}}}")
+  .asString();
 ```
 
 ```go
 package main
 
 import (
-       "bytes"
-       "net/http"
+	"fmt"
+	"strings"
+	"net/http"
+	"io/ioutil"
 )
 
 func main() {
 
-    headers := map[string][]string{
-        "Content-Type": []string{"application/vnd.api+json"},
-        "Accept": []string{"application/vnd.api+json"},
-        "Accept-Language": []string{"en,nl"},
-        "X-API-KEY": []string{"API_KEY"},
-    }
+	url := "https://api.bookingexperts.nl/v3/administrations/string/payments"
 
-    data := bytes.NewBuffer([]byte{jsonReq})
-    req, err := http.NewRequest("POST", "https://api.bookingexperts.nl/v3/administrations/{administration_id}/payments", data)
-    req.Header = headers
+	payload := strings.NewReader("{\"data\":{\"type\":\"payment\",\"attributes\":{\"paid_at\":\"2020-06-09\",\"foreign_price\":0,\"memo\":\"string\"},\"relationships\":{\"invoice\":{\"data\":{\"id\":\"string\",\"type\":\"invoice\"},\"links\":{\"related\":\"string\"}}}}}")
 
-    client := &http.Client{}
-    resp, err := client.Do(req)
-    // ...
+	req, _ := http.NewRequest("POST", url, payload)
+
+	req.Header.Add("content-type", "application/vnd.api+json")
+	req.Header.Add("accept", "application/vnd.api+json")
+	req.Header.Add("accept-language", "en,nl")
+	req.Header.Add("x-api-key", "API_KEY")
+
+	res, _ := http.DefaultClient.Do(req)
+
+	defer res.Body.Close()
+	body, _ := ioutil.ReadAll(res.Body)
+
+	fmt.Println(res)
+	fmt.Println(string(body))
+
 }
-
 ```
 
 `POST /v3/administrations/{administration_id}/payments`
@@ -3582,7 +3580,7 @@ Create a new payment
   "data": {
     "type": "payment",
     "attributes": {
-      "paid_at": "2020-05-20",
+      "paid_at": "2020-06-09",
       "foreign_price": 0,
       "memo": "string"
     },
@@ -3606,7 +3604,7 @@ Create a new payment
 |Name|In|Type|Required|Description|
 |---|---|---|---|---|
 |administration_id|path|string|true|Administration ID|
-|Accept-Language|header|string|false|Supported languages. A comma separated list with one or more of the following locales: nl, en, de, fr, da, cs, es, tr, pt. Default: 'en'.|
+|Accept-Language|header|string|false|Supported languages. A comma separated list with one or more of the following locales: nl, en, de, fr, da, cs, es, tr, pt, it. Default: 'en'.|
 |send_notification|query|boolean|false|Send a notification to the customer after creation|
 |body|body|object|true|none|
 |» data|body|object|false|none|
@@ -3633,7 +3631,7 @@ Create a new payment
     "id": "1",
     "type": "payment",
     "attributes": {
-      "paid_at": "2020-05-20",
+      "paid_at": "2020-06-09",
       "foreign_price": 0,
       "memo": "string"
     },
@@ -3704,151 +3702,149 @@ ApiKeyAuth, OAuth2
 > Code samples
 
 ```shell
-# You can also use wget
-curl -X GET https://api.bookingexperts.nl/v3/administrations/{administration_id}/payments/{id} \
-  -H 'Accept: application/vnd.api+json' \
-  -H 'Accept-Language: en,nl' \
-  -H 'X-API-KEY: API_KEY'
-
+curl --request GET \
+  --url https://api.bookingexperts.nl/v3/administrations/string/payments/string \
+  --header 'accept: application/vnd.api+json' \
+  --header 'accept-language: en,nl' \
+  --header 'x-api-key: API_KEY'
 ```
 
 ```http
-GET https://api.bookingexperts.nl/v3/administrations/{administration_id}/payments/{id} HTTP/1.1
-Host: api.bookingexperts.nl
+GET /v3/administrations/string/payments/string HTTP/1.1
 Accept: application/vnd.api+json
 Accept-Language: en,nl
+X-Api-Key: API_KEY
+Host: api.bookingexperts.nl
 
 ```
 
 ```javascript
+var data = null;
 
-const headers = {
-  'Accept':'application/vnd.api+json',
-  'Accept-Language':'en,nl',
-  'X-API-KEY':'API_KEY'
-};
+var xhr = new XMLHttpRequest();
+xhr.withCredentials = true;
 
-fetch('https://api.bookingexperts.nl/v3/administrations/{administration_id}/payments/{id}',
-{
-  method: 'GET',
-
-  headers: headers
-})
-.then(function(res) {
-    return res.json();
-}).then(function(body) {
-    console.log(body);
+xhr.addEventListener("readystatechange", function () {
+  if (this.readyState === this.DONE) {
+    console.log(this.responseText);
+  }
 });
 
+xhr.open("GET", "https://api.bookingexperts.nl/v3/administrations/string/payments/string");
+xhr.setRequestHeader("accept", "application/vnd.api+json");
+xhr.setRequestHeader("accept-language", "en,nl");
+xhr.setRequestHeader("x-api-key", "API_KEY");
+
+xhr.send(data);
 ```
 
 ```ruby
-require 'rest-client'
-require 'json'
+require 'uri'
+require 'net/http'
+require 'openssl'
 
-headers = {
-  'Accept' => 'application/vnd.api+json',
-  'Accept-Language' => 'en,nl',
-  'X-API-KEY' => 'API_KEY'
-}
+url = URI("https://api.bookingexperts.nl/v3/administrations/string/payments/string")
 
-result = RestClient.get 'https://api.bookingexperts.nl/v3/administrations/{administration_id}/payments/{id}',
-  params: {
-  }, headers: headers
+http = Net::HTTP.new(url.host, url.port)
+http.use_ssl = true
+http.verify_mode = OpenSSL::SSL::VERIFY_NONE
 
-p JSON.parse(result)
+request = Net::HTTP::Get.new(url)
+request["accept"] = 'application/vnd.api+json'
+request["accept-language"] = 'en,nl'
+request["x-api-key"] = 'API_KEY'
 
+response = http.request(request)
+puts response.read_body
 ```
 
 ```python
-import requests
+import http.client
+
+conn = http.client.HTTPSConnection("api.bookingexperts.nl")
+
 headers = {
-  'Accept': 'application/vnd.api+json',
-  'Accept-Language': 'en,nl',
-  'X-API-KEY': 'API_KEY'
-}
+    'accept': "application/vnd.api+json",
+    'accept-language': "en,nl",
+    'x-api-key': "API_KEY"
+    }
 
-r = requests.get('https://api.bookingexperts.nl/v3/administrations/{administration_id}/payments/{id}', headers = headers)
+conn.request("GET", "/v3/administrations/string/payments/string", headers=headers)
 
-print(r.json())
+res = conn.getresponse()
+data = res.read()
 
+print(data.decode("utf-8"))
 ```
 
 ```php
 <?php
 
-require 'vendor/autoload.php';
+$curl = curl_init();
 
-$headers = array(
-    'Accept' => 'application/vnd.api+json',
-    'Accept-Language' => 'en,nl',
-    'X-API-KEY' => 'API_KEY',
-);
+curl_setopt_array($curl, array(
+  CURLOPT_URL => "https://api.bookingexperts.nl/v3/administrations/string/payments/string",
+  CURLOPT_RETURNTRANSFER => true,
+  CURLOPT_ENCODING => "",
+  CURLOPT_MAXREDIRS => 10,
+  CURLOPT_TIMEOUT => 30,
+  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+  CURLOPT_CUSTOMREQUEST => "GET",
+  CURLOPT_HTTPHEADER => array(
+    "accept: application/vnd.api+json",
+    "accept-language: en,nl",
+    "x-api-key: API_KEY"
+  ),
+));
 
-$client = new \GuzzleHttp\Client();
+$response = curl_exec($curl);
+$err = curl_error($curl);
 
-// Define array of request body.
-$request_body = array();
+curl_close($curl);
 
-try {
-    $response = $client->request('GET','https://api.bookingexperts.nl/v3/administrations/{administration_id}/payments/{id}', array(
-        'headers' => $headers,
-        'json' => $request_body,
-       )
-    );
-    print_r($response->getBody()->getContents());
- }
- catch (\GuzzleHttp\Exception\BadResponseException $e) {
-    // handle exception or api errors.
-    print_r($e->getMessage());
- }
-
- // ...
-
+if ($err) {
+  echo "cURL Error #:" . $err;
+} else {
+  echo $response;
+}
 ```
 
 ```java
-URL obj = new URL("https://api.bookingexperts.nl/v3/administrations/{administration_id}/payments/{id}");
-HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-con.setRequestMethod("GET");
-int responseCode = con.getResponseCode();
-BufferedReader in = new BufferedReader(
-    new InputStreamReader(con.getInputStream()));
-String inputLine;
-StringBuffer response = new StringBuffer();
-while ((inputLine = in.readLine()) != null) {
-    response.append(inputLine);
-}
-in.close();
-System.out.println(response.toString());
-
+HttpResponse<String> response = Unirest.get("https://api.bookingexperts.nl/v3/administrations/string/payments/string")
+  .header("accept", "application/vnd.api+json")
+  .header("accept-language", "en,nl")
+  .header("x-api-key", "API_KEY")
+  .asString();
 ```
 
 ```go
 package main
 
 import (
-       "bytes"
-       "net/http"
+	"fmt"
+	"net/http"
+	"io/ioutil"
 )
 
 func main() {
 
-    headers := map[string][]string{
-        "Accept": []string{"application/vnd.api+json"},
-        "Accept-Language": []string{"en,nl"},
-        "X-API-KEY": []string{"API_KEY"},
-    }
+	url := "https://api.bookingexperts.nl/v3/administrations/string/payments/string"
 
-    data := bytes.NewBuffer([]byte{jsonReq})
-    req, err := http.NewRequest("GET", "https://api.bookingexperts.nl/v3/administrations/{administration_id}/payments/{id}", data)
-    req.Header = headers
+	req, _ := http.NewRequest("GET", url, nil)
 
-    client := &http.Client{}
-    resp, err := client.Do(req)
-    // ...
+	req.Header.Add("accept", "application/vnd.api+json")
+	req.Header.Add("accept-language", "en,nl")
+	req.Header.Add("x-api-key", "API_KEY")
+
+	res, _ := http.DefaultClient.Do(req)
+
+	defer res.Body.Close()
+	body, _ := ioutil.ReadAll(res.Body)
+
+	fmt.Println(res)
+	fmt.Println(string(body))
+
 }
-
 ```
 
 `GET /v3/administrations/{administration_id}/payments/{id}`
@@ -3867,7 +3863,7 @@ Returns the payment for the given ID
 |filter[memo]|query|string|false|Filter on memo|
 |filter[invoice]|query|string|false|Filter on invoice. Specify a comma separated list of IDs to filter on.|
 |include|query|string|false|Includes list. Specify a comma separated list of resources to include.|
-|Accept-Language|header|string|false|Supported languages. A comma separated list with one or more of the following locales: nl, en, de, fr, da, cs, es, tr, pt. Default: 'en'.|
+|Accept-Language|header|string|false|Supported languages. A comma separated list with one or more of the following locales: nl, en, de, fr, da, cs, es, tr, pt, it. Default: 'en'.|
 
 > Example responses
 
@@ -3879,7 +3875,7 @@ Returns the payment for the given ID
     "id": "1",
     "type": "payment",
     "attributes": {
-      "paid_at": "2020-05-20",
+      "paid_at": "2020-06-09",
       "foreign_price": 0,
       "memo": "string"
     },
@@ -3952,151 +3948,149 @@ ApiKeyAuth, OAuth2
 > Code samples
 
 ```shell
-# You can also use wget
-curl -X GET https://api.bookingexperts.nl/v3/administrations/{administration_id}/reservations \
-  -H 'Accept: application/vnd.api+json' \
-  -H 'Accept-Language: en,nl' \
-  -H 'X-API-KEY: API_KEY'
-
+curl --request GET \
+  --url https://api.bookingexperts.nl/v3/administrations/string/reservations \
+  --header 'accept: application/vnd.api+json' \
+  --header 'accept-language: en,nl' \
+  --header 'x-api-key: API_KEY'
 ```
 
 ```http
-GET https://api.bookingexperts.nl/v3/administrations/{administration_id}/reservations HTTP/1.1
-Host: api.bookingexperts.nl
+GET /v3/administrations/string/reservations HTTP/1.1
 Accept: application/vnd.api+json
 Accept-Language: en,nl
+X-Api-Key: API_KEY
+Host: api.bookingexperts.nl
 
 ```
 
 ```javascript
+var data = null;
 
-const headers = {
-  'Accept':'application/vnd.api+json',
-  'Accept-Language':'en,nl',
-  'X-API-KEY':'API_KEY'
-};
+var xhr = new XMLHttpRequest();
+xhr.withCredentials = true;
 
-fetch('https://api.bookingexperts.nl/v3/administrations/{administration_id}/reservations',
-{
-  method: 'GET',
-
-  headers: headers
-})
-.then(function(res) {
-    return res.json();
-}).then(function(body) {
-    console.log(body);
+xhr.addEventListener("readystatechange", function () {
+  if (this.readyState === this.DONE) {
+    console.log(this.responseText);
+  }
 });
 
+xhr.open("GET", "https://api.bookingexperts.nl/v3/administrations/string/reservations");
+xhr.setRequestHeader("accept", "application/vnd.api+json");
+xhr.setRequestHeader("accept-language", "en,nl");
+xhr.setRequestHeader("x-api-key", "API_KEY");
+
+xhr.send(data);
 ```
 
 ```ruby
-require 'rest-client'
-require 'json'
+require 'uri'
+require 'net/http'
+require 'openssl'
 
-headers = {
-  'Accept' => 'application/vnd.api+json',
-  'Accept-Language' => 'en,nl',
-  'X-API-KEY' => 'API_KEY'
-}
+url = URI("https://api.bookingexperts.nl/v3/administrations/string/reservations")
 
-result = RestClient.get 'https://api.bookingexperts.nl/v3/administrations/{administration_id}/reservations',
-  params: {
-  }, headers: headers
+http = Net::HTTP.new(url.host, url.port)
+http.use_ssl = true
+http.verify_mode = OpenSSL::SSL::VERIFY_NONE
 
-p JSON.parse(result)
+request = Net::HTTP::Get.new(url)
+request["accept"] = 'application/vnd.api+json'
+request["accept-language"] = 'en,nl'
+request["x-api-key"] = 'API_KEY'
 
+response = http.request(request)
+puts response.read_body
 ```
 
 ```python
-import requests
+import http.client
+
+conn = http.client.HTTPSConnection("api.bookingexperts.nl")
+
 headers = {
-  'Accept': 'application/vnd.api+json',
-  'Accept-Language': 'en,nl',
-  'X-API-KEY': 'API_KEY'
-}
+    'accept': "application/vnd.api+json",
+    'accept-language': "en,nl",
+    'x-api-key': "API_KEY"
+    }
 
-r = requests.get('https://api.bookingexperts.nl/v3/administrations/{administration_id}/reservations', headers = headers)
+conn.request("GET", "/v3/administrations/string/reservations", headers=headers)
 
-print(r.json())
+res = conn.getresponse()
+data = res.read()
 
+print(data.decode("utf-8"))
 ```
 
 ```php
 <?php
 
-require 'vendor/autoload.php';
+$curl = curl_init();
 
-$headers = array(
-    'Accept' => 'application/vnd.api+json',
-    'Accept-Language' => 'en,nl',
-    'X-API-KEY' => 'API_KEY',
-);
+curl_setopt_array($curl, array(
+  CURLOPT_URL => "https://api.bookingexperts.nl/v3/administrations/string/reservations",
+  CURLOPT_RETURNTRANSFER => true,
+  CURLOPT_ENCODING => "",
+  CURLOPT_MAXREDIRS => 10,
+  CURLOPT_TIMEOUT => 30,
+  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+  CURLOPT_CUSTOMREQUEST => "GET",
+  CURLOPT_HTTPHEADER => array(
+    "accept: application/vnd.api+json",
+    "accept-language: en,nl",
+    "x-api-key: API_KEY"
+  ),
+));
 
-$client = new \GuzzleHttp\Client();
+$response = curl_exec($curl);
+$err = curl_error($curl);
 
-// Define array of request body.
-$request_body = array();
+curl_close($curl);
 
-try {
-    $response = $client->request('GET','https://api.bookingexperts.nl/v3/administrations/{administration_id}/reservations', array(
-        'headers' => $headers,
-        'json' => $request_body,
-       )
-    );
-    print_r($response->getBody()->getContents());
- }
- catch (\GuzzleHttp\Exception\BadResponseException $e) {
-    // handle exception or api errors.
-    print_r($e->getMessage());
- }
-
- // ...
-
+if ($err) {
+  echo "cURL Error #:" . $err;
+} else {
+  echo $response;
+}
 ```
 
 ```java
-URL obj = new URL("https://api.bookingexperts.nl/v3/administrations/{administration_id}/reservations");
-HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-con.setRequestMethod("GET");
-int responseCode = con.getResponseCode();
-BufferedReader in = new BufferedReader(
-    new InputStreamReader(con.getInputStream()));
-String inputLine;
-StringBuffer response = new StringBuffer();
-while ((inputLine = in.readLine()) != null) {
-    response.append(inputLine);
-}
-in.close();
-System.out.println(response.toString());
-
+HttpResponse<String> response = Unirest.get("https://api.bookingexperts.nl/v3/administrations/string/reservations")
+  .header("accept", "application/vnd.api+json")
+  .header("accept-language", "en,nl")
+  .header("x-api-key", "API_KEY")
+  .asString();
 ```
 
 ```go
 package main
 
 import (
-       "bytes"
-       "net/http"
+	"fmt"
+	"net/http"
+	"io/ioutil"
 )
 
 func main() {
 
-    headers := map[string][]string{
-        "Accept": []string{"application/vnd.api+json"},
-        "Accept-Language": []string{"en,nl"},
-        "X-API-KEY": []string{"API_KEY"},
-    }
+	url := "https://api.bookingexperts.nl/v3/administrations/string/reservations"
 
-    data := bytes.NewBuffer([]byte{jsonReq})
-    req, err := http.NewRequest("GET", "https://api.bookingexperts.nl/v3/administrations/{administration_id}/reservations", data)
-    req.Header = headers
+	req, _ := http.NewRequest("GET", url, nil)
 
-    client := &http.Client{}
-    resp, err := client.Do(req)
-    // ...
+	req.Header.Add("accept", "application/vnd.api+json")
+	req.Header.Add("accept-language", "en,nl")
+	req.Header.Add("x-api-key", "API_KEY")
+
+	res, _ := http.DefaultClient.Do(req)
+
+	defer res.Body.Close()
+	body, _ := ioutil.ReadAll(res.Body)
+
+	fmt.Println(res)
+	fmt.Println(string(body))
+
 }
-
 ```
 
 `GET /v3/administrations/{administration_id}/reservations`
@@ -4123,7 +4117,7 @@ Returns all reservations of the administration
 |filter[administration]|query|string|false|Filter on administration. Specify a comma separated list of IDs to filter on.|
 |filter[order]|query|string|false|Filter on order. Specify a comma separated list of IDs to filter on.|
 |include|query|string|false|Includes list. Specify a comma separated list of resources to include.|
-|Accept-Language|header|string|false|Supported languages. A comma separated list with one or more of the following locales: nl, en, de, fr, da, cs, es, tr, pt. Default: 'en'.|
+|Accept-Language|header|string|false|Supported languages. A comma separated list with one or more of the following locales: nl, en, de, fr, da, cs, es, tr, pt, it. Default: 'en'.|
 
 > Example responses
 
@@ -4142,8 +4136,8 @@ Returns all reservations of the administration
         "end_date": "string",
         "state": "string",
         "rentable": "string",
-        "created_at": "2020-05-20T13:12:31Z",
-        "updated_at": "2020-05-20T13:12:31Z"
+        "created_at": "2020-06-09T07:58:26Z",
+        "updated_at": "2020-06-09T07:58:26Z"
       },
       "links": {
         "self": "string"
@@ -4250,151 +4244,149 @@ ApiKeyAuth, OAuth2
 > Code samples
 
 ```shell
-# You can also use wget
-curl -X GET https://api.bookingexperts.nl/v3/administrations/{administration_id}/reservations/{id} \
-  -H 'Accept: application/vnd.api+json' \
-  -H 'Accept-Language: en,nl' \
-  -H 'X-API-KEY: API_KEY'
-
+curl --request GET \
+  --url https://api.bookingexperts.nl/v3/administrations/string/reservations/string \
+  --header 'accept: application/vnd.api+json' \
+  --header 'accept-language: en,nl' \
+  --header 'x-api-key: API_KEY'
 ```
 
 ```http
-GET https://api.bookingexperts.nl/v3/administrations/{administration_id}/reservations/{id} HTTP/1.1
-Host: api.bookingexperts.nl
+GET /v3/administrations/string/reservations/string HTTP/1.1
 Accept: application/vnd.api+json
 Accept-Language: en,nl
+X-Api-Key: API_KEY
+Host: api.bookingexperts.nl
 
 ```
 
 ```javascript
+var data = null;
 
-const headers = {
-  'Accept':'application/vnd.api+json',
-  'Accept-Language':'en,nl',
-  'X-API-KEY':'API_KEY'
-};
+var xhr = new XMLHttpRequest();
+xhr.withCredentials = true;
 
-fetch('https://api.bookingexperts.nl/v3/administrations/{administration_id}/reservations/{id}',
-{
-  method: 'GET',
-
-  headers: headers
-})
-.then(function(res) {
-    return res.json();
-}).then(function(body) {
-    console.log(body);
+xhr.addEventListener("readystatechange", function () {
+  if (this.readyState === this.DONE) {
+    console.log(this.responseText);
+  }
 });
 
+xhr.open("GET", "https://api.bookingexperts.nl/v3/administrations/string/reservations/string");
+xhr.setRequestHeader("accept", "application/vnd.api+json");
+xhr.setRequestHeader("accept-language", "en,nl");
+xhr.setRequestHeader("x-api-key", "API_KEY");
+
+xhr.send(data);
 ```
 
 ```ruby
-require 'rest-client'
-require 'json'
+require 'uri'
+require 'net/http'
+require 'openssl'
 
-headers = {
-  'Accept' => 'application/vnd.api+json',
-  'Accept-Language' => 'en,nl',
-  'X-API-KEY' => 'API_KEY'
-}
+url = URI("https://api.bookingexperts.nl/v3/administrations/string/reservations/string")
 
-result = RestClient.get 'https://api.bookingexperts.nl/v3/administrations/{administration_id}/reservations/{id}',
-  params: {
-  }, headers: headers
+http = Net::HTTP.new(url.host, url.port)
+http.use_ssl = true
+http.verify_mode = OpenSSL::SSL::VERIFY_NONE
 
-p JSON.parse(result)
+request = Net::HTTP::Get.new(url)
+request["accept"] = 'application/vnd.api+json'
+request["accept-language"] = 'en,nl'
+request["x-api-key"] = 'API_KEY'
 
+response = http.request(request)
+puts response.read_body
 ```
 
 ```python
-import requests
+import http.client
+
+conn = http.client.HTTPSConnection("api.bookingexperts.nl")
+
 headers = {
-  'Accept': 'application/vnd.api+json',
-  'Accept-Language': 'en,nl',
-  'X-API-KEY': 'API_KEY'
-}
+    'accept': "application/vnd.api+json",
+    'accept-language': "en,nl",
+    'x-api-key': "API_KEY"
+    }
 
-r = requests.get('https://api.bookingexperts.nl/v3/administrations/{administration_id}/reservations/{id}', headers = headers)
+conn.request("GET", "/v3/administrations/string/reservations/string", headers=headers)
 
-print(r.json())
+res = conn.getresponse()
+data = res.read()
 
+print(data.decode("utf-8"))
 ```
 
 ```php
 <?php
 
-require 'vendor/autoload.php';
+$curl = curl_init();
 
-$headers = array(
-    'Accept' => 'application/vnd.api+json',
-    'Accept-Language' => 'en,nl',
-    'X-API-KEY' => 'API_KEY',
-);
+curl_setopt_array($curl, array(
+  CURLOPT_URL => "https://api.bookingexperts.nl/v3/administrations/string/reservations/string",
+  CURLOPT_RETURNTRANSFER => true,
+  CURLOPT_ENCODING => "",
+  CURLOPT_MAXREDIRS => 10,
+  CURLOPT_TIMEOUT => 30,
+  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+  CURLOPT_CUSTOMREQUEST => "GET",
+  CURLOPT_HTTPHEADER => array(
+    "accept: application/vnd.api+json",
+    "accept-language: en,nl",
+    "x-api-key: API_KEY"
+  ),
+));
 
-$client = new \GuzzleHttp\Client();
+$response = curl_exec($curl);
+$err = curl_error($curl);
 
-// Define array of request body.
-$request_body = array();
+curl_close($curl);
 
-try {
-    $response = $client->request('GET','https://api.bookingexperts.nl/v3/administrations/{administration_id}/reservations/{id}', array(
-        'headers' => $headers,
-        'json' => $request_body,
-       )
-    );
-    print_r($response->getBody()->getContents());
- }
- catch (\GuzzleHttp\Exception\BadResponseException $e) {
-    // handle exception or api errors.
-    print_r($e->getMessage());
- }
-
- // ...
-
+if ($err) {
+  echo "cURL Error #:" . $err;
+} else {
+  echo $response;
+}
 ```
 
 ```java
-URL obj = new URL("https://api.bookingexperts.nl/v3/administrations/{administration_id}/reservations/{id}");
-HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-con.setRequestMethod("GET");
-int responseCode = con.getResponseCode();
-BufferedReader in = new BufferedReader(
-    new InputStreamReader(con.getInputStream()));
-String inputLine;
-StringBuffer response = new StringBuffer();
-while ((inputLine = in.readLine()) != null) {
-    response.append(inputLine);
-}
-in.close();
-System.out.println(response.toString());
-
+HttpResponse<String> response = Unirest.get("https://api.bookingexperts.nl/v3/administrations/string/reservations/string")
+  .header("accept", "application/vnd.api+json")
+  .header("accept-language", "en,nl")
+  .header("x-api-key", "API_KEY")
+  .asString();
 ```
 
 ```go
 package main
 
 import (
-       "bytes"
-       "net/http"
+	"fmt"
+	"net/http"
+	"io/ioutil"
 )
 
 func main() {
 
-    headers := map[string][]string{
-        "Accept": []string{"application/vnd.api+json"},
-        "Accept-Language": []string{"en,nl"},
-        "X-API-KEY": []string{"API_KEY"},
-    }
+	url := "https://api.bookingexperts.nl/v3/administrations/string/reservations/string"
 
-    data := bytes.NewBuffer([]byte{jsonReq})
-    req, err := http.NewRequest("GET", "https://api.bookingexperts.nl/v3/administrations/{administration_id}/reservations/{id}", data)
-    req.Header = headers
+	req, _ := http.NewRequest("GET", url, nil)
 
-    client := &http.Client{}
-    resp, err := client.Do(req)
-    // ...
+	req.Header.Add("accept", "application/vnd.api+json")
+	req.Header.Add("accept-language", "en,nl")
+	req.Header.Add("x-api-key", "API_KEY")
+
+	res, _ := http.DefaultClient.Do(req)
+
+	defer res.Body.Close()
+	body, _ := ioutil.ReadAll(res.Body)
+
+	fmt.Println(res)
+	fmt.Println(string(body))
+
 }
-
 ```
 
 `GET /v3/administrations/{administration_id}/reservations/{id}`
@@ -4419,7 +4411,7 @@ Returns a reservation
 |filter[administration]|query|string|false|Filter on administration. Specify a comma separated list of IDs to filter on.|
 |filter[order]|query|string|false|Filter on order. Specify a comma separated list of IDs to filter on.|
 |include|query|string|false|Includes list. Specify a comma separated list of resources to include.|
-|Accept-Language|header|string|false|Supported languages. A comma separated list with one or more of the following locales: nl, en, de, fr, da, cs, es, tr, pt. Default: 'en'.|
+|Accept-Language|header|string|false|Supported languages. A comma separated list with one or more of the following locales: nl, en, de, fr, da, cs, es, tr, pt, it. Default: 'en'.|
 
 > Example responses
 
@@ -4437,8 +4429,8 @@ Returns a reservation
       "end_date": "string",
       "state": "string",
       "rentable": "string",
-      "created_at": "2020-05-20T13:12:31Z",
-      "updated_at": "2020-05-20T13:12:31Z"
+      "created_at": "2020-06-09T07:58:26Z",
+      "updated_at": "2020-06-09T07:58:26Z"
     },
     "links": {
       "self": "string"
@@ -4534,151 +4526,149 @@ ApiKeyAuth, OAuth2
 > Code samples
 
 ```shell
-# You can also use wget
-curl -X GET https://api.bookingexperts.nl/v3/subscription \
-  -H 'Accept: application/vnd.api+json' \
-  -H 'Accept-Language: en,nl' \
-  -H 'X-API-KEY: API_KEY'
-
+curl --request GET \
+  --url https://api.bookingexperts.nl/v3/subscription \
+  --header 'accept: application/vnd.api+json' \
+  --header 'accept-language: en,nl' \
+  --header 'x-api-key: API_KEY'
 ```
 
 ```http
-GET https://api.bookingexperts.nl/v3/subscription HTTP/1.1
-Host: api.bookingexperts.nl
+GET /v3/subscription HTTP/1.1
 Accept: application/vnd.api+json
 Accept-Language: en,nl
+X-Api-Key: API_KEY
+Host: api.bookingexperts.nl
 
 ```
 
 ```javascript
+var data = null;
 
-const headers = {
-  'Accept':'application/vnd.api+json',
-  'Accept-Language':'en,nl',
-  'X-API-KEY':'API_KEY'
-};
+var xhr = new XMLHttpRequest();
+xhr.withCredentials = true;
 
-fetch('https://api.bookingexperts.nl/v3/subscription',
-{
-  method: 'GET',
-
-  headers: headers
-})
-.then(function(res) {
-    return res.json();
-}).then(function(body) {
-    console.log(body);
+xhr.addEventListener("readystatechange", function () {
+  if (this.readyState === this.DONE) {
+    console.log(this.responseText);
+  }
 });
 
+xhr.open("GET", "https://api.bookingexperts.nl/v3/subscription");
+xhr.setRequestHeader("accept", "application/vnd.api+json");
+xhr.setRequestHeader("accept-language", "en,nl");
+xhr.setRequestHeader("x-api-key", "API_KEY");
+
+xhr.send(data);
 ```
 
 ```ruby
-require 'rest-client'
-require 'json'
+require 'uri'
+require 'net/http'
+require 'openssl'
 
-headers = {
-  'Accept' => 'application/vnd.api+json',
-  'Accept-Language' => 'en,nl',
-  'X-API-KEY' => 'API_KEY'
-}
+url = URI("https://api.bookingexperts.nl/v3/subscription")
 
-result = RestClient.get 'https://api.bookingexperts.nl/v3/subscription',
-  params: {
-  }, headers: headers
+http = Net::HTTP.new(url.host, url.port)
+http.use_ssl = true
+http.verify_mode = OpenSSL::SSL::VERIFY_NONE
 
-p JSON.parse(result)
+request = Net::HTTP::Get.new(url)
+request["accept"] = 'application/vnd.api+json'
+request["accept-language"] = 'en,nl'
+request["x-api-key"] = 'API_KEY'
 
+response = http.request(request)
+puts response.read_body
 ```
 
 ```python
-import requests
+import http.client
+
+conn = http.client.HTTPSConnection("api.bookingexperts.nl")
+
 headers = {
-  'Accept': 'application/vnd.api+json',
-  'Accept-Language': 'en,nl',
-  'X-API-KEY': 'API_KEY'
-}
+    'accept': "application/vnd.api+json",
+    'accept-language': "en,nl",
+    'x-api-key': "API_KEY"
+    }
 
-r = requests.get('https://api.bookingexperts.nl/v3/subscription', headers = headers)
+conn.request("GET", "/v3/subscription", headers=headers)
 
-print(r.json())
+res = conn.getresponse()
+data = res.read()
 
+print(data.decode("utf-8"))
 ```
 
 ```php
 <?php
 
-require 'vendor/autoload.php';
+$curl = curl_init();
 
-$headers = array(
-    'Accept' => 'application/vnd.api+json',
-    'Accept-Language' => 'en,nl',
-    'X-API-KEY' => 'API_KEY',
-);
+curl_setopt_array($curl, array(
+  CURLOPT_URL => "https://api.bookingexperts.nl/v3/subscription",
+  CURLOPT_RETURNTRANSFER => true,
+  CURLOPT_ENCODING => "",
+  CURLOPT_MAXREDIRS => 10,
+  CURLOPT_TIMEOUT => 30,
+  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+  CURLOPT_CUSTOMREQUEST => "GET",
+  CURLOPT_HTTPHEADER => array(
+    "accept: application/vnd.api+json",
+    "accept-language: en,nl",
+    "x-api-key: API_KEY"
+  ),
+));
 
-$client = new \GuzzleHttp\Client();
+$response = curl_exec($curl);
+$err = curl_error($curl);
 
-// Define array of request body.
-$request_body = array();
+curl_close($curl);
 
-try {
-    $response = $client->request('GET','https://api.bookingexperts.nl/v3/subscription', array(
-        'headers' => $headers,
-        'json' => $request_body,
-       )
-    );
-    print_r($response->getBody()->getContents());
- }
- catch (\GuzzleHttp\Exception\BadResponseException $e) {
-    // handle exception or api errors.
-    print_r($e->getMessage());
- }
-
- // ...
-
+if ($err) {
+  echo "cURL Error #:" . $err;
+} else {
+  echo $response;
+}
 ```
 
 ```java
-URL obj = new URL("https://api.bookingexperts.nl/v3/subscription");
-HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-con.setRequestMethod("GET");
-int responseCode = con.getResponseCode();
-BufferedReader in = new BufferedReader(
-    new InputStreamReader(con.getInputStream()));
-String inputLine;
-StringBuffer response = new StringBuffer();
-while ((inputLine = in.readLine()) != null) {
-    response.append(inputLine);
-}
-in.close();
-System.out.println(response.toString());
-
+HttpResponse<String> response = Unirest.get("https://api.bookingexperts.nl/v3/subscription")
+  .header("accept", "application/vnd.api+json")
+  .header("accept-language", "en,nl")
+  .header("x-api-key", "API_KEY")
+  .asString();
 ```
 
 ```go
 package main
 
 import (
-       "bytes"
-       "net/http"
+	"fmt"
+	"net/http"
+	"io/ioutil"
 )
 
 func main() {
 
-    headers := map[string][]string{
-        "Accept": []string{"application/vnd.api+json"},
-        "Accept-Language": []string{"en,nl"},
-        "X-API-KEY": []string{"API_KEY"},
-    }
+	url := "https://api.bookingexperts.nl/v3/subscription"
 
-    data := bytes.NewBuffer([]byte{jsonReq})
-    req, err := http.NewRequest("GET", "https://api.bookingexperts.nl/v3/subscription", data)
-    req.Header = headers
+	req, _ := http.NewRequest("GET", url, nil)
 
-    client := &http.Client{}
-    resp, err := client.Do(req)
-    // ...
+	req.Header.Add("accept", "application/vnd.api+json")
+	req.Header.Add("accept-language", "en,nl")
+	req.Header.Add("x-api-key", "API_KEY")
+
+	res, _ := http.DefaultClient.Do(req)
+
+	defer res.Body.Close()
+	body, _ := ioutil.ReadAll(res.Body)
+
+	fmt.Println(res)
+	fmt.Println(string(body))
+
 }
-
 ```
 
 `GET /v3/subscription`
@@ -4697,7 +4687,7 @@ Returns the subscription of the current organization
 |filter[organization]|query|string|false|Filter on organization. Specify a comma separated list of IDs to filter on.|
 |filter[administration_subscriptions]|query|string|false|Filter on administration_subscriptions. Specify a comma separated list of IDs to filter on.|
 |include|query|string|false|Includes list. Specify a comma separated list of resources to include.|
-|Accept-Language|header|string|false|Supported languages. A comma separated list with one or more of the following locales: nl, en, de, fr, da, cs, es, tr, pt. Default: 'en'.|
+|Accept-Language|header|string|false|Supported languages. A comma separated list with one or more of the following locales: nl, en, de, fr, da, cs, es, tr, pt, it. Default: 'en'.|
 
 > Example responses
 
@@ -4711,8 +4701,8 @@ Returns the subscription of the current organization
     "attributes": {
       "authorized": "string",
       "user_locale": "string",
-      "created_at": "2020-05-20T13:12:31Z",
-      "updated_at": "2020-05-20T13:12:31Z"
+      "created_at": "2020-06-09T07:58:26Z",
+      "updated_at": "2020-06-09T07:58:26Z"
     },
     "links": {
       "self": "string",
@@ -4803,156 +4793,154 @@ ApiKeyAuth, OAuth2
 > Code samples
 
 ```shell
-# You can also use wget
-curl -X GET https://api.bookingexperts.nl/v3/subscription/webhook_endpoints \
-  -H 'Accept: application/vnd.api+json' \
-  -H 'Accept-Language: en,nl' \
-  -H 'X-API-KEY: API_KEY'
-
+curl --request GET \
+  --url https://api.bookingexperts.nl/v3/webhook_endpoints \
+  --header 'accept: application/vnd.api+json' \
+  --header 'accept-language: en,nl' \
+  --header 'x-api-key: API_KEY'
 ```
 
 ```http
-GET https://api.bookingexperts.nl/v3/subscription/webhook_endpoints HTTP/1.1
-Host: api.bookingexperts.nl
+GET /v3/webhook_endpoints HTTP/1.1
 Accept: application/vnd.api+json
 Accept-Language: en,nl
+X-Api-Key: API_KEY
+Host: api.bookingexperts.nl
 
 ```
 
 ```javascript
+var data = null;
 
-const headers = {
-  'Accept':'application/vnd.api+json',
-  'Accept-Language':'en,nl',
-  'X-API-KEY':'API_KEY'
-};
+var xhr = new XMLHttpRequest();
+xhr.withCredentials = true;
 
-fetch('https://api.bookingexperts.nl/v3/subscription/webhook_endpoints',
-{
-  method: 'GET',
-
-  headers: headers
-})
-.then(function(res) {
-    return res.json();
-}).then(function(body) {
-    console.log(body);
+xhr.addEventListener("readystatechange", function () {
+  if (this.readyState === this.DONE) {
+    console.log(this.responseText);
+  }
 });
 
+xhr.open("GET", "https://api.bookingexperts.nl/v3/webhook_endpoints");
+xhr.setRequestHeader("accept", "application/vnd.api+json");
+xhr.setRequestHeader("accept-language", "en,nl");
+xhr.setRequestHeader("x-api-key", "API_KEY");
+
+xhr.send(data);
 ```
 
 ```ruby
-require 'rest-client'
-require 'json'
+require 'uri'
+require 'net/http'
+require 'openssl'
 
-headers = {
-  'Accept' => 'application/vnd.api+json',
-  'Accept-Language' => 'en,nl',
-  'X-API-KEY' => 'API_KEY'
-}
+url = URI("https://api.bookingexperts.nl/v3/webhook_endpoints")
 
-result = RestClient.get 'https://api.bookingexperts.nl/v3/subscription/webhook_endpoints',
-  params: {
-  }, headers: headers
+http = Net::HTTP.new(url.host, url.port)
+http.use_ssl = true
+http.verify_mode = OpenSSL::SSL::VERIFY_NONE
 
-p JSON.parse(result)
+request = Net::HTTP::Get.new(url)
+request["accept"] = 'application/vnd.api+json'
+request["accept-language"] = 'en,nl'
+request["x-api-key"] = 'API_KEY'
 
+response = http.request(request)
+puts response.read_body
 ```
 
 ```python
-import requests
+import http.client
+
+conn = http.client.HTTPSConnection("api.bookingexperts.nl")
+
 headers = {
-  'Accept': 'application/vnd.api+json',
-  'Accept-Language': 'en,nl',
-  'X-API-KEY': 'API_KEY'
-}
+    'accept': "application/vnd.api+json",
+    'accept-language': "en,nl",
+    'x-api-key': "API_KEY"
+    }
 
-r = requests.get('https://api.bookingexperts.nl/v3/subscription/webhook_endpoints', headers = headers)
+conn.request("GET", "/v3/webhook_endpoints", headers=headers)
 
-print(r.json())
+res = conn.getresponse()
+data = res.read()
 
+print(data.decode("utf-8"))
 ```
 
 ```php
 <?php
 
-require 'vendor/autoload.php';
+$curl = curl_init();
 
-$headers = array(
-    'Accept' => 'application/vnd.api+json',
-    'Accept-Language' => 'en,nl',
-    'X-API-KEY' => 'API_KEY',
-);
+curl_setopt_array($curl, array(
+  CURLOPT_URL => "https://api.bookingexperts.nl/v3/webhook_endpoints",
+  CURLOPT_RETURNTRANSFER => true,
+  CURLOPT_ENCODING => "",
+  CURLOPT_MAXREDIRS => 10,
+  CURLOPT_TIMEOUT => 30,
+  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+  CURLOPT_CUSTOMREQUEST => "GET",
+  CURLOPT_HTTPHEADER => array(
+    "accept: application/vnd.api+json",
+    "accept-language: en,nl",
+    "x-api-key: API_KEY"
+  ),
+));
 
-$client = new \GuzzleHttp\Client();
+$response = curl_exec($curl);
+$err = curl_error($curl);
 
-// Define array of request body.
-$request_body = array();
+curl_close($curl);
 
-try {
-    $response = $client->request('GET','https://api.bookingexperts.nl/v3/subscription/webhook_endpoints', array(
-        'headers' => $headers,
-        'json' => $request_body,
-       )
-    );
-    print_r($response->getBody()->getContents());
- }
- catch (\GuzzleHttp\Exception\BadResponseException $e) {
-    // handle exception or api errors.
-    print_r($e->getMessage());
- }
-
- // ...
-
+if ($err) {
+  echo "cURL Error #:" . $err;
+} else {
+  echo $response;
+}
 ```
 
 ```java
-URL obj = new URL("https://api.bookingexperts.nl/v3/subscription/webhook_endpoints");
-HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-con.setRequestMethod("GET");
-int responseCode = con.getResponseCode();
-BufferedReader in = new BufferedReader(
-    new InputStreamReader(con.getInputStream()));
-String inputLine;
-StringBuffer response = new StringBuffer();
-while ((inputLine = in.readLine()) != null) {
-    response.append(inputLine);
-}
-in.close();
-System.out.println(response.toString());
-
+HttpResponse<String> response = Unirest.get("https://api.bookingexperts.nl/v3/webhook_endpoints")
+  .header("accept", "application/vnd.api+json")
+  .header("accept-language", "en,nl")
+  .header("x-api-key", "API_KEY")
+  .asString();
 ```
 
 ```go
 package main
 
 import (
-       "bytes"
-       "net/http"
+	"fmt"
+	"net/http"
+	"io/ioutil"
 )
 
 func main() {
 
-    headers := map[string][]string{
-        "Accept": []string{"application/vnd.api+json"},
-        "Accept-Language": []string{"en,nl"},
-        "X-API-KEY": []string{"API_KEY"},
-    }
+	url := "https://api.bookingexperts.nl/v3/webhook_endpoints"
 
-    data := bytes.NewBuffer([]byte{jsonReq})
-    req, err := http.NewRequest("GET", "https://api.bookingexperts.nl/v3/subscription/webhook_endpoints", data)
-    req.Header = headers
+	req, _ := http.NewRequest("GET", url, nil)
 
-    client := &http.Client{}
-    resp, err := client.Do(req)
-    // ...
+	req.Header.Add("accept", "application/vnd.api+json")
+	req.Header.Add("accept-language", "en,nl")
+	req.Header.Add("x-api-key", "API_KEY")
+
+	res, _ := http.DefaultClient.Do(req)
+
+	defer res.Body.Close()
+	body, _ := ioutil.ReadAll(res.Body)
+
+	fmt.Println(res)
+	fmt.Println(string(body))
+
 }
-
 ```
 
-`GET /v3/subscription/webhook_endpoints`
+`GET /v3/webhook_endpoints`
 
-Returns the webhook endpoints you have registered for the current subscription
+Returns the webhook endpoints you have registered for the current application
 
 <h3 id="get-webhook-endpoints-parameters">Parameters</h3>
 
@@ -4967,7 +4955,7 @@ Returns the webhook endpoints you have registered for the current subscription
 |filter[events]|query|string|false|Filter on events|
 |filter[created_at]|query|string|false|Filter on created_at|
 |filter[updated_at]|query|string|false|Filter on updated_at|
-|Accept-Language|header|string|false|Supported languages. A comma separated list with one or more of the following locales: nl, en, de, fr, da, cs, es, tr, pt. Default: 'en'.|
+|Accept-Language|header|string|false|Supported languages. A comma separated list with one or more of the following locales: nl, en, de, fr, da, cs, es, tr, pt, it. Default: 'en'.|
 
 > Example responses
 
@@ -4987,8 +4975,8 @@ Returns the webhook endpoints you have registered for the current subscription
           "reservation|updated",
           "reservation|deleted"
         ],
-        "created_at": "2020-05-20T13:12:31Z",
-        "updated_at": "2020-05-20T13:12:31Z"
+        "created_at": "2020-06-09T07:58:26Z",
+        "updated_at": "2020-06-09T07:58:26Z"
       },
       "links": {
         "self": "string"
@@ -5024,7 +5012,7 @@ Status Code **200**
 |»» attributes|object|false|none|Attributes|
 |»»» target_url|string|false|none|none|
 |»»» confirm_strategy|string|false|none|One of: wait_for_success, fire_and_forget|
-|»»» events|[string]|false|none|One or more of:<br><br>* accommodation_subtype|created<br>* accommodation_subtype|deleted<br>* accommodation_subtype|updated<br>* administration|created<br>* administration|deleted<br>* administration|updated<br>* agenda_period|created<br>* agenda_period|deleted<br>* agenda_period|updated<br>* area_type|created<br>* area_type|deleted<br>* area_type|updated<br>* arrival_checkout_date|created<br>* arrival_checkout_date|deleted<br>* arrival_checkout_date|updated<br>* category_group|created<br>* category_group|deleted<br>* category_group|updated<br>* category|created<br>* category|deleted<br>* category|reindexed<br>* category|updated<br>* channel|created<br>* channel|deleted<br>* channel|updated<br>* cost|created<br>* cost|deleted<br>* cost|updated<br>* coupon|created<br>* coupon|deleted<br>* coupon|updated<br>* currency_conversion|created<br>* currency_conversion|deleted<br>* currency_conversion|updated<br>* discount_action|created<br>* discount_action|deleted<br>* discount_action|updated<br>* extra|created<br>* extra|deleted<br>* extra|updated<br>* invoice|created<br>* invoice|deleted<br>* invoice|updated<br>* organization|created<br>* organization|deleted<br>* organization|updated<br>* package_entry|created<br>* package_entry|deleted<br>* package_entry|updated<br>* package|created<br>* package|deleted<br>* package|updated<br>* payment_method|created<br>* payment_method|deleted<br>* payment_method|updated<br>* period|created<br>* period|deleted<br>* period|updated<br>* rentable_identity|created<br>* rentable_identity|deleted<br>* rentable_identity|updated<br>* rentable|created<br>* rentable|deleted<br>* rentable|updated<br>* reservation|cancelled<br>* reservation|confirmed<br>* reservation|created<br>* reservation|deleted<br>* reservation|updated<br>* review|created<br>* review|deleted<br>* review|updated<br>* room_type|created<br>* room_type|deleted<br>* room_type|updated<br>* room|created<br>* room|deleted<br>* room|updated<br>* subscription|created<br>* subscription|deleted<br>* subscription|updated<br>* terms|created<br>* terms|deleted<br>* terms|updated|
+|»»» events|[string]|false|none|One or more of:<br><br>* accommodation_subtype|created<br>* accommodation_subtype|deleted<br>* accommodation_subtype|updated<br>* administration|created<br>* administration|deleted<br>* administration|updated<br>* agenda_period|created<br>* agenda_period|deleted<br>* agenda_period|updated<br>* area_type|created<br>* area_type|deleted<br>* area_type|updated<br>* arrival_checkout_date|created<br>* arrival_checkout_date|deleted<br>* arrival_checkout_date|updated<br>* category_group|created<br>* category_group|deleted<br>* category_group|updated<br>* category|created<br>* category|deleted<br>* category|reindexed<br>* category|updated<br>* channel|created<br>* channel|deleted<br>* channel|updated<br>* city|created<br>* city|deleted<br>* city|updated<br>* cost|created<br>* cost|deleted<br>* cost|updated<br>* currency_conversion|created<br>* currency_conversion|deleted<br>* currency_conversion|updated<br>* discount_action|created<br>* discount_action|deleted<br>* discount_action|updated<br>* extra|created<br>* extra|deleted<br>* extra|updated<br>* invoice|created<br>* invoice|deleted<br>* invoice|updated<br>* organization|created<br>* organization|deleted<br>* organization|updated<br>* package_entry|created<br>* package_entry|deleted<br>* package_entry|updated<br>* package|created<br>* package|deleted<br>* package|updated<br>* payment_method|created<br>* payment_method|deleted<br>* payment_method|updated<br>* payment|created<br>* payment|deleted<br>* payment|updated<br>* period|created<br>* period|deleted<br>* period|updated<br>* region|created<br>* region|deleted<br>* region|updated<br>* rentable_identity|created<br>* rentable_identity|deleted<br>* rentable_identity|updated<br>* rentable|created<br>* rentable|deleted<br>* rentable|updated<br>* reservation|cancelled<br>* reservation|confirmed<br>* reservation|created<br>* reservation|deleted<br>* reservation|updated<br>* review|created<br>* review|deleted<br>* review|updated<br>* room_type|created<br>* room_type|deleted<br>* room_type|updated<br>* room|created<br>* room|deleted<br>* room|updated<br>* subscription|created<br>* subscription|deleted<br>* subscription|updated<br>* terms|created<br>* terms|deleted<br>* terms|updated|
 |»»» created_at|string(date-time)|false|none|none|
 |»»» updated_at|string(date-time)|false|none|none|
 |»» links|object|false|none|Links|
@@ -5059,176 +5047,173 @@ ApiKeyAuth, OAuth2
 > Code samples
 
 ```shell
-# You can also use wget
-curl -X POST https://api.bookingexperts.nl/v3/subscription/webhook_endpoints \
-  -H 'Content-Type: application/vnd.api+json' \
-  -H 'Accept: application/vnd.api+json' \
-  -H 'Accept-Language: en,nl' \
-  -H 'X-API-KEY: API_KEY'
-
+curl --request POST \
+  --url https://api.bookingexperts.nl/v3/webhook_endpoints \
+  --header 'accept: application/vnd.api+json' \
+  --header 'accept-language: en,nl' \
+  --header 'content-type: application/vnd.api+json' \
+  --header 'x-api-key: API_KEY' \
+  --data '{"data":{"type":"webhook_endpoint","attributes":{"target_url":"https://myapp.lvh.me:3000/callback","confirm_strategy":"wait_for_success","events":["reservation|created","reservation|updated","reservation|deleted"]}}}'
 ```
 
 ```http
-POST https://api.bookingexperts.nl/v3/subscription/webhook_endpoints HTTP/1.1
-Host: api.bookingexperts.nl
+POST /v3/webhook_endpoints HTTP/1.1
 Content-Type: application/vnd.api+json
 Accept: application/vnd.api+json
 Accept-Language: en,nl
+X-Api-Key: API_KEY
+Host: api.bookingexperts.nl
+Content-Length: 216
 
+{"data":{"type":"webhook_endpoint","attributes":{"target_url":"https://myapp.lvh.me:3000/callback","confirm_strategy":"wait_for_success","events":["reservation|created","reservation|updated","reservation|deleted"]}}}
 ```
 
 ```javascript
-const inputBody = '{
-  "data": {
-    "type": "webhook_endpoint",
-    "attributes": {
-      "target_url": "https://myapp.lvh.me:3000/callback",
-      "confirm_strategy": "wait_for_success",
-      "events": [
-        "reservation|created",
-        "reservation|updated",
-        "reservation|deleted"
-      ]
-    }
-  }
-}';
-const headers = {
-  'Content-Type':'application/vnd.api+json',
-  'Accept':'application/vnd.api+json',
-  'Accept-Language':'en,nl',
-  'X-API-KEY':'API_KEY'
-};
+var data = "{\"data\":{\"type\":\"webhook_endpoint\",\"attributes\":{\"target_url\":\"https://myapp.lvh.me:3000/callback\",\"confirm_strategy\":\"wait_for_success\",\"events\":[\"reservation|created\",\"reservation|updated\",\"reservation|deleted\"]}}}";
 
-fetch('https://api.bookingexperts.nl/v3/subscription/webhook_endpoints',
-{
-  method: 'POST',
-  body: inputBody,
-  headers: headers
-})
-.then(function(res) {
-    return res.json();
-}).then(function(body) {
-    console.log(body);
+var xhr = new XMLHttpRequest();
+xhr.withCredentials = true;
+
+xhr.addEventListener("readystatechange", function () {
+  if (this.readyState === this.DONE) {
+    console.log(this.responseText);
+  }
 });
 
+xhr.open("POST", "https://api.bookingexperts.nl/v3/webhook_endpoints");
+xhr.setRequestHeader("content-type", "application/vnd.api+json");
+xhr.setRequestHeader("accept", "application/vnd.api+json");
+xhr.setRequestHeader("accept-language", "en,nl");
+xhr.setRequestHeader("x-api-key", "API_KEY");
+
+xhr.send(data);
 ```
 
 ```ruby
-require 'rest-client'
-require 'json'
+require 'uri'
+require 'net/http'
+require 'openssl'
 
-headers = {
-  'Content-Type' => 'application/vnd.api+json',
-  'Accept' => 'application/vnd.api+json',
-  'Accept-Language' => 'en,nl',
-  'X-API-KEY' => 'API_KEY'
-}
+url = URI("https://api.bookingexperts.nl/v3/webhook_endpoints")
 
-result = RestClient.post 'https://api.bookingexperts.nl/v3/subscription/webhook_endpoints',
-  params: {
-  }, headers: headers
+http = Net::HTTP.new(url.host, url.port)
+http.use_ssl = true
+http.verify_mode = OpenSSL::SSL::VERIFY_NONE
 
-p JSON.parse(result)
+request = Net::HTTP::Post.new(url)
+request["content-type"] = 'application/vnd.api+json'
+request["accept"] = 'application/vnd.api+json'
+request["accept-language"] = 'en,nl'
+request["x-api-key"] = 'API_KEY'
+request.body = "{\"data\":{\"type\":\"webhook_endpoint\",\"attributes\":{\"target_url\":\"https://myapp.lvh.me:3000/callback\",\"confirm_strategy\":\"wait_for_success\",\"events\":[\"reservation|created\",\"reservation|updated\",\"reservation|deleted\"]}}}"
 
+response = http.request(request)
+puts response.read_body
 ```
 
 ```python
-import requests
+import http.client
+
+conn = http.client.HTTPSConnection("api.bookingexperts.nl")
+
+payload = "{\"data\":{\"type\":\"webhook_endpoint\",\"attributes\":{\"target_url\":\"https://myapp.lvh.me:3000/callback\",\"confirm_strategy\":\"wait_for_success\",\"events\":[\"reservation|created\",\"reservation|updated\",\"reservation|deleted\"]}}}"
+
 headers = {
-  'Content-Type': 'application/vnd.api+json',
-  'Accept': 'application/vnd.api+json',
-  'Accept-Language': 'en,nl',
-  'X-API-KEY': 'API_KEY'
-}
+    'content-type': "application/vnd.api+json",
+    'accept': "application/vnd.api+json",
+    'accept-language': "en,nl",
+    'x-api-key': "API_KEY"
+    }
 
-r = requests.post('https://api.bookingexperts.nl/v3/subscription/webhook_endpoints', headers = headers)
+conn.request("POST", "/v3/webhook_endpoints", payload, headers)
 
-print(r.json())
+res = conn.getresponse()
+data = res.read()
 
+print(data.decode("utf-8"))
 ```
 
 ```php
 <?php
 
-require 'vendor/autoload.php';
+$curl = curl_init();
 
-$headers = array(
-    'Content-Type' => 'application/vnd.api+json',
-    'Accept' => 'application/vnd.api+json',
-    'Accept-Language' => 'en,nl',
-    'X-API-KEY' => 'API_KEY',
-);
+curl_setopt_array($curl, array(
+  CURLOPT_URL => "https://api.bookingexperts.nl/v3/webhook_endpoints",
+  CURLOPT_RETURNTRANSFER => true,
+  CURLOPT_ENCODING => "",
+  CURLOPT_MAXREDIRS => 10,
+  CURLOPT_TIMEOUT => 30,
+  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+  CURLOPT_CUSTOMREQUEST => "POST",
+  CURLOPT_POSTFIELDS => "{\"data\":{\"type\":\"webhook_endpoint\",\"attributes\":{\"target_url\":\"https://myapp.lvh.me:3000/callback\",\"confirm_strategy\":\"wait_for_success\",\"events\":[\"reservation|created\",\"reservation|updated\",\"reservation|deleted\"]}}}",
+  CURLOPT_HTTPHEADER => array(
+    "accept: application/vnd.api+json",
+    "accept-language: en,nl",
+    "content-type: application/vnd.api+json",
+    "x-api-key: API_KEY"
+  ),
+));
 
-$client = new \GuzzleHttp\Client();
+$response = curl_exec($curl);
+$err = curl_error($curl);
 
-// Define array of request body.
-$request_body = array();
+curl_close($curl);
 
-try {
-    $response = $client->request('POST','https://api.bookingexperts.nl/v3/subscription/webhook_endpoints', array(
-        'headers' => $headers,
-        'json' => $request_body,
-       )
-    );
-    print_r($response->getBody()->getContents());
- }
- catch (\GuzzleHttp\Exception\BadResponseException $e) {
-    // handle exception or api errors.
-    print_r($e->getMessage());
- }
-
- // ...
-
+if ($err) {
+  echo "cURL Error #:" . $err;
+} else {
+  echo $response;
+}
 ```
 
 ```java
-URL obj = new URL("https://api.bookingexperts.nl/v3/subscription/webhook_endpoints");
-HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-con.setRequestMethod("POST");
-int responseCode = con.getResponseCode();
-BufferedReader in = new BufferedReader(
-    new InputStreamReader(con.getInputStream()));
-String inputLine;
-StringBuffer response = new StringBuffer();
-while ((inputLine = in.readLine()) != null) {
-    response.append(inputLine);
-}
-in.close();
-System.out.println(response.toString());
-
+HttpResponse<String> response = Unirest.post("https://api.bookingexperts.nl/v3/webhook_endpoints")
+  .header("content-type", "application/vnd.api+json")
+  .header("accept", "application/vnd.api+json")
+  .header("accept-language", "en,nl")
+  .header("x-api-key", "API_KEY")
+  .body("{\"data\":{\"type\":\"webhook_endpoint\",\"attributes\":{\"target_url\":\"https://myapp.lvh.me:3000/callback\",\"confirm_strategy\":\"wait_for_success\",\"events\":[\"reservation|created\",\"reservation|updated\",\"reservation|deleted\"]}}}")
+  .asString();
 ```
 
 ```go
 package main
 
 import (
-       "bytes"
-       "net/http"
+	"fmt"
+	"strings"
+	"net/http"
+	"io/ioutil"
 )
 
 func main() {
 
-    headers := map[string][]string{
-        "Content-Type": []string{"application/vnd.api+json"},
-        "Accept": []string{"application/vnd.api+json"},
-        "Accept-Language": []string{"en,nl"},
-        "X-API-KEY": []string{"API_KEY"},
-    }
+	url := "https://api.bookingexperts.nl/v3/webhook_endpoints"
 
-    data := bytes.NewBuffer([]byte{jsonReq})
-    req, err := http.NewRequest("POST", "https://api.bookingexperts.nl/v3/subscription/webhook_endpoints", data)
-    req.Header = headers
+	payload := strings.NewReader("{\"data\":{\"type\":\"webhook_endpoint\",\"attributes\":{\"target_url\":\"https://myapp.lvh.me:3000/callback\",\"confirm_strategy\":\"wait_for_success\",\"events\":[\"reservation|created\",\"reservation|updated\",\"reservation|deleted\"]}}}")
 
-    client := &http.Client{}
-    resp, err := client.Do(req)
-    // ...
+	req, _ := http.NewRequest("POST", url, payload)
+
+	req.Header.Add("content-type", "application/vnd.api+json")
+	req.Header.Add("accept", "application/vnd.api+json")
+	req.Header.Add("accept-language", "en,nl")
+	req.Header.Add("x-api-key", "API_KEY")
+
+	res, _ := http.DefaultClient.Do(req)
+
+	defer res.Body.Close()
+	body, _ := ioutil.ReadAll(res.Body)
+
+	fmt.Println(res)
+	fmt.Println(string(body))
+
 }
-
 ```
 
-`POST /v3/subscription/webhook_endpoints`
+`POST /v3/webhook_endpoints`
 
-Create a new webhook endpoint.
+Create a new webhook endpoint. When webhooks are called, the following **JSON** data will be sent using a **POST** request:
 
 ```json
   {
@@ -5241,10 +5226,11 @@ Create a new webhook endpoint.
     # The context ID, if any. Will contain the ID of the administration or organization if applicable.
     "context_id": "id",
     # The record on which the event applies. Conforms to the documented schema.
-    "record": { "data": { "id": "1", "type": "reservation" } }
+    "record": { "data": { "id": "1", "type": "reservation" } },
+    # The subscription ID of the application subscription for which this event has been sent
+    "subscription_id": "id"
   }
 ```
-When webhooks are called, the following **JSON** data will be sent using a **POST** request:
 
 > Body parameter
 
@@ -5269,7 +5255,7 @@ When webhooks are called, the following **JSON** data will be sent using a **POS
 
 |Name|In|Type|Required|Description|
 |---|---|---|---|---|
-|Accept-Language|header|string|false|Supported languages. A comma separated list with one or more of the following locales: nl, en, de, fr, da, cs, es, tr, pt. Default: 'en'.|
+|Accept-Language|header|string|false|Supported languages. A comma separated list with one or more of the following locales: nl, en, de, fr, da, cs, es, tr, pt, it. Default: 'en'.|
 |body|body|object|true|none|
 |» data|body|object|false|none|
 |»» type|body|string|false|Type|
@@ -5307,12 +5293,12 @@ When webhooks are called, the following **JSON** data will be sent using a **POS
 * channel|created
 * channel|deleted
 * channel|updated
+* city|created
+* city|deleted
+* city|updated
 * cost|created
 * cost|deleted
 * cost|updated
-* coupon|created
-* coupon|deleted
-* coupon|updated
 * currency_conversion|created
 * currency_conversion|deleted
 * currency_conversion|updated
@@ -5337,9 +5323,15 @@ When webhooks are called, the following **JSON** data will be sent using a **POS
 * payment_method|created
 * payment_method|deleted
 * payment_method|updated
+* payment|created
+* payment|deleted
+* payment|updated
 * period|created
 * period|deleted
 * period|updated
+* region|created
+* region|deleted
+* region|updated
 * rentable_identity|created
 * rentable_identity|deleted
 * rentable_identity|updated
@@ -5384,8 +5376,8 @@ When webhooks are called, the following **JSON** data will be sent using a **POS
         "reservation|updated",
         "reservation|deleted"
       ],
-      "created_at": "2020-05-20T13:12:31Z",
-      "updated_at": "2020-05-20T13:12:31Z"
+      "created_at": "2020-06-09T07:58:26Z",
+      "updated_at": "2020-06-09T07:58:26Z"
     },
     "links": {
       "self": "string"
@@ -5413,7 +5405,7 @@ Status Code **200**
 |»» attributes|object|false|none|Attributes|
 |»»» target_url|string|false|none|none|
 |»»» confirm_strategy|string|false|none|One of: wait_for_success, fire_and_forget|
-|»»» events|[string]|false|none|One or more of:<br><br>* accommodation_subtype|created<br>* accommodation_subtype|deleted<br>* accommodation_subtype|updated<br>* administration|created<br>* administration|deleted<br>* administration|updated<br>* agenda_period|created<br>* agenda_period|deleted<br>* agenda_period|updated<br>* area_type|created<br>* area_type|deleted<br>* area_type|updated<br>* arrival_checkout_date|created<br>* arrival_checkout_date|deleted<br>* arrival_checkout_date|updated<br>* category_group|created<br>* category_group|deleted<br>* category_group|updated<br>* category|created<br>* category|deleted<br>* category|reindexed<br>* category|updated<br>* channel|created<br>* channel|deleted<br>* channel|updated<br>* cost|created<br>* cost|deleted<br>* cost|updated<br>* coupon|created<br>* coupon|deleted<br>* coupon|updated<br>* currency_conversion|created<br>* currency_conversion|deleted<br>* currency_conversion|updated<br>* discount_action|created<br>* discount_action|deleted<br>* discount_action|updated<br>* extra|created<br>* extra|deleted<br>* extra|updated<br>* invoice|created<br>* invoice|deleted<br>* invoice|updated<br>* organization|created<br>* organization|deleted<br>* organization|updated<br>* package_entry|created<br>* package_entry|deleted<br>* package_entry|updated<br>* package|created<br>* package|deleted<br>* package|updated<br>* payment_method|created<br>* payment_method|deleted<br>* payment_method|updated<br>* period|created<br>* period|deleted<br>* period|updated<br>* rentable_identity|created<br>* rentable_identity|deleted<br>* rentable_identity|updated<br>* rentable|created<br>* rentable|deleted<br>* rentable|updated<br>* reservation|cancelled<br>* reservation|confirmed<br>* reservation|created<br>* reservation|deleted<br>* reservation|updated<br>* review|created<br>* review|deleted<br>* review|updated<br>* room_type|created<br>* room_type|deleted<br>* room_type|updated<br>* room|created<br>* room|deleted<br>* room|updated<br>* subscription|created<br>* subscription|deleted<br>* subscription|updated<br>* terms|created<br>* terms|deleted<br>* terms|updated|
+|»»» events|[string]|false|none|One or more of:<br><br>* accommodation_subtype|created<br>* accommodation_subtype|deleted<br>* accommodation_subtype|updated<br>* administration|created<br>* administration|deleted<br>* administration|updated<br>* agenda_period|created<br>* agenda_period|deleted<br>* agenda_period|updated<br>* area_type|created<br>* area_type|deleted<br>* area_type|updated<br>* arrival_checkout_date|created<br>* arrival_checkout_date|deleted<br>* arrival_checkout_date|updated<br>* category_group|created<br>* category_group|deleted<br>* category_group|updated<br>* category|created<br>* category|deleted<br>* category|reindexed<br>* category|updated<br>* channel|created<br>* channel|deleted<br>* channel|updated<br>* city|created<br>* city|deleted<br>* city|updated<br>* cost|created<br>* cost|deleted<br>* cost|updated<br>* currency_conversion|created<br>* currency_conversion|deleted<br>* currency_conversion|updated<br>* discount_action|created<br>* discount_action|deleted<br>* discount_action|updated<br>* extra|created<br>* extra|deleted<br>* extra|updated<br>* invoice|created<br>* invoice|deleted<br>* invoice|updated<br>* organization|created<br>* organization|deleted<br>* organization|updated<br>* package_entry|created<br>* package_entry|deleted<br>* package_entry|updated<br>* package|created<br>* package|deleted<br>* package|updated<br>* payment_method|created<br>* payment_method|deleted<br>* payment_method|updated<br>* payment|created<br>* payment|deleted<br>* payment|updated<br>* period|created<br>* period|deleted<br>* period|updated<br>* region|created<br>* region|deleted<br>* region|updated<br>* rentable_identity|created<br>* rentable_identity|deleted<br>* rentable_identity|updated<br>* rentable|created<br>* rentable|deleted<br>* rentable|updated<br>* reservation|cancelled<br>* reservation|confirmed<br>* reservation|created<br>* reservation|deleted<br>* reservation|updated<br>* review|created<br>* review|deleted<br>* review|updated<br>* room_type|created<br>* room_type|deleted<br>* room_type|updated<br>* room|created<br>* room|deleted<br>* room|updated<br>* subscription|created<br>* subscription|deleted<br>* subscription|updated<br>* terms|created<br>* terms|deleted<br>* terms|updated|
 |»»» created_at|string(date-time)|false|none|none|
 |»»» updated_at|string(date-time)|false|none|none|
 |»» links|object|false|none|Links|
@@ -5443,154 +5435,152 @@ ApiKeyAuth, OAuth2
 > Code samples
 
 ```shell
-# You can also use wget
-curl -X GET https://api.bookingexperts.nl/v3/subscription/webhook_endpoints/{id} \
-  -H 'Accept: application/vnd.api+json' \
-  -H 'Accept-Language: en,nl' \
-  -H 'X-API-KEY: API_KEY'
-
+curl --request GET \
+  --url https://api.bookingexperts.nl/v3/webhook_endpoints/string \
+  --header 'accept: application/vnd.api+json' \
+  --header 'accept-language: en,nl' \
+  --header 'x-api-key: API_KEY'
 ```
 
 ```http
-GET https://api.bookingexperts.nl/v3/subscription/webhook_endpoints/{id} HTTP/1.1
-Host: api.bookingexperts.nl
+GET /v3/webhook_endpoints/string HTTP/1.1
 Accept: application/vnd.api+json
 Accept-Language: en,nl
+X-Api-Key: API_KEY
+Host: api.bookingexperts.nl
 
 ```
 
 ```javascript
+var data = null;
 
-const headers = {
-  'Accept':'application/vnd.api+json',
-  'Accept-Language':'en,nl',
-  'X-API-KEY':'API_KEY'
-};
+var xhr = new XMLHttpRequest();
+xhr.withCredentials = true;
 
-fetch('https://api.bookingexperts.nl/v3/subscription/webhook_endpoints/{id}',
-{
-  method: 'GET',
-
-  headers: headers
-})
-.then(function(res) {
-    return res.json();
-}).then(function(body) {
-    console.log(body);
+xhr.addEventListener("readystatechange", function () {
+  if (this.readyState === this.DONE) {
+    console.log(this.responseText);
+  }
 });
 
+xhr.open("GET", "https://api.bookingexperts.nl/v3/webhook_endpoints/string");
+xhr.setRequestHeader("accept", "application/vnd.api+json");
+xhr.setRequestHeader("accept-language", "en,nl");
+xhr.setRequestHeader("x-api-key", "API_KEY");
+
+xhr.send(data);
 ```
 
 ```ruby
-require 'rest-client'
-require 'json'
+require 'uri'
+require 'net/http'
+require 'openssl'
 
-headers = {
-  'Accept' => 'application/vnd.api+json',
-  'Accept-Language' => 'en,nl',
-  'X-API-KEY' => 'API_KEY'
-}
+url = URI("https://api.bookingexperts.nl/v3/webhook_endpoints/string")
 
-result = RestClient.get 'https://api.bookingexperts.nl/v3/subscription/webhook_endpoints/{id}',
-  params: {
-  }, headers: headers
+http = Net::HTTP.new(url.host, url.port)
+http.use_ssl = true
+http.verify_mode = OpenSSL::SSL::VERIFY_NONE
 
-p JSON.parse(result)
+request = Net::HTTP::Get.new(url)
+request["accept"] = 'application/vnd.api+json'
+request["accept-language"] = 'en,nl'
+request["x-api-key"] = 'API_KEY'
 
+response = http.request(request)
+puts response.read_body
 ```
 
 ```python
-import requests
+import http.client
+
+conn = http.client.HTTPSConnection("api.bookingexperts.nl")
+
 headers = {
-  'Accept': 'application/vnd.api+json',
-  'Accept-Language': 'en,nl',
-  'X-API-KEY': 'API_KEY'
-}
+    'accept': "application/vnd.api+json",
+    'accept-language': "en,nl",
+    'x-api-key': "API_KEY"
+    }
 
-r = requests.get('https://api.bookingexperts.nl/v3/subscription/webhook_endpoints/{id}', headers = headers)
+conn.request("GET", "/v3/webhook_endpoints/string", headers=headers)
 
-print(r.json())
+res = conn.getresponse()
+data = res.read()
 
+print(data.decode("utf-8"))
 ```
 
 ```php
 <?php
 
-require 'vendor/autoload.php';
+$curl = curl_init();
 
-$headers = array(
-    'Accept' => 'application/vnd.api+json',
-    'Accept-Language' => 'en,nl',
-    'X-API-KEY' => 'API_KEY',
-);
+curl_setopt_array($curl, array(
+  CURLOPT_URL => "https://api.bookingexperts.nl/v3/webhook_endpoints/string",
+  CURLOPT_RETURNTRANSFER => true,
+  CURLOPT_ENCODING => "",
+  CURLOPT_MAXREDIRS => 10,
+  CURLOPT_TIMEOUT => 30,
+  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+  CURLOPT_CUSTOMREQUEST => "GET",
+  CURLOPT_HTTPHEADER => array(
+    "accept: application/vnd.api+json",
+    "accept-language: en,nl",
+    "x-api-key: API_KEY"
+  ),
+));
 
-$client = new \GuzzleHttp\Client();
+$response = curl_exec($curl);
+$err = curl_error($curl);
 
-// Define array of request body.
-$request_body = array();
+curl_close($curl);
 
-try {
-    $response = $client->request('GET','https://api.bookingexperts.nl/v3/subscription/webhook_endpoints/{id}', array(
-        'headers' => $headers,
-        'json' => $request_body,
-       )
-    );
-    print_r($response->getBody()->getContents());
- }
- catch (\GuzzleHttp\Exception\BadResponseException $e) {
-    // handle exception or api errors.
-    print_r($e->getMessage());
- }
-
- // ...
-
+if ($err) {
+  echo "cURL Error #:" . $err;
+} else {
+  echo $response;
+}
 ```
 
 ```java
-URL obj = new URL("https://api.bookingexperts.nl/v3/subscription/webhook_endpoints/{id}");
-HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-con.setRequestMethod("GET");
-int responseCode = con.getResponseCode();
-BufferedReader in = new BufferedReader(
-    new InputStreamReader(con.getInputStream()));
-String inputLine;
-StringBuffer response = new StringBuffer();
-while ((inputLine = in.readLine()) != null) {
-    response.append(inputLine);
-}
-in.close();
-System.out.println(response.toString());
-
+HttpResponse<String> response = Unirest.get("https://api.bookingexperts.nl/v3/webhook_endpoints/string")
+  .header("accept", "application/vnd.api+json")
+  .header("accept-language", "en,nl")
+  .header("x-api-key", "API_KEY")
+  .asString();
 ```
 
 ```go
 package main
 
 import (
-       "bytes"
-       "net/http"
+	"fmt"
+	"net/http"
+	"io/ioutil"
 )
 
 func main() {
 
-    headers := map[string][]string{
-        "Accept": []string{"application/vnd.api+json"},
-        "Accept-Language": []string{"en,nl"},
-        "X-API-KEY": []string{"API_KEY"},
-    }
+	url := "https://api.bookingexperts.nl/v3/webhook_endpoints/string"
 
-    data := bytes.NewBuffer([]byte{jsonReq})
-    req, err := http.NewRequest("GET", "https://api.bookingexperts.nl/v3/subscription/webhook_endpoints/{id}", data)
-    req.Header = headers
+	req, _ := http.NewRequest("GET", url, nil)
 
-    client := &http.Client{}
-    resp, err := client.Do(req)
-    // ...
+	req.Header.Add("accept", "application/vnd.api+json")
+	req.Header.Add("accept-language", "en,nl")
+	req.Header.Add("x-api-key", "API_KEY")
+
+	res, _ := http.DefaultClient.Do(req)
+
+	defer res.Body.Close()
+	body, _ := ioutil.ReadAll(res.Body)
+
+	fmt.Println(res)
+	fmt.Println(string(body))
+
 }
-
 ```
 
-`GET /v3/subscription/webhook_endpoints/{id}`
+`GET /v3/webhook_endpoints/{id}`
 
 Returns the webhook endpoint for the given ID
 
@@ -5605,7 +5595,7 @@ Returns the webhook endpoint for the given ID
 |filter[events]|query|string|false|Filter on events|
 |filter[created_at]|query|string|false|Filter on created_at|
 |filter[updated_at]|query|string|false|Filter on updated_at|
-|Accept-Language|header|string|false|Supported languages. A comma separated list with one or more of the following locales: nl, en, de, fr, da, cs, es, tr, pt. Default: 'en'.|
+|Accept-Language|header|string|false|Supported languages. A comma separated list with one or more of the following locales: nl, en, de, fr, da, cs, es, tr, pt, it. Default: 'en'.|
 
 > Example responses
 
@@ -5624,8 +5614,8 @@ Returns the webhook endpoint for the given ID
         "reservation|updated",
         "reservation|deleted"
       ],
-      "created_at": "2020-05-20T13:12:31Z",
-      "updated_at": "2020-05-20T13:12:31Z"
+      "created_at": "2020-06-09T07:58:26Z",
+      "updated_at": "2020-06-09T07:58:26Z"
     },
     "links": {
       "self": "string"
@@ -5653,7 +5643,7 @@ Status Code **200**
 |»» attributes|object|false|none|Attributes|
 |»»» target_url|string|false|none|none|
 |»»» confirm_strategy|string|false|none|One of: wait_for_success, fire_and_forget|
-|»»» events|[string]|false|none|One or more of:<br><br>* accommodation_subtype|created<br>* accommodation_subtype|deleted<br>* accommodation_subtype|updated<br>* administration|created<br>* administration|deleted<br>* administration|updated<br>* agenda_period|created<br>* agenda_period|deleted<br>* agenda_period|updated<br>* area_type|created<br>* area_type|deleted<br>* area_type|updated<br>* arrival_checkout_date|created<br>* arrival_checkout_date|deleted<br>* arrival_checkout_date|updated<br>* category_group|created<br>* category_group|deleted<br>* category_group|updated<br>* category|created<br>* category|deleted<br>* category|reindexed<br>* category|updated<br>* channel|created<br>* channel|deleted<br>* channel|updated<br>* cost|created<br>* cost|deleted<br>* cost|updated<br>* coupon|created<br>* coupon|deleted<br>* coupon|updated<br>* currency_conversion|created<br>* currency_conversion|deleted<br>* currency_conversion|updated<br>* discount_action|created<br>* discount_action|deleted<br>* discount_action|updated<br>* extra|created<br>* extra|deleted<br>* extra|updated<br>* invoice|created<br>* invoice|deleted<br>* invoice|updated<br>* organization|created<br>* organization|deleted<br>* organization|updated<br>* package_entry|created<br>* package_entry|deleted<br>* package_entry|updated<br>* package|created<br>* package|deleted<br>* package|updated<br>* payment_method|created<br>* payment_method|deleted<br>* payment_method|updated<br>* period|created<br>* period|deleted<br>* period|updated<br>* rentable_identity|created<br>* rentable_identity|deleted<br>* rentable_identity|updated<br>* rentable|created<br>* rentable|deleted<br>* rentable|updated<br>* reservation|cancelled<br>* reservation|confirmed<br>* reservation|created<br>* reservation|deleted<br>* reservation|updated<br>* review|created<br>* review|deleted<br>* review|updated<br>* room_type|created<br>* room_type|deleted<br>* room_type|updated<br>* room|created<br>* room|deleted<br>* room|updated<br>* subscription|created<br>* subscription|deleted<br>* subscription|updated<br>* terms|created<br>* terms|deleted<br>* terms|updated|
+|»»» events|[string]|false|none|One or more of:<br><br>* accommodation_subtype|created<br>* accommodation_subtype|deleted<br>* accommodation_subtype|updated<br>* administration|created<br>* administration|deleted<br>* administration|updated<br>* agenda_period|created<br>* agenda_period|deleted<br>* agenda_period|updated<br>* area_type|created<br>* area_type|deleted<br>* area_type|updated<br>* arrival_checkout_date|created<br>* arrival_checkout_date|deleted<br>* arrival_checkout_date|updated<br>* category_group|created<br>* category_group|deleted<br>* category_group|updated<br>* category|created<br>* category|deleted<br>* category|reindexed<br>* category|updated<br>* channel|created<br>* channel|deleted<br>* channel|updated<br>* city|created<br>* city|deleted<br>* city|updated<br>* cost|created<br>* cost|deleted<br>* cost|updated<br>* currency_conversion|created<br>* currency_conversion|deleted<br>* currency_conversion|updated<br>* discount_action|created<br>* discount_action|deleted<br>* discount_action|updated<br>* extra|created<br>* extra|deleted<br>* extra|updated<br>* invoice|created<br>* invoice|deleted<br>* invoice|updated<br>* organization|created<br>* organization|deleted<br>* organization|updated<br>* package_entry|created<br>* package_entry|deleted<br>* package_entry|updated<br>* package|created<br>* package|deleted<br>* package|updated<br>* payment_method|created<br>* payment_method|deleted<br>* payment_method|updated<br>* payment|created<br>* payment|deleted<br>* payment|updated<br>* period|created<br>* period|deleted<br>* period|updated<br>* region|created<br>* region|deleted<br>* region|updated<br>* rentable_identity|created<br>* rentable_identity|deleted<br>* rentable_identity|updated<br>* rentable|created<br>* rentable|deleted<br>* rentable|updated<br>* reservation|cancelled<br>* reservation|confirmed<br>* reservation|created<br>* reservation|deleted<br>* reservation|updated<br>* review|created<br>* review|deleted<br>* review|updated<br>* room_type|created<br>* room_type|deleted<br>* room_type|updated<br>* room|created<br>* room|deleted<br>* room|updated<br>* subscription|created<br>* subscription|deleted<br>* subscription|updated<br>* terms|created<br>* terms|deleted<br>* terms|updated|
 |»»» created_at|string(date-time)|false|none|none|
 |»»» updated_at|string(date-time)|false|none|none|
 |»» links|object|false|none|Links|
@@ -5683,175 +5673,171 @@ ApiKeyAuth, OAuth2
 > Code samples
 
 ```shell
-# You can also use wget
-curl -X PATCH https://api.bookingexperts.nl/v3/subscription/webhook_endpoints/{id} \
-  -H 'Content-Type: application/vnd.api+json' \
-  -H 'Accept: application/vnd.api+json' \
-  -H 'Accept-Language: en,nl' \
-  -H 'X-API-KEY: API_KEY'
-
+curl --request PATCH \
+  --url https://api.bookingexperts.nl/v3/webhook_endpoints/string \
+  --header 'accept: application/vnd.api+json' \
+  --header 'accept-language: en,nl' \
+  --header 'content-type: application/vnd.api+json' \
+  --header 'x-api-key: API_KEY' \
+  --data '{"data":{"id":"1","type":"webhook_endpoint","attributes":{"target_url":"https://myapp.lvh.me:3000/callback","confirm_strategy":"wait_for_success","events":["reservation|created","reservation|updated","reservation|deleted"]}}}'
 ```
 
 ```http
-PATCH https://api.bookingexperts.nl/v3/subscription/webhook_endpoints/{id} HTTP/1.1
-Host: api.bookingexperts.nl
+PATCH /v3/webhook_endpoints/string HTTP/1.1
 Content-Type: application/vnd.api+json
 Accept: application/vnd.api+json
 Accept-Language: en,nl
+X-Api-Key: API_KEY
+Host: api.bookingexperts.nl
+Content-Length: 225
 
+{"data":{"id":"1","type":"webhook_endpoint","attributes":{"target_url":"https://myapp.lvh.me:3000/callback","confirm_strategy":"wait_for_success","events":["reservation|created","reservation|updated","reservation|deleted"]}}}
 ```
 
 ```javascript
-const inputBody = '{
-  "data": {
-    "id": "1",
-    "type": "webhook_endpoint",
-    "attributes": {
-      "target_url": "https://myapp.lvh.me:3000/callback",
-      "confirm_strategy": "wait_for_success",
-      "events": [
-        "reservation|created",
-        "reservation|updated",
-        "reservation|deleted"
-      ]
-    }
-  }
-}';
-const headers = {
-  'Content-Type':'application/vnd.api+json',
-  'Accept':'application/vnd.api+json',
-  'Accept-Language':'en,nl',
-  'X-API-KEY':'API_KEY'
-};
+var data = "{\"data\":{\"id\":\"1\",\"type\":\"webhook_endpoint\",\"attributes\":{\"target_url\":\"https://myapp.lvh.me:3000/callback\",\"confirm_strategy\":\"wait_for_success\",\"events\":[\"reservation|created\",\"reservation|updated\",\"reservation|deleted\"]}}}";
 
-fetch('https://api.bookingexperts.nl/v3/subscription/webhook_endpoints/{id}',
-{
-  method: 'PATCH',
-  body: inputBody,
-  headers: headers
-})
-.then(function(res) {
-    return res.json();
-}).then(function(body) {
-    console.log(body);
+var xhr = new XMLHttpRequest();
+xhr.withCredentials = true;
+
+xhr.addEventListener("readystatechange", function () {
+  if (this.readyState === this.DONE) {
+    console.log(this.responseText);
+  }
 });
 
+xhr.open("PATCH", "https://api.bookingexperts.nl/v3/webhook_endpoints/string");
+xhr.setRequestHeader("content-type", "application/vnd.api+json");
+xhr.setRequestHeader("accept", "application/vnd.api+json");
+xhr.setRequestHeader("accept-language", "en,nl");
+xhr.setRequestHeader("x-api-key", "API_KEY");
+
+xhr.send(data);
 ```
 
 ```ruby
-require 'rest-client'
-require 'json'
+require 'uri'
+require 'net/http'
+require 'openssl'
 
-headers = {
-  'Content-Type' => 'application/vnd.api+json',
-  'Accept' => 'application/vnd.api+json',
-  'Accept-Language' => 'en,nl',
-  'X-API-KEY' => 'API_KEY'
-}
+url = URI("https://api.bookingexperts.nl/v3/webhook_endpoints/string")
 
-result = RestClient.patch 'https://api.bookingexperts.nl/v3/subscription/webhook_endpoints/{id}',
-  params: {
-  }, headers: headers
+http = Net::HTTP.new(url.host, url.port)
+http.use_ssl = true
+http.verify_mode = OpenSSL::SSL::VERIFY_NONE
 
-p JSON.parse(result)
+request = Net::HTTP::Patch.new(url)
+request["content-type"] = 'application/vnd.api+json'
+request["accept"] = 'application/vnd.api+json'
+request["accept-language"] = 'en,nl'
+request["x-api-key"] = 'API_KEY'
+request.body = "{\"data\":{\"id\":\"1\",\"type\":\"webhook_endpoint\",\"attributes\":{\"target_url\":\"https://myapp.lvh.me:3000/callback\",\"confirm_strategy\":\"wait_for_success\",\"events\":[\"reservation|created\",\"reservation|updated\",\"reservation|deleted\"]}}}"
 
+response = http.request(request)
+puts response.read_body
 ```
 
 ```python
-import requests
+import http.client
+
+conn = http.client.HTTPSConnection("api.bookingexperts.nl")
+
+payload = "{\"data\":{\"id\":\"1\",\"type\":\"webhook_endpoint\",\"attributes\":{\"target_url\":\"https://myapp.lvh.me:3000/callback\",\"confirm_strategy\":\"wait_for_success\",\"events\":[\"reservation|created\",\"reservation|updated\",\"reservation|deleted\"]}}}"
+
 headers = {
-  'Content-Type': 'application/vnd.api+json',
-  'Accept': 'application/vnd.api+json',
-  'Accept-Language': 'en,nl',
-  'X-API-KEY': 'API_KEY'
-}
+    'content-type': "application/vnd.api+json",
+    'accept': "application/vnd.api+json",
+    'accept-language': "en,nl",
+    'x-api-key': "API_KEY"
+    }
 
-r = requests.patch('https://api.bookingexperts.nl/v3/subscription/webhook_endpoints/{id}', headers = headers)
+conn.request("PATCH", "/v3/webhook_endpoints/string", payload, headers)
 
-print(r.json())
+res = conn.getresponse()
+data = res.read()
 
+print(data.decode("utf-8"))
 ```
 
 ```php
 <?php
 
-require 'vendor/autoload.php';
+$curl = curl_init();
 
-$headers = array(
-    'Content-Type' => 'application/vnd.api+json',
-    'Accept' => 'application/vnd.api+json',
-    'Accept-Language' => 'en,nl',
-    'X-API-KEY' => 'API_KEY',
-);
+curl_setopt_array($curl, array(
+  CURLOPT_URL => "https://api.bookingexperts.nl/v3/webhook_endpoints/string",
+  CURLOPT_RETURNTRANSFER => true,
+  CURLOPT_ENCODING => "",
+  CURLOPT_MAXREDIRS => 10,
+  CURLOPT_TIMEOUT => 30,
+  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+  CURLOPT_CUSTOMREQUEST => "PATCH",
+  CURLOPT_POSTFIELDS => "{\"data\":{\"id\":\"1\",\"type\":\"webhook_endpoint\",\"attributes\":{\"target_url\":\"https://myapp.lvh.me:3000/callback\",\"confirm_strategy\":\"wait_for_success\",\"events\":[\"reservation|created\",\"reservation|updated\",\"reservation|deleted\"]}}}",
+  CURLOPT_HTTPHEADER => array(
+    "accept: application/vnd.api+json",
+    "accept-language: en,nl",
+    "content-type: application/vnd.api+json",
+    "x-api-key: API_KEY"
+  ),
+));
 
-$client = new \GuzzleHttp\Client();
+$response = curl_exec($curl);
+$err = curl_error($curl);
 
-// Define array of request body.
-$request_body = array();
+curl_close($curl);
 
-try {
-    $response = $client->request('PATCH','https://api.bookingexperts.nl/v3/subscription/webhook_endpoints/{id}', array(
-        'headers' => $headers,
-        'json' => $request_body,
-       )
-    );
-    print_r($response->getBody()->getContents());
- }
- catch (\GuzzleHttp\Exception\BadResponseException $e) {
-    // handle exception or api errors.
-    print_r($e->getMessage());
- }
-
- // ...
-
+if ($err) {
+  echo "cURL Error #:" . $err;
+} else {
+  echo $response;
+}
 ```
 
 ```java
-URL obj = new URL("https://api.bookingexperts.nl/v3/subscription/webhook_endpoints/{id}");
-HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-con.setRequestMethod("PATCH");
-int responseCode = con.getResponseCode();
-BufferedReader in = new BufferedReader(
-    new InputStreamReader(con.getInputStream()));
-String inputLine;
-StringBuffer response = new StringBuffer();
-while ((inputLine = in.readLine()) != null) {
-    response.append(inputLine);
-}
-in.close();
-System.out.println(response.toString());
-
+HttpResponse<String> response = Unirest.patch("https://api.bookingexperts.nl/v3/webhook_endpoints/string")
+  .header("content-type", "application/vnd.api+json")
+  .header("accept", "application/vnd.api+json")
+  .header("accept-language", "en,nl")
+  .header("x-api-key", "API_KEY")
+  .body("{\"data\":{\"id\":\"1\",\"type\":\"webhook_endpoint\",\"attributes\":{\"target_url\":\"https://myapp.lvh.me:3000/callback\",\"confirm_strategy\":\"wait_for_success\",\"events\":[\"reservation|created\",\"reservation|updated\",\"reservation|deleted\"]}}}")
+  .asString();
 ```
 
 ```go
 package main
 
 import (
-       "bytes"
-       "net/http"
+	"fmt"
+	"strings"
+	"net/http"
+	"io/ioutil"
 )
 
 func main() {
 
-    headers := map[string][]string{
-        "Content-Type": []string{"application/vnd.api+json"},
-        "Accept": []string{"application/vnd.api+json"},
-        "Accept-Language": []string{"en,nl"},
-        "X-API-KEY": []string{"API_KEY"},
-    }
+	url := "https://api.bookingexperts.nl/v3/webhook_endpoints/string"
 
-    data := bytes.NewBuffer([]byte{jsonReq})
-    req, err := http.NewRequest("PATCH", "https://api.bookingexperts.nl/v3/subscription/webhook_endpoints/{id}", data)
-    req.Header = headers
+	payload := strings.NewReader("{\"data\":{\"id\":\"1\",\"type\":\"webhook_endpoint\",\"attributes\":{\"target_url\":\"https://myapp.lvh.me:3000/callback\",\"confirm_strategy\":\"wait_for_success\",\"events\":[\"reservation|created\",\"reservation|updated\",\"reservation|deleted\"]}}}")
 
-    client := &http.Client{}
-    resp, err := client.Do(req)
-    // ...
+	req, _ := http.NewRequest("PATCH", url, payload)
+
+	req.Header.Add("content-type", "application/vnd.api+json")
+	req.Header.Add("accept", "application/vnd.api+json")
+	req.Header.Add("accept-language", "en,nl")
+	req.Header.Add("x-api-key", "API_KEY")
+
+	res, _ := http.DefaultClient.Do(req)
+
+	defer res.Body.Close()
+	body, _ := ioutil.ReadAll(res.Body)
+
+	fmt.Println(res)
+	fmt.Println(string(body))
+
 }
-
 ```
 
-`PATCH /v3/subscription/webhook_endpoints/{id}`
+`PATCH /v3/webhook_endpoints/{id}`
 
 Update a webhook endpoint
 
@@ -5880,7 +5866,7 @@ Update a webhook endpoint
 |Name|In|Type|Required|Description|
 |---|---|---|---|---|
 |id|path|string|true|Resource ID|
-|Accept-Language|header|string|false|Supported languages. A comma separated list with one or more of the following locales: nl, en, de, fr, da, cs, es, tr, pt. Default: 'en'.|
+|Accept-Language|header|string|false|Supported languages. A comma separated list with one or more of the following locales: nl, en, de, fr, da, cs, es, tr, pt, it. Default: 'en'.|
 |body|body|object|true|none|
 |» data|body|object|false|none|
 |»» id|body|string|false|ID|
@@ -5919,12 +5905,12 @@ Update a webhook endpoint
 * channel|created
 * channel|deleted
 * channel|updated
+* city|created
+* city|deleted
+* city|updated
 * cost|created
 * cost|deleted
 * cost|updated
-* coupon|created
-* coupon|deleted
-* coupon|updated
 * currency_conversion|created
 * currency_conversion|deleted
 * currency_conversion|updated
@@ -5949,9 +5935,15 @@ Update a webhook endpoint
 * payment_method|created
 * payment_method|deleted
 * payment_method|updated
+* payment|created
+* payment|deleted
+* payment|updated
 * period|created
 * period|deleted
 * period|updated
+* region|created
+* region|deleted
+* region|updated
 * rentable_identity|created
 * rentable_identity|deleted
 * rentable_identity|updated
@@ -5996,8 +5988,8 @@ Update a webhook endpoint
         "reservation|updated",
         "reservation|deleted"
       ],
-      "created_at": "2020-05-20T13:12:31Z",
-      "updated_at": "2020-05-20T13:12:31Z"
+      "created_at": "2020-06-09T07:58:26Z",
+      "updated_at": "2020-06-09T07:58:26Z"
     },
     "links": {
       "self": "string"
@@ -6025,7 +6017,7 @@ Status Code **200**
 |»» attributes|object|false|none|Attributes|
 |»»» target_url|string|false|none|none|
 |»»» confirm_strategy|string|false|none|One of: wait_for_success, fire_and_forget|
-|»»» events|[string]|false|none|One or more of:<br><br>* accommodation_subtype|created<br>* accommodation_subtype|deleted<br>* accommodation_subtype|updated<br>* administration|created<br>* administration|deleted<br>* administration|updated<br>* agenda_period|created<br>* agenda_period|deleted<br>* agenda_period|updated<br>* area_type|created<br>* area_type|deleted<br>* area_type|updated<br>* arrival_checkout_date|created<br>* arrival_checkout_date|deleted<br>* arrival_checkout_date|updated<br>* category_group|created<br>* category_group|deleted<br>* category_group|updated<br>* category|created<br>* category|deleted<br>* category|reindexed<br>* category|updated<br>* channel|created<br>* channel|deleted<br>* channel|updated<br>* cost|created<br>* cost|deleted<br>* cost|updated<br>* coupon|created<br>* coupon|deleted<br>* coupon|updated<br>* currency_conversion|created<br>* currency_conversion|deleted<br>* currency_conversion|updated<br>* discount_action|created<br>* discount_action|deleted<br>* discount_action|updated<br>* extra|created<br>* extra|deleted<br>* extra|updated<br>* invoice|created<br>* invoice|deleted<br>* invoice|updated<br>* organization|created<br>* organization|deleted<br>* organization|updated<br>* package_entry|created<br>* package_entry|deleted<br>* package_entry|updated<br>* package|created<br>* package|deleted<br>* package|updated<br>* payment_method|created<br>* payment_method|deleted<br>* payment_method|updated<br>* period|created<br>* period|deleted<br>* period|updated<br>* rentable_identity|created<br>* rentable_identity|deleted<br>* rentable_identity|updated<br>* rentable|created<br>* rentable|deleted<br>* rentable|updated<br>* reservation|cancelled<br>* reservation|confirmed<br>* reservation|created<br>* reservation|deleted<br>* reservation|updated<br>* review|created<br>* review|deleted<br>* review|updated<br>* room_type|created<br>* room_type|deleted<br>* room_type|updated<br>* room|created<br>* room|deleted<br>* room|updated<br>* subscription|created<br>* subscription|deleted<br>* subscription|updated<br>* terms|created<br>* terms|deleted<br>* terms|updated|
+|»»» events|[string]|false|none|One or more of:<br><br>* accommodation_subtype|created<br>* accommodation_subtype|deleted<br>* accommodation_subtype|updated<br>* administration|created<br>* administration|deleted<br>* administration|updated<br>* agenda_period|created<br>* agenda_period|deleted<br>* agenda_period|updated<br>* area_type|created<br>* area_type|deleted<br>* area_type|updated<br>* arrival_checkout_date|created<br>* arrival_checkout_date|deleted<br>* arrival_checkout_date|updated<br>* category_group|created<br>* category_group|deleted<br>* category_group|updated<br>* category|created<br>* category|deleted<br>* category|reindexed<br>* category|updated<br>* channel|created<br>* channel|deleted<br>* channel|updated<br>* city|created<br>* city|deleted<br>* city|updated<br>* cost|created<br>* cost|deleted<br>* cost|updated<br>* currency_conversion|created<br>* currency_conversion|deleted<br>* currency_conversion|updated<br>* discount_action|created<br>* discount_action|deleted<br>* discount_action|updated<br>* extra|created<br>* extra|deleted<br>* extra|updated<br>* invoice|created<br>* invoice|deleted<br>* invoice|updated<br>* organization|created<br>* organization|deleted<br>* organization|updated<br>* package_entry|created<br>* package_entry|deleted<br>* package_entry|updated<br>* package|created<br>* package|deleted<br>* package|updated<br>* payment_method|created<br>* payment_method|deleted<br>* payment_method|updated<br>* payment|created<br>* payment|deleted<br>* payment|updated<br>* period|created<br>* period|deleted<br>* period|updated<br>* region|created<br>* region|deleted<br>* region|updated<br>* rentable_identity|created<br>* rentable_identity|deleted<br>* rentable_identity|updated<br>* rentable|created<br>* rentable|deleted<br>* rentable|updated<br>* reservation|cancelled<br>* reservation|confirmed<br>* reservation|created<br>* reservation|deleted<br>* reservation|updated<br>* review|created<br>* review|deleted<br>* review|updated<br>* room_type|created<br>* room_type|deleted<br>* room_type|updated<br>* room|created<br>* room|deleted<br>* room|updated<br>* subscription|created<br>* subscription|deleted<br>* subscription|updated<br>* terms|created<br>* terms|deleted<br>* terms|updated|
 |»»» created_at|string(date-time)|false|none|none|
 |»»» updated_at|string(date-time)|false|none|none|
 |»» links|object|false|none|Links|
@@ -6055,154 +6047,152 @@ ApiKeyAuth, OAuth2
 > Code samples
 
 ```shell
-# You can also use wget
-curl -X DELETE https://api.bookingexperts.nl/v3/subscription/webhook_endpoints/{id} \
-  -H 'Accept: application/vnd.api+json' \
-  -H 'Accept-Language: en,nl' \
-  -H 'X-API-KEY: API_KEY'
-
+curl --request DELETE \
+  --url https://api.bookingexperts.nl/v3/webhook_endpoints/string \
+  --header 'accept: application/vnd.api+json' \
+  --header 'accept-language: en,nl' \
+  --header 'x-api-key: API_KEY'
 ```
 
 ```http
-DELETE https://api.bookingexperts.nl/v3/subscription/webhook_endpoints/{id} HTTP/1.1
-Host: api.bookingexperts.nl
+DELETE /v3/webhook_endpoints/string HTTP/1.1
 Accept: application/vnd.api+json
 Accept-Language: en,nl
+X-Api-Key: API_KEY
+Host: api.bookingexperts.nl
 
 ```
 
 ```javascript
+var data = null;
 
-const headers = {
-  'Accept':'application/vnd.api+json',
-  'Accept-Language':'en,nl',
-  'X-API-KEY':'API_KEY'
-};
+var xhr = new XMLHttpRequest();
+xhr.withCredentials = true;
 
-fetch('https://api.bookingexperts.nl/v3/subscription/webhook_endpoints/{id}',
-{
-  method: 'DELETE',
-
-  headers: headers
-})
-.then(function(res) {
-    return res.json();
-}).then(function(body) {
-    console.log(body);
+xhr.addEventListener("readystatechange", function () {
+  if (this.readyState === this.DONE) {
+    console.log(this.responseText);
+  }
 });
 
+xhr.open("DELETE", "https://api.bookingexperts.nl/v3/webhook_endpoints/string");
+xhr.setRequestHeader("accept", "application/vnd.api+json");
+xhr.setRequestHeader("accept-language", "en,nl");
+xhr.setRequestHeader("x-api-key", "API_KEY");
+
+xhr.send(data);
 ```
 
 ```ruby
-require 'rest-client'
-require 'json'
+require 'uri'
+require 'net/http'
+require 'openssl'
 
-headers = {
-  'Accept' => 'application/vnd.api+json',
-  'Accept-Language' => 'en,nl',
-  'X-API-KEY' => 'API_KEY'
-}
+url = URI("https://api.bookingexperts.nl/v3/webhook_endpoints/string")
 
-result = RestClient.delete 'https://api.bookingexperts.nl/v3/subscription/webhook_endpoints/{id}',
-  params: {
-  }, headers: headers
+http = Net::HTTP.new(url.host, url.port)
+http.use_ssl = true
+http.verify_mode = OpenSSL::SSL::VERIFY_NONE
 
-p JSON.parse(result)
+request = Net::HTTP::Delete.new(url)
+request["accept"] = 'application/vnd.api+json'
+request["accept-language"] = 'en,nl'
+request["x-api-key"] = 'API_KEY'
 
+response = http.request(request)
+puts response.read_body
 ```
 
 ```python
-import requests
+import http.client
+
+conn = http.client.HTTPSConnection("api.bookingexperts.nl")
+
 headers = {
-  'Accept': 'application/vnd.api+json',
-  'Accept-Language': 'en,nl',
-  'X-API-KEY': 'API_KEY'
-}
+    'accept': "application/vnd.api+json",
+    'accept-language': "en,nl",
+    'x-api-key': "API_KEY"
+    }
 
-r = requests.delete('https://api.bookingexperts.nl/v3/subscription/webhook_endpoints/{id}', headers = headers)
+conn.request("DELETE", "/v3/webhook_endpoints/string", headers=headers)
 
-print(r.json())
+res = conn.getresponse()
+data = res.read()
 
+print(data.decode("utf-8"))
 ```
 
 ```php
 <?php
 
-require 'vendor/autoload.php';
+$curl = curl_init();
 
-$headers = array(
-    'Accept' => 'application/vnd.api+json',
-    'Accept-Language' => 'en,nl',
-    'X-API-KEY' => 'API_KEY',
-);
+curl_setopt_array($curl, array(
+  CURLOPT_URL => "https://api.bookingexperts.nl/v3/webhook_endpoints/string",
+  CURLOPT_RETURNTRANSFER => true,
+  CURLOPT_ENCODING => "",
+  CURLOPT_MAXREDIRS => 10,
+  CURLOPT_TIMEOUT => 30,
+  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+  CURLOPT_CUSTOMREQUEST => "DELETE",
+  CURLOPT_HTTPHEADER => array(
+    "accept: application/vnd.api+json",
+    "accept-language: en,nl",
+    "x-api-key: API_KEY"
+  ),
+));
 
-$client = new \GuzzleHttp\Client();
+$response = curl_exec($curl);
+$err = curl_error($curl);
 
-// Define array of request body.
-$request_body = array();
+curl_close($curl);
 
-try {
-    $response = $client->request('DELETE','https://api.bookingexperts.nl/v3/subscription/webhook_endpoints/{id}', array(
-        'headers' => $headers,
-        'json' => $request_body,
-       )
-    );
-    print_r($response->getBody()->getContents());
- }
- catch (\GuzzleHttp\Exception\BadResponseException $e) {
-    // handle exception or api errors.
-    print_r($e->getMessage());
- }
-
- // ...
-
+if ($err) {
+  echo "cURL Error #:" . $err;
+} else {
+  echo $response;
+}
 ```
 
 ```java
-URL obj = new URL("https://api.bookingexperts.nl/v3/subscription/webhook_endpoints/{id}");
-HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-con.setRequestMethod("DELETE");
-int responseCode = con.getResponseCode();
-BufferedReader in = new BufferedReader(
-    new InputStreamReader(con.getInputStream()));
-String inputLine;
-StringBuffer response = new StringBuffer();
-while ((inputLine = in.readLine()) != null) {
-    response.append(inputLine);
-}
-in.close();
-System.out.println(response.toString());
-
+HttpResponse<String> response = Unirest.delete("https://api.bookingexperts.nl/v3/webhook_endpoints/string")
+  .header("accept", "application/vnd.api+json")
+  .header("accept-language", "en,nl")
+  .header("x-api-key", "API_KEY")
+  .asString();
 ```
 
 ```go
 package main
 
 import (
-       "bytes"
-       "net/http"
+	"fmt"
+	"net/http"
+	"io/ioutil"
 )
 
 func main() {
 
-    headers := map[string][]string{
-        "Accept": []string{"application/vnd.api+json"},
-        "Accept-Language": []string{"en,nl"},
-        "X-API-KEY": []string{"API_KEY"},
-    }
+	url := "https://api.bookingexperts.nl/v3/webhook_endpoints/string"
 
-    data := bytes.NewBuffer([]byte{jsonReq})
-    req, err := http.NewRequest("DELETE", "https://api.bookingexperts.nl/v3/subscription/webhook_endpoints/{id}", data)
-    req.Header = headers
+	req, _ := http.NewRequest("DELETE", url, nil)
 
-    client := &http.Client{}
-    resp, err := client.Do(req)
-    // ...
+	req.Header.Add("accept", "application/vnd.api+json")
+	req.Header.Add("accept-language", "en,nl")
+	req.Header.Add("x-api-key", "API_KEY")
+
+	res, _ := http.DefaultClient.Do(req)
+
+	defer res.Body.Close()
+	body, _ := ioutil.ReadAll(res.Body)
+
+	fmt.Println(res)
+	fmt.Println(string(body))
+
 }
-
 ```
 
-`DELETE /v3/subscription/webhook_endpoints/{id}`
+`DELETE /v3/webhook_endpoints/{id}`
 
 Delete a webhook endpoint
 
@@ -6211,7 +6201,7 @@ Delete a webhook endpoint
 |Name|In|Type|Required|Description|
 |---|---|---|---|---|
 |id|path|string|true|Resource ID|
-|Accept-Language|header|string|false|Supported languages. A comma separated list with one or more of the following locales: nl, en, de, fr, da, cs, es, tr, pt. Default: 'en'.|
+|Accept-Language|header|string|false|Supported languages. A comma separated list with one or more of the following locales: nl, en, de, fr, da, cs, es, tr, pt, it. Default: 'en'.|
 
 > Example responses
 
@@ -6305,6 +6295,7 @@ attributes:
     es: string
     tr: string
     pt: string
+    it: string
   surroundings_description:
     nl: string
     en: string
@@ -6315,6 +6306,7 @@ attributes:
     es: string
     tr: string
     pt: string
+    it: string
   available_locales:
     - string
   utc_offset: string
@@ -6343,6 +6335,7 @@ links:
 |»» es|string|false|none|none|
 |»» tr|string|false|none|none|
 |»» pt|string|false|none|none|
+|»» it|string|false|none|none|
 |» surroundings_description|object|false|none|A description of the surroundings|
 |»» nl|string|false|none|none|
 |»» en|string|false|none|none|
@@ -6353,6 +6346,7 @@ links:
 |»» es|string|false|none|none|
 |»» tr|string|false|none|none|
 |»» pt|string|false|none|none|
+|»» it|string|false|none|none|
 |» available_locales|[string]|false|none|Enabled locales|
 |» utc_offset|string|false|none|The UTC offset of the administration, for example: +01:00|
 |links|object|false|none|Links|
@@ -6438,8 +6432,8 @@ attributes:
   http_method: post
   target_url: https://myapp.lvh.me:3000/gate_cards
   enabled_script: reservation.dig(:data, :attributes, :state) == 'confirmed'
-  created_at: 2020-05-20T13:12:31Z
-  updated_at: 2020-05-20T13:12:31Z
+  created_at: 2020-06-09T07:58:26Z
+  updated_at: 2020-06-09T07:58:26Z
 links:
   self: string
 
@@ -6463,6 +6457,7 @@ links:
 |»» es|string|false|none|none|
 |»» tr|string|false|none|none|
 |»» pt|string|false|none|none|
+|»» it|string|false|none|none|
 |» description|object|false|none|none|
 |»» nl|string|false|none|none|
 |»» en|string|false|none|none|
@@ -6473,6 +6468,7 @@ links:
 |»» es|string|false|none|none|
 |»» tr|string|false|none|none|
 |»» pt|string|false|none|none|
+|»» it|string|false|none|none|
 |» context_model|string|false|none|One of: invoice, reservation, subscription|
 |» http_method|string|false|none|One of: get, post, put, patch, delete|
 |» target_url|string|false|none|This URL will be called by us using the `http_method` specified|
@@ -6725,6 +6721,7 @@ attributes:
     es: string
     tr: string
     pt: string
+    it: string
   description:
     nl: string
     en: string
@@ -6735,6 +6732,7 @@ attributes:
     es: string
     tr: string
     pt: string
+    it: string
   invoiced_as: string
   cost_type: string
   if_stay_overlaps: string
@@ -6758,6 +6756,7 @@ attributes:
 |»» es|string|false|none|none|
 |»» tr|string|false|none|none|
 |»» pt|string|false|none|none|
+|»» it|string|false|none|none|
 |» description|object|false|none|none|
 |»» nl|string|false|none|none|
 |»» en|string|false|none|none|
@@ -6768,6 +6767,7 @@ attributes:
 |»» es|string|false|none|none|
 |»» tr|string|false|none|none|
 |»» pt|string|false|none|none|
+|»» it|string|false|none|none|
 |» invoiced_as|string|false|none|none|
 |» cost_type|string|false|none|none|
 |» if_stay_overlaps|string|false|none|none|
@@ -6853,6 +6853,7 @@ attributes:
     es: string
     tr: string
     pt: string
+    it: string
   description:
     nl: string
     en: string
@@ -6863,6 +6864,7 @@ attributes:
     es: string
     tr: string
     pt: string
+    it: string
   memo_description:
     nl: string
     en: string
@@ -6873,6 +6875,7 @@ attributes:
     es: string
     tr: string
     pt: string
+    it: string
   invoiced_as: string
   selectable: string
   confirm_by_guest: string
@@ -6900,6 +6903,7 @@ attributes:
 |»» es|string|false|none|none|
 |»» tr|string|false|none|none|
 |»» pt|string|false|none|none|
+|»» it|string|false|none|none|
 |» description|object|false|none|none|
 |»» nl|string|false|none|none|
 |»» en|string|false|none|none|
@@ -6910,6 +6914,7 @@ attributes:
 |»» es|string|false|none|none|
 |»» tr|string|false|none|none|
 |»» pt|string|false|none|none|
+|»» it|string|false|none|none|
 |» memo_description|object|false|none|none|
 |»» nl|string|false|none|none|
 |»» en|string|false|none|none|
@@ -6920,6 +6925,7 @@ attributes:
 |»» es|string|false|none|none|
 |»» tr|string|false|none|none|
 |»» pt|string|false|none|none|
+|»» it|string|false|none|none|
 |» invoiced_as|string|false|none|none|
 |» selectable|string|false|none|none|
 |» confirm_by_guest|string|false|none|none|
@@ -7169,7 +7175,7 @@ type: payment_method
 id: "1"
 type: payment
 attributes:
-  paid_at: 2020-05-20
+  paid_at: 2020-06-09
   foreign_price: 0
   memo: string
 relationships:
@@ -7297,8 +7303,8 @@ attributes:
   end_date: string
   state: string
   rentable: string
-  created_at: 2020-05-20T13:12:31Z
-  updated_at: 2020-05-20T13:12:31Z
+  created_at: 2020-06-09T07:58:26Z
+  updated_at: 2020-06-09T07:58:26Z
 links:
   self: string
 relationships:
@@ -7421,8 +7427,8 @@ type: subscription
 attributes:
   authorized: string
   user_locale: string
-  created_at: 2020-05-20T13:12:31Z
-  updated_at: 2020-05-20T13:12:31Z
+  created_at: 2020-06-09T07:58:26Z
+  updated_at: 2020-06-09T07:58:26Z
 links:
   self: string
   url: string
@@ -7533,8 +7539,8 @@ attributes:
     - reservation|created
     - reservation|updated
     - reservation|deleted
-  created_at: 2020-05-20T13:12:31Z
-  updated_at: 2020-05-20T13:12:31Z
+  created_at: 2020-06-09T07:58:26Z
+  updated_at: 2020-06-09T07:58:26Z
 links:
   self: string
 
@@ -7549,7 +7555,7 @@ links:
 |attributes|object|false|none|Attributes|
 |» target_url|string|false|none|none|
 |» confirm_strategy|string|false|none|One of: wait_for_success, fire_and_forget|
-|» events|[string]|false|none|One or more of:<br><br>* accommodation_subtype|created<br>* accommodation_subtype|deleted<br>* accommodation_subtype|updated<br>* administration|created<br>* administration|deleted<br>* administration|updated<br>* agenda_period|created<br>* agenda_period|deleted<br>* agenda_period|updated<br>* area_type|created<br>* area_type|deleted<br>* area_type|updated<br>* arrival_checkout_date|created<br>* arrival_checkout_date|deleted<br>* arrival_checkout_date|updated<br>* category_group|created<br>* category_group|deleted<br>* category_group|updated<br>* category|created<br>* category|deleted<br>* category|reindexed<br>* category|updated<br>* channel|created<br>* channel|deleted<br>* channel|updated<br>* cost|created<br>* cost|deleted<br>* cost|updated<br>* coupon|created<br>* coupon|deleted<br>* coupon|updated<br>* currency_conversion|created<br>* currency_conversion|deleted<br>* currency_conversion|updated<br>* discount_action|created<br>* discount_action|deleted<br>* discount_action|updated<br>* extra|created<br>* extra|deleted<br>* extra|updated<br>* invoice|created<br>* invoice|deleted<br>* invoice|updated<br>* organization|created<br>* organization|deleted<br>* organization|updated<br>* package_entry|created<br>* package_entry|deleted<br>* package_entry|updated<br>* package|created<br>* package|deleted<br>* package|updated<br>* payment_method|created<br>* payment_method|deleted<br>* payment_method|updated<br>* period|created<br>* period|deleted<br>* period|updated<br>* rentable_identity|created<br>* rentable_identity|deleted<br>* rentable_identity|updated<br>* rentable|created<br>* rentable|deleted<br>* rentable|updated<br>* reservation|cancelled<br>* reservation|confirmed<br>* reservation|created<br>* reservation|deleted<br>* reservation|updated<br>* review|created<br>* review|deleted<br>* review|updated<br>* room_type|created<br>* room_type|deleted<br>* room_type|updated<br>* room|created<br>* room|deleted<br>* room|updated<br>* subscription|created<br>* subscription|deleted<br>* subscription|updated<br>* terms|created<br>* terms|deleted<br>* terms|updated|
+|» events|[string]|false|none|One or more of:<br><br>* accommodation_subtype|created<br>* accommodation_subtype|deleted<br>* accommodation_subtype|updated<br>* administration|created<br>* administration|deleted<br>* administration|updated<br>* agenda_period|created<br>* agenda_period|deleted<br>* agenda_period|updated<br>* area_type|created<br>* area_type|deleted<br>* area_type|updated<br>* arrival_checkout_date|created<br>* arrival_checkout_date|deleted<br>* arrival_checkout_date|updated<br>* category_group|created<br>* category_group|deleted<br>* category_group|updated<br>* category|created<br>* category|deleted<br>* category|reindexed<br>* category|updated<br>* channel|created<br>* channel|deleted<br>* channel|updated<br>* city|created<br>* city|deleted<br>* city|updated<br>* cost|created<br>* cost|deleted<br>* cost|updated<br>* currency_conversion|created<br>* currency_conversion|deleted<br>* currency_conversion|updated<br>* discount_action|created<br>* discount_action|deleted<br>* discount_action|updated<br>* extra|created<br>* extra|deleted<br>* extra|updated<br>* invoice|created<br>* invoice|deleted<br>* invoice|updated<br>* organization|created<br>* organization|deleted<br>* organization|updated<br>* package_entry|created<br>* package_entry|deleted<br>* package_entry|updated<br>* package|created<br>* package|deleted<br>* package|updated<br>* payment_method|created<br>* payment_method|deleted<br>* payment_method|updated<br>* payment|created<br>* payment|deleted<br>* payment|updated<br>* period|created<br>* period|deleted<br>* period|updated<br>* region|created<br>* region|deleted<br>* region|updated<br>* rentable_identity|created<br>* rentable_identity|deleted<br>* rentable_identity|updated<br>* rentable|created<br>* rentable|deleted<br>* rentable|updated<br>* reservation|cancelled<br>* reservation|confirmed<br>* reservation|created<br>* reservation|deleted<br>* reservation|updated<br>* review|created<br>* review|deleted<br>* review|updated<br>* room_type|created<br>* room_type|deleted<br>* room_type|updated<br>* room|created<br>* room|deleted<br>* room|updated<br>* subscription|created<br>* subscription|deleted<br>* subscription|updated<br>* terms|created<br>* terms|deleted<br>* terms|updated|
 |» created_at|string(date-time)|false|none|none|
 |» updated_at|string(date-time)|false|none|none|
 |links|object|false|none|Links|
